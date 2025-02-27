@@ -1,0 +1,667 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Addresses - Mr.Foody & Ms.Foody</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Header styles */
+        header {
+            width: 100%;
+            background: #fc8019;
+            height: 70px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 0;
+        }
+        
+        .header-content {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+            max-width: 100%;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            min-width: 50px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .site-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        
+        .site-title h2 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            min-width: 50px;
+            justify-content: flex-end;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .profile-icon i {
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+
+        .profile-icon.active .profile-dropdown,
+        .profile-icon:hover .profile-dropdown {
+            display: block;
+        }
+
+        .profile-menu {
+            list-style: none;
+            padding: 8px 0;
+            margin: 0;
+            width: 250px;
+        }
+
+        .profile-menu li {
+            padding: 0;
+        }
+
+        .profile-menu a {
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .profile-menu a:hover {
+            background: #f8f8f8;
+        }
+
+        .profile-menu i {
+            width: 20px;
+            color: #666;
+        }
+
+        .profile-menu .divider {
+            height: 1px;
+            background: #eee;
+            margin: 8px 0;
+        }
+
+        .profile-menu li:last-child a {
+            color: #fc8019;
+        }
+
+        .profile-menu li:last-child a:hover {
+            background: #fff0e6;
+        }
+
+        /* Ensure content is below fixed header */
+        body {
+            padding-top: 70px;
+            min-height: 100vh;
+        }
+
+        /* Address specific styles */
+        .addresses-container {
+            max-width: 1200px;
+            margin-top: 30px;
+            padding: 0 16px;
+        }
+
+        .addresses-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .addresses-header h1 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .addresses-header h1 i {
+            color: #fc8019;
+        }
+
+        .add-address-btn {
+            padding: 12px 24px;
+            background: #fc8019;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-address-btn:hover {
+            background: #e67312;
+        }
+
+        .addresses-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .address-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .address-actions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn, .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .edit-btn { color: #666; }
+        .delete-btn { color: #ff4444; }
+
+        /* Address Form Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1001;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            width: 95%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 30px;
+            border-radius: 8px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .address-form {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .form-actions button {
+            padding: 12px 24px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .save-btn {
+            background: #fc8019;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        /* Map container styles */
+        .map-container {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .selected-location {
+            background: #f8f8f8;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 14px;
+            max-height: 80px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-height: 800px) {
+            .map-container {
+                height: 300px;
+            }
+
+            .modal-content {
+                margin: 10px auto;
+                padding: 20px;
+            }
+        }
+
+        .instruction {
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        textarea#address {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+    </style>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body class="addresses-page">
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <a href="{% url 'joo:home_page' %}">
+                    <img src="{% static 'img/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo" 
+                         style="width: 50px; height: 50px; border-radius: 50%; background: white; filter: none; object-fit: contain;">
+                </a>
+            </div>
+            <div class="site-title">
+                <h2>Mr.Foody & Ms.Foody</h2>
+            </div>
+            <div class="header-right">
+                <div class="profile-icon">
+                    <i class="fas fa-user"></i>
+                    <div class="profile-dropdown">
+                        <ul class="profile-menu">
+                            <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
+                            <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
+                            <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
+                            <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                            <li class="divider"></li>
+                            <li><a href="{% url 'joo:logout' %}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="addresses-container">
+            <div class="addresses-header">
+                <h1><i class="fas fa-map-marker-alt"></i>Saved Addresses</h1>
+                <button class="add-address-btn" onclick="openAddressModal()">
+                    <i class="fas fa-plus"></i> Add New Address
+                </button>
+            </div>
+
+            <div class="addresses-grid">
+                {% for address in addresses %}
+                <div class="address-card">
+                    <div class="address-actions">
+                        <button class="edit-btn" onclick="editAddress('{{ address.id }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn" onclick="deleteAddress('{{ address.id }}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <h3>Address {{ forloop.counter }}</h3>
+                    <p>{{ address.address }}</p>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <p>No addresses added yet</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Address Modal -->
+    <div id="addressModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeAddressModal()">&times;</span>
+            <h2 id="modalTitle">Add New Address</h2>
+            <form id="addressForm" class="address-form" onsubmit="handleAddressSubmit(event)">
+                <input type="hidden" id="addressId" name="addressId">
+                
+                <p class="instruction">Click on the map to select your location</p>
+                <!-- Map container -->
+                <div id="map" class="map-container"></div>
+
+                <!-- Selected location display -->
+                <div class="selected-location" id="selectedLocation">
+                    No location selected
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address Details</label>
+                    <textarea id="address" name="address" rows="3" required></textarea>
+                    <input type="hidden" id="latitude" name="latitude">
+                    <input type="hidden" id="longitude" name="longitude">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeAddressModal()">Cancel</button>
+                    <button type="submit" class="save-btn">Save Address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    let map;
+    let marker;
+
+    function initMap() {
+        // Default center (Chennai coordinates)
+        const defaultCenter = [13.0827, 80.2707];
+
+        // Initialize map
+        map = L.map('map').setView(defaultCenter, 13);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add click listener to map
+        map.on('click', function(e) {
+            updateMarkerAndAddress(e.latlng);
+        });
+    }
+
+    function updateMarkerAndAddress(latlng) {
+        // Update marker
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        
+        marker = L.marker(latlng, { draggable: true }).addTo(map);
+        
+        // Add drag listener
+        marker.on('dragend', function() {
+            updateSelectedLocation(marker.getLatLng());
+        });
+
+        updateSelectedLocation(latlng);
+    }
+
+    function updateSelectedLocation(latlng) {
+        // Use fetch to get address from OpenStreetMap Nominatim
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`)
+            .then(response => response.json())
+            .then(data => {
+                const address = data.display_name;
+                document.getElementById('selectedLocation').textContent = address;
+                document.getElementById('address').value = address;
+                document.getElementById('latitude').value = latlng.lat;
+                document.getElementById('longitude').value = latlng.lng;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('selectedLocation').textContent = `Selected coordinates: ${latlng.lat}, ${latlng.lng}`;
+                document.getElementById('address').value = `Location at ${latlng.lat}, ${latlng.lng}`;
+                document.getElementById('latitude').value = latlng.lat;
+                document.getElementById('longitude').value = latlng.lng;
+            });
+    }
+
+    function openAddressModal(addressData = null) {
+        const modal = document.getElementById('addressModal');
+        const form = document.getElementById('addressForm');
+        const title = document.getElementById('modalTitle');
+        
+        if (addressData) {
+            title.textContent = 'Edit Address';
+            form.addressId.value = addressData.id;
+            form.address.value = addressData.address;
+        } else {
+            title.textContent = 'Add New Address';
+            form.reset();
+            form.addressId.value = '';
+        }
+        
+        modal.style.display = 'block';
+        
+        // Initialize map after modal is displayed
+        setTimeout(() => {
+            initMap();
+            
+            // If editing and coordinates exist, center map there
+            if (addressData && addressData.coordinates) {
+                const latlng = L.latLng(addressData.coordinates.lat, addressData.coordinates.lng);
+                map.setView(latlng, 17);
+                updateMarkerAndAddress(latlng);
+            }
+        }, 100);
+    }
+
+    function closeAddressModal() {
+        const modal = document.getElementById('addressModal');
+        modal.style.display = 'none';
+        if (marker) map.removeLayer(marker);
+    }
+
+    // Update handleAddressSubmit to include coordinates
+    async function handleAddressSubmit(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        try {
+            const response = await fetch('{% url "joo:update_address" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+            
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error updating address');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error updating address');
+        }
+    }
+
+    // Delete address
+    async function deleteAddress(addressId) {
+        if (confirm('Are you sure you want to delete this address?')) {
+            try {
+                const response = await fetch(`{% url "joo:delete_address" %}?id=${addressId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Error deleting address');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error deleting address');
+            }
+        }
+    }
+
+    // Edit address
+    function editAddress(addressId) {
+        fetch(`{% url "joo:get_address" %}?id=${addressId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Parse coordinates from address string if they exist
+                const match = data.address.match(/\[([-\d.]+),\s*([-\d.]+)\]$/);
+                if (match) {
+                    const lat = parseFloat(match[1]);
+                    const lng = parseFloat(match[2]);
+                    data.coordinates = { lat, lng };
+                    data.address = data.address.replace(/\s*\[[-\d.,\s]+\]$/, '');
+                }
+                openAddressModal(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error fetching address data');
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileIcon = document.querySelector('.profile-icon');
+        const dropdown = document.querySelector('.profile-dropdown');
+
+        // Toggle active class on profile icon click
+        profileIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
+        });
+
+        // Prevent dropdown from closing when clicking inside it
+        dropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Close dropdown only when clicking outside profile icon and dropdown
+        document.addEventListener('click', function(e) {
+            if (!profileIcon.contains(e.target)) {
+                profileIcon.classList.remove('active');
+            }
+        });
+
+        // Keep dropdown open when hovering from icon to dropdown
+        dropdown.addEventListener('mouseover', function() {
+            profileIcon.classList.add('active');
+        });
+
+        // Keep dropdown open when moving cursor between icon and dropdown
+        profileIcon.addEventListener('mouseover', function() {
+            if (this.contains(document.activeElement)) {
+                this.classList.add('active');
+            }
+        });
+    });
+    </script>
+</body>
+
+</html>

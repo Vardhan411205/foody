@@ -1,0 +1,242 @@
+{% load static %}
+{% load venue_filters %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr.Foody & Ms.Foody - BuzzFest</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/buzzfest.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="inner-page buzzfest-page">
+    <!-- Header -->
+    <header>
+        <!-- Left corner logo -->
+        <div class="logo">
+            <img src="{% static 'img/logocopy.png' %}" alt="Logo" style="width: 50px; height: 50px;">
+        </div>
+        
+        <!-- Centered search bar -->
+        <div class="header-content">
+            <div class="search-picker">
+                <input type="text" id="venue-search" placeholder="Search for venues, events, or locations...">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Right corner profile -->
+        <div class="profile-icon">
+            <i class="fas fa-user" style="color: black;"></i>
+            <div class="profile-dropdown">
+                <ul class="profile-menu">
+                    <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
+                    <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
+                    <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
+                    <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{% url 'joo:logout' %}" class="logout"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Add this after the search bar and before the venues section -->
+        <div class="date-selection">
+            <h3><i class="fas fa-calendar-alt"></i> Select Event Date</h3>
+            <div class="date-picker">
+                <input type="date" id="event-date" 
+                       min="{% now 'Y-m-d' %}"
+                       max="{% now 'Y-m-d'|date:'Y-m-d' %}" 
+                       required>
+            </div>
+        </div>
+
+        <!-- Venues Section -->
+        <section class="venues-section">
+            <h2>All Event Venues</h2>
+            <div class="venue-grid">
+                {% for venue in venues %}
+                <div class="venue-card {{ venue.venue_type|lower }}">
+                    <img src="{{ venue.image_url|default:'{% static "img/events/default-venue.jpg" %}' }}" alt="{{ venue.venue_name }}">
+                    <div class="category-tag">{{ venue.venue_type }}</div>
+                    <div class="venue-info">
+                        <h3>{{ venue.venue_name }}</h3>
+                        <p>{{ venue.description }}</p>
+                        <div class="rating">{{ venue.rating|floatformat:1 }} ★</div>
+                        <p>Capacity: {{ venue.min_capacity }}-{{ venue.max_capacity }} people</p>
+                        <p class="pricing">Starting from ₹{{ venue.base_price|floatformat:0 }} per event</p>
+                        <div class="features">
+                            {% for feature in venue.features|split:',' %}
+                            <span>{{ feature }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="action-button">
+                            <button class="book-btn" onclick="bookVenue(this)" 
+                                    data-venue-id="{{ venue.id }}"
+                                    data-venue-name="{{ venue.venue_name }}"
+                                    data-venue-price="{{ venue.base_price }}"
+                                    data-venue-image="{{ venue.image_url }}">
+                                Book Venue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-venues">
+                    <p>No venues available at the moment.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <!-- Navigation bar -->
+    <nav class="navbar">
+        <ul>
+            <li><a href="{% url 'joo:home_page' %}"><i class="fas fa-home"></i><span>Home</span></a></li>
+            <li><a href="{% url 'joo:food' %}"><i class="fas fa-utensils"></i><span>Food</span></a></li>
+            <li><a href="{% url 'joo:quickbite' %}"><i class="fas fa-shopping-basket"></i><span>QuickBite</span></a></li>
+            <li><a href="{% url 'joo:dinespot' %}"><i class="fas fa-chair"></i><span>DineSpot</span></a></li>
+            <li><a href="{% url 'joo:buzzfest' %}" class="active"><i class="fas fa-calendar-alt"></i><span>BuzzFest</span></a></li>
+            <li><a href="{% url 'joo:packages' %}"><i class="fas fa-box"></i><span>Packages</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Add this before closing body tag, after the navbar -->
+    <div class="sticky-book-btn">
+        <button class="book-venue-btn">
+            <i class="fas fa-calendar-check"></i>
+            Book Venue
+        </button>
+    </div>
+
+    <script src="{% static 'js/common.js' %}"></script>
+    <script src="{% static 'js/search.js' %}"></script>
+    <script src="{% static 'js/secondary-nav.js' %}"></script>
+    <script>
+    // Add this script to set max date to 6 months from now
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.getElementById('event-date');
+        const today = new Date();
+        const sixMonthsFromNow = new Date();
+        sixMonthsFromNow.setMonth(today.getMonth() + 6);
+        
+        dateInput.min = today.toISOString().split('T')[0];
+        dateInput.max = sixMonthsFromNow.toISOString().split('T')[0];
+    });
+
+    // Update the bookVenue function
+    function bookVenue(button) {
+        const date = document.getElementById('event-date').value;
+        if (!date) {
+            alert('Please select an event date');
+            return;
+        }
+
+        const venueData = {
+            type: 'venue',
+            id: button.dataset.venueId,
+            name: button.dataset.venueName,
+            price: button.dataset.venuePrice,
+            image: button.dataset.venueImage,
+            date: date
+        };
+        
+        localStorage.setItem('bookingData', JSON.stringify(venueData));
+        window.location.href = "{% url 'joo:payments' %}";
+    }
+    </script>
+
+    <!-- Add these styles -->
+    <style>
+        .date-selection {
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .date-selection h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-selection h3 i {
+            color: #fc8019;
+        }
+
+        .date-picker {
+            display: flex;
+            justify-content: center;
+        }
+
+        .date-picker input[type="date"] {
+            padding: 10px 15px;
+            border: 2px solid #fc8019;
+            border-radius: 6px;
+            font-size: 16px;
+            color: #333;
+            outline: none;
+        }
+
+        .date-picker input[type="date"]:focus {
+            border-color: #e67312;
+        }
+
+        .venue-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .venue-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .venue-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .features span {
+            background: #f0f0f0;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .no-venues {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            color: #666;
+        }
+    </style>
+</body>
+
+</html>

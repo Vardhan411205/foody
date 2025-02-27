@@ -1,0 +1,272 @@
+/* Cart Page Styles */
+
+.cart-page {
+    background: #f8f8f8;
+    min-height: 100vh;
+}
+
+.cart-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 20px;
+}
+
+
+/* Cart Items Section */
+
+.cart-items {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-cart img {
+    width: 200px;
+    margin-bottom: 20px;
+}
+
+.empty-cart h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.empty-cart p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.browse-btn {
+    display: inline-block;
+    background: #fc8019;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.browse-btn:hover {
+    background: #e67312;
+    transform: translateY(-2px);
+}
+
+
+/* Cart Summary Section */
+
+.cart-summary {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 90px;
+}
+
+.cart-summary h2 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    color: #666;
+}
+
+.summary-row.total {
+    color: #333;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.divider {
+    height: 1px;
+    background: #eee;
+    margin: 15px 0;
+}
+
+.checkout-btn {
+    width: 100%;
+    background: #fc8019;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.checkout-btn:hover {
+    background: #e67312;
+}
+
+.checkout-btn:disabled {
+    background: #ddd;
+    cursor: not-allowed;
+}
+
+
+/* Cart Item Styles */
+
+.cart-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.item-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-details {
+    flex: 1;
+    padding: 0 15px;
+}
+
+.item-name {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.item-restaurant {
+    color: #666;
+    font-size: 14px;
+}
+
+.item-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity-btn:hover {
+    background: #f8f8f8;
+}
+
+.item-price {
+    font-weight: 500;
+    color: #333;
+    margin-left: auto;
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .cart-container {
+        grid-template-columns: 1fr;
+    }
+    .cart-summary {
+        position: static;
+    }
+}
+
+@media (max-width: 480px) {
+    .cart-item {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .item-actions {
+        justify-content: space-between;
+    }
+}
+
+
+/* Add these styles to your existing cart.css */
+
+.restaurant-section {
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.restaurant-header {
+    padding: 15px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #eee;
+}
+
+.restaurant-header h3 {
+    color: #333;
+    font-size: 18px;
+    margin: 0;
+}
+
+.delivery-message {
+    color: #666;
+    font-size: 14px;
+    padding: 5px 0;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+
+/* Update the existing delivery fee style when it's free */
+
+.summary-row .delivery-fee {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.summary-row .delivery-fee:after {
+    content: attr(data-free);
+    font-size: 12px;
+    color: #4CAF50;
+    font-weight: 500;
+}

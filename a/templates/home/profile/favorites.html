@@ -1,0 +1,602 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Favorites - Mr.Foody & Ms.Foody</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        /* Header styles */
+        header {
+            width: 100%;
+            background: #fc8019;
+            height: 70px;
+            padding: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+            max-width: 100%;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            min-width: 50px;
+        }
+
+        .site-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        
+        .site-title h2 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            min-width: 50px;
+            justify-content: flex-end;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .profile-icon i {
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+
+        .profile-icon:hover .profile-dropdown {
+            display: block;
+        }
+
+        .profile-menu {
+            list-style: none;
+            padding: 8px 0;
+            margin: 0;
+        }
+
+        .profile-menu li {
+            padding: 0;
+        }
+
+        .profile-menu a {
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .profile-menu a:hover {
+            background: #f8f8f8;
+        }
+
+        .profile-menu i {
+            width: 20px;
+            color: #666;
+        }
+
+        .profile-menu .divider {
+            height: 1px;
+            background: #eee;
+            margin: 8px 0;
+        }
+
+        .profile-menu li:last-child a {
+            color: #fc8019;
+        }
+
+        .profile-menu li:last-child a:hover {
+            background: #fff0e6;
+        }
+
+        /* Page Title Styles */
+        .page-title {
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .page-title h1 {
+            color: #333;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .page-title h1 i {
+            color: #fc8019;
+            font-size: 1.8rem;
+        }
+
+        /* Main Content Styles */
+        .favorites-container {
+            max-width: 1200px;
+            margin: 120px auto 40px;
+            padding: 0 20px;
+        }
+
+        /* Category Filters Styles */
+        .category-filters {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .filter-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            background: #f5f5f5;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .filter-btn.active {
+            background: #fc8019;
+            color: white;
+        }
+
+        .filter-btn:hover {
+            background: #fc8019;
+            color: white;
+        }
+
+        /* Ensure content is below fixed header */
+        body {
+            padding-top: 70px;
+            min-height: 100vh;
+        }
+
+        /* Add these styles in your <style> section */
+        .favorite-card {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s ease;
+        }
+
+        .favorite-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Ensure remove button still works */
+        .remove-btn {
+            position: relative;
+            z-index: 2;
+        }
+
+        .category-section {
+            transition: all 0.3s ease;
+        }
+
+        /* Favorites Grid Layout */
+        .favorites-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .favorites-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .favorite-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .favorite-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .favorite-content {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .favorite-content h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .favorite-content .cuisine,
+        .favorite-content .category {
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .favorite-content .rating {
+            color: #fc8019;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .favorite-content .price {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .favorite-content .actions {
+            margin-top: auto;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #ff4d4d;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .remove-btn:hover {
+            background-color: #fff0f0;
+        }
+
+        /* Category Section Styles */
+        .category-section {
+            width: 100%;
+        }
+
+        .category-section:not(:last-child) {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .category-section:empty {
+            display: none;
+        }
+
+        .category-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #fc8019;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-section h2 i {
+            color: #fc8019;
+        }
+
+        /* Empty State Styles */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-state img {
+            width: 200px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .browse-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #fc8019;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .browse-btn:hover {
+            background: #e67312;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .favorites-cards {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .favorites-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="favorites-page">
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <a href="{% url 'joo:home_page' %}">
+                    <img src="{% static 'img/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo" 
+                         style="width: 50px; height: 50px; border-radius: 50%; background: white; filter: none; object-fit: contain;">
+                </a>
+            </div>
+            <div class="site-title">
+                <h2>Mr.Foody & Ms.Foody</h2>
+            </div>
+            <div class="header-right">
+                <div class="profile-icon">
+                    <i class="fas fa-user"></i>
+                    <div class="profile-dropdown">
+                        <ul class="profile-menu">
+                            <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
+                            <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
+                            <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
+                            <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                            <li class="divider"></li>
+                            <li><a href="{% url 'joo:logout' %}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <div class="page-title">
+        <h1><i class="fas fa-heart"></i> My Favorites</h1>
+    </div>
+
+    <main>
+        <div class="favorites-container">
+            <!-- Category Filters -->
+            <div class="category-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="food">Food</button>
+                <button class="filter-btn" data-filter="quickbite">QuickBite</button>
+                <button class="filter-btn" data-filter="dinespot">DineSpot</button>
+            </div>
+
+            <!-- Favorites Grid -->
+            <div class="favorites-grid">
+                <!-- Food Section -->
+                <div class="category-section" id="food-section">
+                    <h2><i class="fas fa-utensils"></i> Food Favorites</h2>
+                    <div class="favorites-cards food-cards"></div>
+                </div>
+
+                <!-- QuickBite Section -->
+                <div class="category-section" id="quickbite-section">
+                    <h2><i class="fas fa-shopping-basket"></i> QuickBite Favorites</h2>
+                    <div class="favorites-cards quickbite-cards"></div>
+                </div>
+
+                <!-- DineSpot Section -->
+                <div class="category-section" id="dinespot-section">
+                    <h2><i class="fas fa-chair"></i> DineSpot Favorites</h2>
+                    <div class="favorites-cards dinespot-cards"></div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" style="display: none;">
+                <img src="../../static/img/empty-favorites.svg" alt="No favorites">
+                <h3>No favorites yet</h3>
+                <p>Start adding items to your favorites</p>
+                <a href="../home/index.html" class="browse-btn">Browse Now</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="{% static 'js/common.js' %}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const sections = document.querySelectorAll('.category-section');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+
+                const filter = button.dataset.filter;
+                
+                sections.forEach(section => {
+                    if (filter === 'all') {
+                        section.style.display = 'block';
+                    } else {
+                        if (section.id.includes(filter)) {
+                            section.style.display = 'block';
+                        } else {
+                            section.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+
+        // Get favorites from localStorage
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        
+        // Filter favorites by type
+        const foodFavorites = favorites.filter(item => item.type === 'food');
+        const quickbiteFavorites = favorites.filter(item => item.type === 'quickbite');
+        const dinespotFavorites = favorites.filter(item => item.type === 'dinespot');
+        
+        // Get containers
+        const foodContainer = document.querySelector('#food-section .favorites-cards');
+        const quickbiteContainer = document.querySelector('#quickbite-section .favorites-cards');
+        const dinespotContainer = document.querySelector('#dinespot-section .favorites-cards');
+        
+        // Hide sections if they're empty
+        if (foodFavorites.length === 0) {
+            document.querySelector('#food-section').style.display = 'none';
+        }
+        if (quickbiteFavorites.length === 0) {
+            document.querySelector('#quickbite-section').style.display = 'none';
+        }
+        if (dinespotFavorites.length === 0) {
+            document.querySelector('#dinespot-section').style.display = 'none';
+        }
+
+        // Display food favorites
+        foodFavorites.forEach(item => {
+            const card = `
+                <a href="{% url 'joo:food' %}" class="favorite-card food">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="favorite-content">
+                        <h3>${item.name}</h3>
+                        <p class="cuisine">${item.cuisine}</p>
+                        <div class="rating">${item.rating} ★</div>
+                        <p class="price">₹${item.price} for one</p>
+                        <div class="actions">
+                            <button class="remove-btn" data-id="${item.id}">
+                                <i class="fas fa-heart-broken"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+            `;
+            foodContainer.innerHTML += card;
+        });
+
+        // Display quickbite favorites
+        quickbiteFavorites.forEach(item => {
+            const card = `
+                <a href="{% url 'joo:quickbite' %}" class="favorite-card quickbite">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="favorite-content">
+                        <h3>${item.name}</h3>
+                        <p class="category">${item.category}</p>
+                        <div class="stock">${item.stock}</div>
+                        <p class="price">₹${item.price}</p>
+                        <div class="actions">
+                            <button class="remove-btn" data-id="${item.id}">
+                                <i class="fas fa-heart-broken"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+            `;
+            quickbiteContainer.innerHTML += card;
+        });
+
+        // Display dinespot favorites
+        dinespotFavorites.forEach(item => {
+            const card = `
+                <a href="{% url 'joo:dinespot' %}" class="favorite-card dinespot">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="favorite-content">
+                        <h3>${item.name}</h3>
+                        <p class="cuisine">${item.cuisine}</p>
+                        <div class="rating">${item.rating} ★</div>
+                        <p class="price">₹${item.price} for two</p>
+                        <div class="actions">
+                            <button class="remove-btn" data-id="${item.id}">
+                                <i class="fas fa-heart-broken"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+            `;
+            dinespotContainer.innerHTML += card;
+        });
+
+        // Handle remove functionality
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent card click when removing
+                const id = this.dataset.id;
+                const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+                const updatedFavorites = favorites.filter(item => item.id !== id);
+                localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+                location.reload(); // Refresh to show updated favorites
+            });
+        });
+
+        // Show empty state if no favorites
+        if (favorites.length === 0) {
+            document.querySelector('.empty-state').style.display = 'block';
+            document.querySelector('.favorites-grid').style.display = 'none';
+        }
+    });
+    </script>
+</body>
+
+</html>

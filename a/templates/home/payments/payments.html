@@ -1,0 +1,339 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Mr.Foody & Ms.Foody</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/payments.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+    <!-- Profile-style Header -->
+    <header>
+        <a href="{% url 'joo:home' %}" class="back-btn" style="text-decoration: none;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="header-title">
+            <h1 style="color: white; font-size: 2.5rem; margin: 0;">Secure Payment</h1>
+        </div>
+        <div class="header-actions">
+            <div class="profile-icon" style="background-color: #fc8019; display: none;">
+                <i class="fas fa-user" style="color: #fc8019;"></i>
+                <div class="profile-dropdown">
+                    <ul class="profile-menu">
+                        <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
+                        <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
+                        <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
+                        <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                        <li class="divider"></li>
+                        <li><a href="{% url 'joo:logout' %}" class="logout"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="payment-container">
+            <div class="order-summary">
+                <h2>Order Summary</h2>
+                <div class="total-section">
+                    <div class="total">
+                        <span>Total Amount</span>
+                        <span class="amount">₹0</span>
+                    </div>
+                </div>
+            </div>
+
+            <form class="payment-methods" onsubmit="return false;">
+                <h2>Payment Method</h2>
+                <div class="payment-options">
+                    <!-- UPI Option -->
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="upi" checked>
+                        <span class="option-content">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>UPI</span>
+                        </span>
+                    </label>
+
+                    <!-- Credit/Debit Card Option -->
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="card">
+                        <span class="option-content">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Credit/Debit Card</span>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="payment-details">
+                    <!-- UPI Section -->
+                    <div class="payment-section upi-section">
+                        <div class="input-group">
+                            <input type="text" class="upi-input" placeholder="Enter UPI ID (e.g., name@upi)">
+                            <button type="button" class="verify-btn">Verify</button>
+                        </div>
+                        <div class="upi-apps">
+                            <p>Pay using UPI Apps</p>
+                            <div class="app-icons">
+                                <div class="app-icon">
+                                    <i class="fab fa-google-pay"></i>
+                                    <span>Google Pay</span>
+                                </div>
+                                <div class="app-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <span>PhonePe</span>
+                                </div>
+                                <div class="app-icon">
+                                    <i class="fas fa-qrcode"></i>
+                                    <span>Paytm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Section -->
+                    <div class="payment-section card-section" style="display: none;">
+                        <div class="input-group">
+                            <input type="text" class="card-number" placeholder="Card Number" maxlength="16">
+                        </div>
+                        <div class="card-details">
+                            <input type="text" class="card-expiry" placeholder="MM/YY" maxlength="5">
+                            <input type="password" class="card-cvv" placeholder="CVV" maxlength="3">
+                        </div>
+                        <div class="card-name">
+                            <input type="text" placeholder="Name on Card">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="pay-button" onclick="handlePayment()">
+                    Pay ₹<span class="pay-amount">0</span>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Add this modal for OTP verification -->
+    <div class="otp-modal" style="display: none;">
+        <div class="otp-content">
+            <div class="otp-header">
+                <h3>Verify Payment</h3>
+                <button class="close-otp">&times;</button>
+            </div>
+            <div class="otp-body">
+                <p>Enter the OTP sent to your registered mobile number</p>
+                <p class="phone-hint">+91 **********</p>
+                <p>OTP: 1234</p>
+                <div class="otp-input-group">
+                    <input type="text" maxlength="1" class="otp-digit">
+                    <input type="text" maxlength="1" class="otp-digit">
+                    <input type="text" maxlength="1" class="otp-digit">
+                    <input type="text" maxlength="1" class="otp-digit">
+                </div>
+                <div class="otp-timer">
+                    <span>Resend OTP in <span class="timer">300</span>s</span>
+                </div>
+                <button class="verify-otp-btn">Verify OTP</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update the success modal -->
+    <div class="success-modal" style="display: none;">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3>Payment Successful!</h3>
+            <p>Your order has been confirmed</p>
+            <div class="success-details">
+                <p>Transaction ID: <span id="transactionId"></span></p>
+                <p>Amount Paid: ₹<span id="amountPaid"></span></p>
+                <div id="bookingDetails">
+                    <!-- Booking details will be inserted here -->
+                </div>
+            </div>
+            <div class="success-actions">
+                <button class="download-btn" onclick="generatePDF()">
+                    <i class="fas fa-download"></i> Download Invoice
+                </button>
+                <a href="{% url 'joo:home' %}" class="continue-btn" style="text-decoration: none;" id="backToHomeBtn">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add back the payments.js script before other scripts -->
+    <script src="{% static 'js/payments.js' %}"></script>
+
+    <!-- Keep the PDF and OTP verification scripts -->
+    <script>
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const bookingData = JSON.parse(localStorage.getItem('bookingData'));
+            const transactionId = document.getElementById('transactionId').textContent;
+            
+            // Header
+            doc.setFontSize(20);
+            doc.text('Mr.Foody & Ms.Foody', 105, 20, { align: 'center' });
+            doc.setFontSize(16);
+            doc.text('Payment Receipt', 105, 30, { align: 'center' });
+            
+            // Transaction Details
+            doc.setFontSize(12);
+            doc.text(`Transaction ID: ${transactionId}`, 20, 50);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 60);
+            doc.text(`Amount Paid: ₹${bookingData.price}`, 20, 70);
+            
+            // Booking Details
+            if (bookingData.type === 'table') {
+                doc.text('Restaurant Booking Details:', 20, 90);
+                doc.text(`Restaurant: ${bookingData.restaurant}`, 30, 105);
+                doc.text(`Date: ${bookingData.date}`, 30, 115);
+                doc.text(`Time: ${bookingData.shiftTime}`, 30, 125);
+                if (bookingData.cuisine) {
+                    doc.text(`Cuisine: ${bookingData.cuisine}`, 30, 135);
+                }
+            } else if (bookingData.type === 'venue') {
+                doc.text('Venue Booking Details:', 20, 90);
+                doc.text(`Venue: ${bookingData.name}`, 30, 105);
+                doc.text(`Event Date: ${bookingData.date}`, 30, 115);
+                if (bookingData.capacity) {
+                    doc.text(`Capacity: ${bookingData.capacity}`, 30, 125);
+                }
+            }
+            
+            // Footer
+            doc.text('Thank you for choosing Mr.Foody & Ms.Foody!', 105, 260, { align: 'center' });
+            
+            // Save PDF
+            doc.save('payment-receipt.pdf');
+        }
+
+        function verifyOTP() {
+            const enteredOTP = Array.from(document.querySelectorAll('.otp-digit'))
+                .map(input => input.value)
+                .join('');
+
+            if (enteredOTP === '1234') {
+                document.querySelector('.otp-modal').style.display = 'none';
+                
+                const transactionId = 'TXN' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                document.getElementById('transactionId').textContent = transactionId;
+                
+                const bookingData = JSON.parse(localStorage.getItem('bookingData'));
+                document.getElementById('amountPaid').textContent = bookingData.price;
+                
+                // Show booking details
+                const bookingDetailsDiv = document.getElementById('bookingDetails');
+                if (bookingData.type === 'table') {
+                    bookingDetailsDiv.innerHTML = `
+                        <h4>Restaurant Details</h4>
+                        <p><strong>Restaurant:</strong> ${bookingData.restaurant}</p>
+                        <p><strong>Date:</strong> ${bookingData.date}</p>
+                        <p><strong>Time:</strong> ${bookingData.shiftTime}</p>
+                        <p><strong>Price:</strong> ₹${bookingData.price}</p>
+                        ${bookingData.cuisine ? `<p><strong>Cuisine:</strong> ${bookingData.cuisine}</p>` : ''}
+                    `;
+                } else if (bookingData.type === 'venue') {
+                    bookingDetailsDiv.innerHTML = `
+                        <h4>Venue Details</h4>
+                        <p><strong>Venue:</strong> ${bookingData.name}</p>
+                        <p><strong>Date:</strong> ${bookingData.date}</p>
+                        <p><strong>Price:</strong> ₹${bookingData.price}</p>
+                        ${bookingData.capacity ? `<p><strong>Capacity:</strong> ${bookingData.capacity}</p>` : ''}
+                    `;
+                }
+                
+                document.querySelector('.success-modal').style.display = 'flex';
+                
+                // Update event listener
+                document.getElementById('backToHomeBtn').addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent default navigation
+                    localStorage.removeItem('bookingData');
+                    window.location.href = this.href; // Programmatically navigate
+                });
+            } else {
+                alert('Invalid OTP! Please try again.');
+            }
+        }
+    </script>
+
+    <!-- Update the styles -->
+    <style>
+    .success-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .download-btn, .continue-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        transition: background-color 0.3s;
+    }
+
+    .download-btn {
+        background-color: #fc8019;
+        color: white;
+    }
+
+    .download-btn:hover {
+        background-color: #e67312;
+    }
+
+    .continue-btn {
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+    }
+
+    .continue-btn:hover {
+        background-color: #45a049;
+        color: white;
+        text-decoration: none;
+    }
+
+    #bookingDetails {
+        margin: 15px 0;
+        padding: 15px;
+        background: #f8f8f8;
+        border-radius: 6px;
+    }
+
+    #bookingDetails h4 {
+        color: #fc8019;
+        margin: 0 0 10px 0;
+        font-size: 1.1rem;
+    }
+
+    #bookingDetails p {
+        margin: 8px 0;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    #bookingDetails strong {
+        color: #666;
+        font-weight: 600;
+    }
+    </style>
+</body>
+
+</html>

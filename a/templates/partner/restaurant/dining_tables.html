@@ -1,0 +1,674 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dining Tables - {{ request.session.restaurant_name }}</title>
+    <link rel="stylesheet" href="{% static 'css/partner/restaurant/base.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        .dining-tables-container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        .search-filter {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .search-input {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 300px;
+            font-size: 15px;
+            background: white;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #fc8019;
+            box-shadow: 0 0 0 2px rgba(252, 128, 25, 0.1);
+        }
+
+        .filter-dropdown {
+            padding: 12px 16px;
+            border: 1px solid #fc8019;
+            border-radius: 8px;
+            background: white;
+            color: #fc8019;
+            cursor: pointer;
+            font-size: 15px;
+            min-width: 150px;
+        }
+
+        .add-new-btn {
+            background: #fc8019;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .add-new-btn:hover {
+            background: #e67215;
+        }
+
+        .add-table-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: #fc8019;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(252, 128, 25, 0.1);
+        }
+
+        .tables-table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tables-table th {
+            background: #f8f8f8;
+            font-weight: 600;
+            color: #333;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tables-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-available {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-occupied {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-reserved {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .edit-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .category-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .category-luxury {
+            background: #ffd700;
+            color: #000;
+        }
+
+        .category-premium {
+            background: #e0f2f1;
+            color: #004d40;
+        }
+
+        .category-casual {
+            background: #f3e5f5;
+            color: #4a148c;
+        }
+
+        .category-budget {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .price-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            left: 12px;
+            color: #666;
+            font-size: 15px;
+        }
+
+        .price-input-wrapper input {
+            padding-left: 25px;
+        }
+
+        .help-text {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .rating-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-size: 18px;
+        }
+
+        .rating-stars i {
+            margin-right: 2px;
+        }
+
+        .price {
+            color: #fc8019;
+            font-weight: 500;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .rating i {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    {% include 'partner/restaurant/header.html' %}
+
+    <div class="dining-tables-container">
+        <h1 class="page-title">Manage Dining Tables</h1>
+
+        <div class="header-actions">
+            <div class="search-filter">
+                <input type="text" class="search-input" placeholder="Search tables...">
+                <select class="filter-dropdown">
+                    <option value="all">All Status</option>
+                    <option value="available">Available</option>
+                    <option value="occupied">Occupied</option>
+                    <option value="reserved">Reserved</option>
+                </select>
+            </div>
+            <button class="add-new-btn" onclick="showAddTableForm()">
+                <i class="fas fa-plus"></i>
+                Add New Table
+            </button>
+        </div>
+
+        <div id="alert" class="alert" style="display: none;"></div>
+
+        <div class="add-table-section">
+            <form id="addTableForm" class="add-table-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="table_number">Table Number</label>
+                    <input type="text" id="table_number" name="table_number" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="seating_capacity">Seating Capacity</label>
+                    <input type="number" id="seating_capacity" name="seating_capacity" min="2" max="20" class="form-input" required>
+                    <small class="help-text">Enter capacity between 2 to 20 persons</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price for 4 Hours (₹)</label>
+                    <div class="price-input-wrapper">
+                        <span class="currency-symbol">₹</span>
+                        <input type="number" id="price" name="price" min="0" step="0.01" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" class="form-input" required>
+                        <option value="">Select Category</option>
+                        <option value="luxury">Luxury</option>
+                        <option value="premium">Premium</option>
+                        <option value="casual">Casual</option>
+                        <option value="budget">Budget</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="rating">Rating (1-5)</label>
+                    <div class="rating-input-wrapper">
+                        <input 
+                            type="number" 
+                            id="rating" 
+                            name="rating" 
+                            min="1" 
+                            max="5" 
+                            step="0.1" 
+                            class="form-input" 
+                            value="5.0" 
+                            required
+                        >
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" class="form-input" required>
+                        <option value="available">Available</option>
+                        <option value="occupied">Occupied</option>
+                        <option value="reserved">Reserved</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="image_url">Image URL</label>
+                    <input type="url" id="image_url" name="image_url" class="form-input" 
+                           placeholder="https://example.com/image.jpg" required>
+                    <small class="help-text">Enter a valid image URL</small>
+                </div>
+
+                <button type="submit" class="submit-btn add-new-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Add Table</span>
+                </button>
+            </form>
+        </div>
+
+        <table class="tables-table">
+            <thead>
+                <tr>
+                    <th>Table Number</th>
+                    <th>Category</th>
+                    <th>Capacity</th>
+                    <th>Price (4 Hours)</th>
+                    <th>Rating</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for table in tables %}
+                <tr data-id="{{ table.id }}">
+                    <td>{{ table.table_number }}</td>
+                    <td>
+                        <span class="category-badge category-{{ table.category|lower }}">
+                            {{ table.category|title }}
+                        </span>
+                    </td>
+                    <td>{{ table.seating_capacity }} persons</td>
+                    <td class="price">₹{{ table.price }}</td>
+                    <td>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>{{ table.rating }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ table.status|lower }}">
+                            {{ table.status|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="edit-btn" onclick="editTable({{ table.id }})">
+                                <i class="fas fa-edit"></i>
+                                Edit
+                            </button>
+                            <button class="delete-btn" onclick="deleteTable({{ table.id }})">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Show/Hide add table form
+        function showAddTableForm() {
+            const addTableSection = document.querySelector('.add-table-section');
+            addTableSection.style.display = addTableSection.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Add table form submission
+        document.getElementById('addTableForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = this.querySelector('.submit-btn');
+            const alert = document.getElementById('alert');
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Adding...</span>';
+                
+                const formData = {
+                    action: 'add',
+                    table_number: document.getElementById('table_number').value,
+                    seating_capacity: document.getElementById('seating_capacity').value,
+                    price: document.getElementById('price').value,
+                    category: document.getElementById('category').value,
+                    rating: document.getElementById('rating').value,
+                    status: document.getElementById('status').value,
+                    image_url: document.getElementById('image_url').value
+                };
+                
+                const response = await fetch('{% url "joo:restaurant_dining_tables" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message || 'Failed to add table');
+                }
+            } catch (error) {
+                alert.className = 'alert alert-error';
+                alert.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
+                alert.style.display = 'flex';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-plus"></i><span>Add Table</span>';
+            }
+        });
+
+        // Delete table
+        async function deleteTable(tableId) {
+            if (!confirm('Are you sure you want to delete this table?')) return;
+            
+            try {
+                const response = await fetch('{% url "joo:restaurant_dining_tables" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        action: 'delete',
+                        table_id: tableId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    document.querySelector(`tr[data-id="${tableId}"]`).remove();
+                } else {
+                    throw new Error(data.message || 'Failed to delete table');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Edit table
+        function editTable(tableId) {
+            const row = document.querySelector(`tr[data-id="${tableId}"]`);
+            const tableNumber = row.cells[0].textContent;
+            const category = row.cells[1].querySelector('.category-badge').textContent.trim();
+            const capacity = row.cells[2].textContent.split(' ')[0];
+            const price = row.cells[3].textContent.replace('₹', '');
+            const rating = row.cells[4].querySelector('.rating span').textContent;
+            const status = row.cells[5].querySelector('.status-badge').textContent.trim().toLowerCase();
+            
+            row.innerHTML = `
+                <td colspan="7">
+                    <form onsubmit="saveEdit(event, ${tableId})" class="edit-form">
+                        <div class="form-group">
+                            <label>Table Number</label>
+                            <input type="text" name="table_number" value="${tableNumber}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select name="category" required>
+                                <option value="luxury" ${category.toLowerCase() === 'luxury' ? 'selected' : ''}>Luxury</option>
+                                <option value="premium" ${category.toLowerCase() === 'premium' ? 'selected' : ''}>Premium</option>
+                                <option value="casual" ${category.toLowerCase() === 'casual' ? 'selected' : ''}>Casual</option>
+                                <option value="budget" ${category.toLowerCase() === 'budget' ? 'selected' : ''}>Budget</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Seating Capacity</label>
+                            <input type="number" name="seating_capacity" value="${capacity}" min="2" max="20" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Price for 4 Hours (₹)</label>
+                            <input type="number" name="price" value="${price}" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Rating</label>
+                            <input type="number" name="rating" value="${rating}" min="1" max="5" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select name="status" required>
+                                <option value="available" ${status === 'available' ? 'selected' : ''}>Available</option>
+                                <option value="occupied" ${status === 'occupied' ? 'selected' : ''}>Occupied</option>
+                                <option value="reserved" ${status === 'reserved' ? 'selected' : ''}>Reserved</option>
+                            </select>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="submit" class="edit-btn">
+                                <i class="fas fa-save"></i>
+                                Save
+                            </button>
+                            <button type="button" class="delete-btn" onclick="cancelEdit(${tableId})">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </td>
+            `;
+        }
+
+        // Save edited table
+        async function saveEdit(e, tableId) {
+            e.preventDefault();
+            const form = e.target;
+            
+            try {
+                const response = await fetch('{% url "joo:restaurant_dining_tables" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        action: 'edit',
+                        table_id: tableId,
+                        table_number: form.table_number.value,
+                        seating_capacity: form.seating_capacity.value,
+                        price: form.price.value,
+                        category: form.category.value,
+                        rating: form.rating.value,
+                        status: form.status.value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message || 'Failed to update table');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Cancel edit
+        function cancelEdit(tableId) {
+            window.location.reload();
+        }
+
+        // Search functionality
+        document.querySelector('.search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.tables-table tbody tr');
+            
+            rows.forEach(row => {
+                const tableNumber = row.cells[0].textContent.toLowerCase();
+                row.style.display = tableNumber.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Filter functionality
+        document.querySelector('.filter-dropdown').addEventListener('change', function(e) {
+            const filterValue = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.tables-table tbody tr');
+            
+            rows.forEach(row => {
+                if (filterValue === 'all') {
+                    row.style.display = '';
+                } else {
+                    const status = row.cells[5].querySelector('.status-badge').textContent.trim().toLowerCase();
+                    row.style.display = status === filterValue ? '' : 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

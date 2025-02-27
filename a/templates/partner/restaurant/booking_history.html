@@ -1,0 +1,371 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking History - {{ request.session.restaurant_name }}</title>
+    <link rel="stylesheet" href="{% static 'css/partner/restaurant/base.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        .booking-history-container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .search-filter {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .date-input {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 200px;
+            font-size: 15px;
+            background: white;
+            transition: all 0.3s;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #fc8019;
+            box-shadow: 0 0 0 2px rgba(252, 128, 25, 0.1);
+        }
+
+        .filter-dropdown {
+            padding: 12px;
+            border: 1px solid #fc8019;
+            border-radius: 8px;
+            background: white;
+            color: #fc8019;
+            cursor: pointer;
+            font-size: 15px;
+            min-width: 140px;
+        }
+
+        .add-new-btn {
+            background: #fc8019;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .add-new-btn:hover {
+            background: #e67215;
+        }
+
+        .bookings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .bookings-table th {
+            background: #f8f8f8;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 1px solid #eee;
+        }
+
+        .bookings-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .status-confirmed {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-completed {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-cancelled {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .confirm-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            background: #388E3C;
+        }
+
+        .cancel-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: #D32F2F;
+        }
+
+        .complete-btn {
+            background: #2196F3;
+            color: white;
+        }
+
+        .complete-btn:hover {
+            background: #1976D2;
+        }
+
+        .guest-count {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+        }
+
+        .table-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #fc8019;
+            font-weight: 500;
+        }
+
+        .no-bookings {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .no-bookings i {
+            font-size: 48px;
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    {% include 'partner/restaurant/header.html' %}
+
+    <div class="booking-history-container">
+        <h1 class="page-title">Booking History</h1>
+
+        <div class="header-actions">
+            <div class="search-filter">
+                <input type="date" class="date-input" id="start_date" name="start_date">
+                <span style="color: #666;">to</span>
+                <input type="date" class="date-input" id="end_date" name="end_date">
+                <select class="filter-dropdown">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+            <button class="add-new-btn">
+                <i class="fas fa-filter"></i>
+                Apply Filters
+            </button>
+        </div>
+
+        {% if bookings %}
+        <table class="bookings-table">
+            <thead>
+                <tr>
+                    <th>Booking Date</th>
+                    <th>Customer</th>
+                    <th>Table</th>
+                    <th>Guests</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.booking_date|date:"d M Y, h:i A" }}</td>
+                    <td>
+                        <div>{{ booking.customer_name }}</div>
+                        <small>{{ booking.customer_phone }}</small>
+                    </td>
+                    <td>
+                        <div class="table-info">
+                            <i class="fas fa-chair"></i>
+                            Table {{ booking.table.table_number }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="guest-count">
+                            <i class="fas fa-users"></i>
+                            {{ booking.guest_count }} guests
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ booking.status|lower }}">
+                            {{ booking.status|title }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if booking.status == 'pending' %}
+                        <div class="action-buttons">
+                            <button class="action-btn confirm-btn" onclick="updateBookingStatus({{ booking.id }}, 'confirmed')">
+                                <i class="fas fa-check"></i>
+                                Confirm
+                            </button>
+                            <button class="action-btn cancel-btn" onclick="updateBookingStatus({{ booking.id }}, 'cancelled')">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                        </div>
+                        {% elif booking.status == 'confirmed' %}
+                        <button class="action-btn complete-btn" onclick="updateBookingStatus({{ booking.id }}, 'completed')">
+                            <i class="fas fa-check-double"></i>
+                            Complete
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-bookings">
+            <i class="fas fa-calendar-times"></i>
+            <p>No bookings found</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function applyFilters() {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            const status = document.querySelector('.filter-dropdown').value;
+            
+            let url = window.location.pathname + '?';
+            if (startDate) url += `start_date=${startDate}&`;
+            if (endDate) url += `end_date=${endDate}&`;
+            if (status) url += `status=${status}`;
+            
+            window.location.href = url;
+        }
+
+        async function updateBookingStatus(bookingId, status) {
+            try {
+                const response = await fetch('{% url "joo:update_booking_status" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        booking_id: bookingId,
+                        status: status
+                    })
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Set default date range and selected status
+        window.addEventListener('load', function() {
+            const today = new Date();
+            const lastWeek = new Date(today.getTime() - (7 * 24 * 60 * 60 * 1000));
+            
+            document.getElementById('end_date').value = today.toISOString().split('T')[0];
+            document.getElementById('start_date').value = lastWeek.toISOString().split('T')[0];
+
+            // Set selected status if it exists in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            if (status) {
+                document.querySelector('.filter-dropdown').value = status;
+            }
+        });
+    </script>
+</body>
+</html> 

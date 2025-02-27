@@ -1,0 +1,300 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Mr.Foody & Ms.Foody</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" href="../../static/css/profile/my-orders.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Header styles */
+        header {
+            width: 100%;
+            background: #fc8019;
+            height: 70px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 0;
+        }
+        
+        .header-content {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+            max-width: 100%;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            min-width: 50px;
+        }
+
+        .site-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        
+        .site-title h2 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            min-width: 50px;
+            justify-content: flex-end;
+            height: 100%;
+            align-items: center;
+            margin-bottom: 30px;
+            margin-left: 20px;
+            right: 10px;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .profile-icon i {
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+
+        .profile-icon.active .profile-dropdown,
+        .profile-icon:hover .profile-dropdown {
+            display: block;
+        }
+
+        .profile-menu {
+            list-style: none;
+            padding: 8px 0;
+            margin: 0;
+            width: 250px;
+        }
+
+        .profile-menu li {
+            padding: 0;
+        }
+
+        .profile-menu a {
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .profile-menu a:hover {
+            background: #f8f8f8;
+        }
+
+        .profile-menu i {
+            width: 20px;
+            color: #666;
+        }
+
+        .profile-menu .divider {
+            height: 1px;
+            background: #eee;
+            margin: 8px 0;
+        }
+
+        .profile-menu li:last-child a {
+            color: #fc8019;
+        }
+
+        .profile-menu li:last-child a:hover {
+            background: #fff0e6;
+        }
+
+        /* Ensure content is below fixed header */
+        body {
+            padding-top: 70px;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+
+<body class="orders-page">
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <a href="{% url 'joo:home_page' %}">
+                    <img src="{% static 'img/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo" 
+                         style="width: 50px; height: 50px; border-radius: 50%; background: white; filter: none; object-fit: contain;">
+                </a>
+            </div>
+            <div class="site-title">
+                <h2>Mr.Foody & Ms.Foody</h2>
+            </div>
+            <div class="header-right">
+                <div class="profile-icon">
+                    <i class="fas fa-user"></i>
+                    <div class="profile-dropdown">
+                        <ul class="profile-menu">
+                            <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
+                            <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
+                            <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
+                            <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                            <li class="divider"></li>
+                            <li><a href="{% url 'joo:logout' %}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="orders-container">
+            <!-- Order Filters -->
+            <div class="form-section">
+                <div class="order-filters">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="fas fa-list"></i> All Orders
+                    </button>
+                    <button class="filter-btn" data-filter="ongoing">
+                        <i class="fas fa-clock"></i> Ongoing
+                    </button>
+                    <button class="filter-btn" data-filter="past">
+                        <i class="fas fa-history"></i> Past Orders
+                    </button>
+                </div>
+            </div>
+
+            <!-- Orders List -->
+            <div class="orders-list">
+                <!-- Sample Order Card -->
+                <div class="form-section order-card">
+                    <div class="order-header">
+                        <div class="restaurant-info">
+                            <img src="../../static/img/restaurants/sample.jpg" alt="Restaurant">
+                            <div class="details">
+                                <h3>Restaurant Name</h3>
+                                <p class="order-id">Order #123456</p>
+                                <p class="order-date">Ordered on 15 Mar, 2024</p>
+                            </div>
+                        </div>
+                        <div class="order-status delivered">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Delivered</span>
+                        </div>
+                    </div>
+
+                    <div class="order-items">
+                        <div class="item">
+                            <span class="quantity">2x</span>
+                            <span class="name">Chicken Biryani</span>
+                            <span class="price">₹300</span>
+                        </div>
+                        <div class="item">
+                            <span class="quantity">1x</span>
+                            <span class="name">Butter Naan</span>
+                            <span class="price">₹150</span>
+                        </div>
+                    </div>
+
+                    <div class="order-footer">
+                        <div class="total">
+                            <span>Total Paid:</span>
+                            <span class="amount">₹450</span>
+                        </div>
+                        <div class="actions">
+                            <button class="reorder-btn">
+                                <i class="fas fa-redo"></i> Reorder
+                            </button>
+                            <button class="help-btn">
+                                <i class="fas fa-question-circle"></i> Help
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add more order cards here -->
+            </div>
+        </div>
+    </main>
+
+    <script src="../../static/js/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileIcon = document.querySelector('.profile-icon');
+            const dropdown = document.querySelector('.profile-dropdown');
+
+            // Toggle active class on profile icon click
+            profileIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.classList.toggle('active');
+            });
+
+            // Prevent dropdown from closing when clicking inside it
+            dropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // Close dropdown only when clicking outside profile icon and dropdown
+            document.addEventListener('click', function(e) {
+                if (!profileIcon.contains(e.target)) {
+                    profileIcon.classList.remove('active');
+                }
+            });
+
+            // Keep dropdown open when hovering from icon to dropdown
+            dropdown.addEventListener('mouseover', function() {
+                profileIcon.classList.add('active');
+            });
+
+            // Keep dropdown open when moving cursor between icon and dropdown
+            profileIcon.addEventListener('mouseover', function() {
+                if (this.contains(document.activeElement)) {
+                    this.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

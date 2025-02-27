@@ -1,0 +1,191 @@
+{% load static %}
+<!-- Header -->
+<div class="header">
+    <div class="restaurant-info">
+        <a href="{% url 'joo:restaurant_dashboard' %}" class="profile-link">
+            {% if request.session.restaurant_image %}
+                <img src="{{ request.session.restaurant_image }}" alt="{{ request.session.restaurant_name }}" class="profile-pic">
+            {% else %}
+                <img src="https://via.placeholder.com/40" alt="Default Profile" class="profile-pic">
+            {% endif %}
+        </a>
+        <span class="restaurant-name">{{ request.session.restaurant_name }}</span>
+    </div>
+    <div class="header-right">
+        <div class="profile-info">
+            <div class="profile-icon" id="profileIcon">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <a href="{% url 'joo:update_restaurant_profile' %}" class="dropdown-item">
+                    <i class="fas fa-user-edit"></i>
+                    Edit Profile
+                </a>
+                <a href="{% url 'joo:restaurant_food_items' %}" class="dropdown-item">
+                    <i class="fas fa-utensils"></i>
+                    My Food Items
+                </a>
+                <a href="{% url 'joo:restaurant_dining_tables' %}" class="dropdown-item">
+                    <i class="fas fa-chair"></i>
+                    My Dining Tables
+                </a>
+                <a href="{% url 'joo:restaurant_booking_history' %}" class="dropdown-item">
+                    <i class="fas fa-history"></i>
+                    Booking History
+                </a>
+                <a href="{% url 'joo:restaurant_logout' %}" class="dropdown-item logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .header {
+        background-color: #fc8019;
+        padding: 15px 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 100;
+    }
+
+    .restaurant-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .restaurant-name {
+        font-size: 1.5em;
+        color: white;
+        font-weight: 500;
+    }
+
+    .profile-link {
+        display: inline-block;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        transition: transform 0.2s;
+    }
+
+    .profile-pic:hover {
+        transform: scale(1.1);
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .profile-info {
+        position: relative;
+    }
+
+    .profile-icon {
+        color: black;
+        font-size: 24px;
+        padding: 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: white;
+    }
+
+    .profile-icon:hover {
+        background: rgba(255, 255, 255, 0.8);
+    }
+
+    .profile-dropdown {
+        position: absolute;
+        top: 45px;
+        right: 0;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 200px;
+        display: none;
+        z-index: 1000;
+    }
+
+    .profile-dropdown.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #333;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
+
+    .dropdown-item:first-child {
+        border-radius: 8px 8px 0 0;
+    }
+
+    .dropdown-item:last-child {
+        border-radius: 0 0 8px 8px;
+        border-top: 1px solid #eee;
+    }
+
+    .dropdown-item i {
+        font-size: 16px;
+        width: 20px;
+        color: #666;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .dropdown-item.logout {
+        color: #dc3545;
+    }
+
+    .dropdown-item.logout i {
+        color: #dc3545;
+    }
+</style>
+
+<script>
+    const profileIcon = document.getElementById('profileIcon');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    // Toggle dropdown on profile icon click
+    profileIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!profileDropdown.contains(e.target)) {
+            profileDropdown.classList.remove('show');
+        }
+    });
+
+    // Handle logout confirmation
+    document.querySelector('.dropdown-item.logout').addEventListener('click', function(e) {
+        e.preventDefault();
+        if(confirm('Are you sure you want to logout?')) {
+            window.location.href = this.href;
+        }
+    });
+</script> 

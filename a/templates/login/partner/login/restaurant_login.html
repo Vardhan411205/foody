@@ -1,0 +1,209 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Partner Login - Mr.Foody & Ms.Foody</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/partner/auth.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="partner-auth-page">
+    <a href="{% url 'joo:partner' %}" class="corner-back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Partner Selection
+    </a>
+
+    <div class="auth-container">
+        <div class="logo">
+            <img src="{% static 'images/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo">
+        </div>
+
+        <div class="auth-form">
+            <h2>Restaurant Partner Login</h2>
+            <p class="subtitle">Welcome back, partner!</p>
+
+            <!-- Alert message container -->
+            <div class="alert" style="display: none;">
+                <!-- Alert messages will be dynamically added here -->
+            </div>
+
+            <form id="loginForm" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                    <input type="email" name="email" id="email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                    <span class="toggle-password" onclick="togglePassword('password', this)" tabindex="0">
+                    </span>
+                </div>
+                <div class="form-options">
+                    <div class="remember-me">
+                        <label>
+                            <input type="checkbox">
+                            <span>Remember me</span>
+                        </label>
+                    </div>
+                    <a href="{% url 'joo:forgot_password' %}" class="forgot-password">Forgot Password?</a>
+                </div>
+                <button type="submit" class="auth-btn">Login</button>
+            </form>
+
+            <div class="auth-links">
+                <a href="{% url 'joo:restaurant' %}">Not registered yet? Sign up here</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        function togglePassword(inputId, element) {
+            const passwordInput = document.getElementById(inputId);
+            const icon = element.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const alertDiv = document.querySelector('.alert');
+
+            // Get the CSRF token from the form
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch('{% url "joo:restaurant_login" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    window.location.href = data.redirect_url || '{% url "joo:restaurant_dashboard" %}';
+                } else {
+                    alertDiv.style.display = 'block';
+                    alertDiv.innerHTML = `<p class="error">${data.message || 'Invalid credentials'}</p>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alertDiv.style.display = 'block';
+                alertDiv.innerHTML = '<p class="error">Login failed. Please check your credentials and try again.</p>';
+            }
+        });
+    </script>
+
+    <style>
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .forgot-password {
+            color: #fc8019;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .forgot-password:hover {
+            color: #e67215;
+            text-decoration: underline;
+        }
+
+        .remember-me span {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .alert .error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            margin: 0;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-group i.fas {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 16px;
+            z-index: 1;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 12px 12px 35px;  /* Added left padding for icon */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #fc8019;
+            box-shadow: 0 0 0 2px rgba(252, 128, 25, 0.1);
+        }
+
+        /* Make sure Font Awesome is loaded */
+        .fa-envelope {
+            display: inline-block !important;
+        }
+    </style>
+</body>
+
+</html>

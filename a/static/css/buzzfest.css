@@ -1,0 +1,402 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/* Venue Cards */
+
+.venue-grid {
+    padding: 20px;
+    display: grid;
+    gap: 20px;
+}
+
+.venue-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.venue-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.category-tag {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 2;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #fc8019; /* Default background color for uncategorized tags */
+}
+
+.venue-content {
+    display: flex;
+    padding: 0 15px 15px;
+}
+
+.content-left {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.content-right {
+    width: 250px;
+}
+
+.content-right img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.venue-info {
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.venue-info h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.venue-info p {
+    color: #666;
+    font-size: 14px;
+    margin: 8px 0;
+}
+
+.venue-info .rating {
+    color: #fc8019;
+    font-weight: 500;
+    font-size: 15px;
+    margin: 12px 0;
+}
+
+.venue-info .pricing {
+    font-weight: 500;
+    color: #333;
+    margin: 12px 0;
+}
+
+.venue-info .features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.venue-info .features span {
+    background: #f5f5f5;
+    padding: 6px 14px;
+    border-radius: 15px;
+    font-size: 12px;
+    color: #666;
+}
+
+.action-button {
+    margin-top: auto;
+    padding-top: 15px;
+}
+
+.book-btn {
+    width: 100%;
+    background: #fc8019;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.book-btn:hover {
+    background: #e67312;
+}
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .venue-content {
+        flex-direction: column-reverse;
+        padding: 10px;
+    }
+    .content-right {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    .content-left {
+        padding-right: 0;
+    }
+    .category-tag {
+        margin: 10px;
+    }
+    .venue-info {
+        padding: 15px;
+    }
+    .venue-info .features {
+        margin: 12px 0;
+    }
+    .book-btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+
+/* Search results styling */
+
+.no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px;
+    color: #666;
+    font-size: 16px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+
+/* Highlight matching text (optional) */
+
+.highlight {
+    background: rgba(252, 128, 25, 0.2);
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+
+/* Update category tag colors with solid backgrounds */
+.artspace .category-tag {
+    background: #7D5FFF;  /* Solid Purple Blue */
+}
+
+.resort .category-tag {
+    background: #00B894;  /* Solid Mint Green */
+}
+
+.desert .category-tag {
+    background: #FD79A8;  /* Solid Desert Rose */
+}
+
+.artgallery .category-tag {
+    background: #6C5CE7;  /* Solid Deep Purple */
+}
+
+.mountain .category-tag {
+    background: #2D98DA;  /* Solid Mountain Blue */
+}
+
+/* Update header styles */
+header {
+    width: 100%;
+    background: #fc8019;
+    height: 70px;
+    padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: white;
+}
+
+.header-content {
+    flex: 1;
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px;
+}
+
+.search-picker {
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+}
+
+.search-picker input {
+    width: 100%;
+    height: 45px;
+    padding: 10px 45px 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.search-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #fc8019;
+    cursor: pointer;
+    height: 24px;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .header-content {
+        padding: 0 20px;
+    }
+    
+    .search-picker {
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        height: auto;
+        padding: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .header-content {
+        order: 3;
+        width: 100%;
+        padding: 10px 0 0 0;
+    }
+    
+    .logo {
+        order: 1;
+    }
+    
+    .profile-icon {
+        order: 2;
+    }
+}
+
+/* Update the sticky book button styles */
+.sticky-book-btn {
+    display: none;
+}
+
+/* Restore navbar display */
+.navbar {
+    display: flex;
+}
+
+/* Update main content padding */
+main {
+    padding-bottom: 80px; /* Adjusted padding to account for the book button */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sticky-book-btn {
+        padding: 8px 10px;
+    }
+    
+    .book-venue-btn {
+        padding: 10px 30px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .book-venue-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+/* Favorite button styles */
+.favorite-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;  /* Changed from right to left */
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.favorite-btn i {
+    font-size: 18px;
+    color: #fc8019;
+    transition: all 0.3s ease;
+}
+
+.favorite-btn.active i {
+    animation: heartPop 0.3s ease;
+}
+
+.favorite-btn.active .far.fa-heart {
+    display: none;
+}
+
+.favorite-btn.active .fas.fa-heart {
+    display: inline-block;
+}
+
+@keyframes heartPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}

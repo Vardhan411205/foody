@@ -1,0 +1,520 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Mr.Foody & Ms.Foody</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+
+        *{
+            box-sizing: border-box;
+        }
+        /* Header styles */
+        header {
+            width: 100%;
+            background-color: #fc8019;
+            height: 70px;
+            padding: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            margin: 0 auto;
+        }
+        
+        .site-title {            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        
+        .site-title h2 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 0.5px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+        
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .profile-icon i {
+            color: #333;
+            font-size: 1.2rem;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .site-title h2 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .site-title h2 {
+                font-size: 1.5rem;
+            }
+            
+            .header-content {
+                justify-content: space-between;
+            }
+        }
+
+        .profile-menu a:hover {
+            background: #f8f8f8;
+        }
+        
+        .profile-menu li:last-child a {
+            color: #fc8019;
+        }
+        
+        .profile-menu li:last-child a:hover {
+            background: #fff0e6;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 80px auto 0;
+        }
+
+        .service-cards {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            text-decoration: none;
+            color: inherit;
+            min-width: 200px;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 12px;
+        }
+
+        .card-content h3 {
+            margin: 0 0 8px;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .card-content p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .features-section {
+            text-align: center;
+            padding: 40px 0;
+            background: #f9f9f9;
+            margin: 40px -20px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .feature-card {
+            padding: 20px;
+        }
+
+        .feature-card i {
+            font-size: 2rem;
+            color: #fc8019;
+            margin-bottom: 15px;
+        }
+
+        .app-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .app-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .app-button img {
+            height: 40px;
+        }
+
+        .app-preview img {
+            max-width: 300px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .service-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .service-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .service-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: #1a1a1a;
+            color: #fff;
+            padding: 40px 20px 20px;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .footer-section {
+            padding: 0 15px;
+        }
+
+        .footer-section h3 {
+            color: #fc8019;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-section p {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-section ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: #fc8019;
+        }
+
+        .footer-section ul li i {
+            margin-right: 10px;
+            color: #fc8019;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            color: #fff;
+            background: #333;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: #fc8019;
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+
+        .footer-bottom p {
+            color: #888;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive footer */
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-section {
+                text-align: center;
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body class="index-page">
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div style="width: 50px; height: 50px; display: flex; align-items: center; margin-right: 20px;">
+                <img src="{% static 'img/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo" 
+                     style="width: 100%; height: 100%; border-radius: 50%; background: white; filter: none; object-fit: contain;">
+            </div>
+            <div class="site-title">
+                <h2>Mr.Foody & Ms.Foody</h2>
+            </div>
+            <div class="header-right">
+                <div class="profile-icon">
+                    <i class="fas fa-user"></i>
+                    <div class="profile-dropdown">
+                        <ul class="profile-menu">
+                            <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
+                            <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
+                            <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
+                            <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                            <li class="divider"></li>
+                            <li><a href="{% url 'joo:logout' %}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Discover Amazing Food & Services</h1>
+                <p>Order food, book tables, plan events, and more!</p>
+            </div>
+        </section>
+
+        <!-- Services Grid -->
+        <section class="services-grid">
+            <div class="service-cards">
+                <a href="{% url 'joo:food' %}" class="service-card">
+                    <img src="{% static 'img/food/food-delivery.jpg' %}" alt="Food Delivery">
+                    <div class="card-content">
+                        <h3>Food Delivery</h3>
+                        <p>Order from your favorite restaurants</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'joo:quickbite' %}" class="service-card">
+                    <img src="{% static 'img/quickbite/quickbite.jpg' %}" alt="QuickBite">
+                    <div class="card-content">
+                        <h3>QuickBite</h3>
+                        <p>Instant grocery delivery</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'joo:dinespot' %}" class="service-card">
+                    <img src="{% static 'img/dinespot/dinespot.jpg' %}" alt="DineSpot">
+                    <div class="card-content">
+                        <h3>DineSpot</h3>
+                        <p>Book tables and get great offers</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'joo:buzzfest' %}" class="service-card">
+                    <img src="{% static 'img/buzzfest/buzzfest.jpg' %}" alt="BuzzFest">
+                    <div class="card-content">
+                        <h3>BuzzFest</h3>
+                        <p>Book venues for your special occasions</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'joo:packages' %}" class="service-card">
+                    <img src="{% static 'img/packages/packages.jpg' %}" alt="Packages">
+                    <div class="card-content">
+                        <h3>Packages</h3>
+                        <p>Send packages across the city</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <h2>Why Choose Us</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-truck-fast"></i>
+                    <h3>Fast Delivery</h3>
+                    <p>Lightning-fast delivery to your doorstep</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-utensils"></i>
+                    <h3>Quality Food</h3>
+                    <p>Best restaurants and quality assured</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-headset"></i>
+                    <h3>24/7 Support</h3>
+                    <p>Round the clock customer support</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-tag"></i>
+                    <h3>Best Offers</h3>
+                    <p>Great deals and exclusive offers</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Navigation bar -->
+    <nav class="main-nav">
+        <a href="{% url 'joo:food' %}">
+            <i class="fas fa-utensils"></i>
+            <span>Food</span>
+        </a>
+        <a href="{% url 'joo:dinespot' %}">
+            <i class="fas fa-concierge-bell"></i>
+            <span>DineSpot</span>
+        </a>
+        <a href="{% url 'joo:quickbite' %}">
+            <i class="fas fa-shopping-basket"></i>
+            <span>QuickBite</span>
+        </a>
+        <a href="{% url 'joo:buzzfest' %}">
+            <i class="fas fa-calendar-alt"></i>
+            <span>BuzzFest</span>
+        </a>
+        <a href="{% url 'joo:packages' %}">
+            <i class="fas fa-box"></i>
+            <span>Packages</span>
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>Mr.Foody & Ms.Foody is your one-stop destination for all food and event needs. From quick bites to grand celebrations, we've got you covered.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="{% url 'joo:food' %}">Food Delivery</a></li>
+                    <li><a href="{% url 'joo:quickbite' %}">QuickBite</a></li>
+                    <li><a href="{% url 'joo:dinespot' %}">DineSpot</a></li>
+                    <li><a href="{% url 'joo:buzzfest' %}">BuzzFest</a></li>
+                    <li><a href="{% url 'joo:packages' %}">Packages</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <ul>
+                    <li><i class="fas fa-phone"></i> +91 123 456 7890</li>
+                    <li><i class="fas fa-envelope"></i> support@mrfoody.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> 123 Food Street, City</li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 Mr.Foody & Ms.Foody. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/common.js' %}"></script>
+    <script src="{% static 'js/location.js' %}"></script>
+</body>
+</html> 

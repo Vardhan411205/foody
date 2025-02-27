@@ -1,0 +1,642 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Mr.Foody & Ms.Foody</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Page layout */
+        body {
+            background-color: #fc8019;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            margin: 20px;
+        }
+
+        /* Logo styles */
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo img {
+            max-width: 150px;
+            height: auto;
+        }
+
+        /* Form styles */
+        .login-form {
+            padding: 20px 0;
+        }
+
+        .login-form h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        /* Form group styles */
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 45px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #fc8019;
+            box-shadow: 0 0 0 2px rgba(252, 128, 25, 0.1);
+        }
+
+        /* Input icons */
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        /* Verify button */
+        .verify-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fc8019;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .verify-btn:hover {
+            background: #e67312;
+            transform: translateY(-50%) scale(1.02);
+            box-shadow: 0 4px 12px rgba(252, 128, 25, 0.3);
+        }
+
+        /* OTP section */
+        .otp-section {
+            display: none;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        .otp-input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .otp-digit {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Submit button */
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #fc8019;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-btn:hover {
+            background: #e67312;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(252, 128, 25, 0.4);
+        }
+
+        .auth-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(252, 128, 25, 0.3);
+        }
+
+        .auth-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Terms checkbox */
+        .terms-group {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .terms-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        /* Links */
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-links a {
+            color: #fc8019;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-links a:hover {
+            color: #e67312;
+            text-decoration: underline;
+        }
+
+        /* Alert messages */
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .alert.error {
+            background: #ffe6e6;
+            color: #d63031;
+            border: 1px solid #fab1a0;
+        }
+
+        .alert.success {
+            background: #e6ffe6;
+            color: #00b894;
+            border: 1px solid #55efc4;
+        }
+
+        /* Corner Partner Button */
+        .corner-partner-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            color: #fc8019;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(252, 128, 25, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .corner-partner-btn i {
+            font-size: 18px;
+        }
+
+        .corner-partner-btn:hover {
+            background-color: white;
+            color: #fc8019;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(252, 128, 25, 0.4);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .corner-partner-btn {
+                top: 10px;
+                right: 10px;
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+
+            .corner-partner-btn i {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .corner-partner-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .corner-partner-btn i {
+                font-size: 14px;
+            }
+        }
+
+        /* Verify OTP button */
+        .verify-otp-btn {
+            background: #fc8019;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .verify-otp-btn:hover {
+            background: #e67312;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(252, 128, 25, 0.3);
+        }
+
+        .verify-otp-btn:disabled {
+            background: #fc8019;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* OTP section improvements */
+        .otp-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .resend-otp {
+            color: #fc8019;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .resend-otp:hover {
+            color: #e67312;
+        }
+
+        /* OTP input improvements */
+        .otp-digit {
+            width: 45px;
+            height: 45px;
+            text-align: center;
+            font-size: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .otp-digit:focus {
+            border-color: #fc8019;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(252, 128, 25, 0.2);
+        }
+
+        .otp-section h3 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body class="signup-page">
+    <!-- Updated Partner Button -->
+    <a href="{% url 'joo:partner' %}" class="corner-partner-btn">
+        <i class="fas fa-store"></i> Become Partner
+    </a>
+
+    <div class="login-container">
+        <div class="logo">
+            <img src="{% static 'img/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo">
+        </div>
+        <div class="login-form signup-form">
+            <h2>Create Account</h2>
+            <p class="subtitle">Join us for delicious experiences</p>
+
+            <div class="alert" style="display: none;"></div>
+
+            <form id="signupForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="full_name" name="full_name" placeholder="Full Name" required>
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" placeholder="Email" required>
+                    <button type="button" id="verifyEmailBtn" class="verify-btn">Verify</button>
+                </div>
+                <div class="otp-section" style="display: none;">
+                    <h3>Enter OTP</h3>
+                    <div class="otp-input-group">
+                        <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" autocomplete="off">
+                        <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" autocomplete="off">
+                        <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" autocomplete="off">
+                        <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" autocomplete="off">
+                    </div>
+                    <div class="otp-actions">
+                        <span class="resend-otp">Resend OTP</span>
+                        <button type="button" class="verify-otp-btn">Verify OTP</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="phone" placeholder="Phone Number" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" placeholder="Password" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="confirm_password" placeholder="Confirm Password" required>
+                </div>
+                <div class="terms-group">
+                    <label>
+                        <input type="checkbox" id="terms" required>
+                        <span>I agree to the <a href="{% url 'joo:terms_conditions' %}" target="_blank">Terms & Conditions</a></span>
+                    </label>
+                </div>
+                <button type="submit" id="signupBtn" class="auth-btn" disabled>
+                    Create Account
+                </button>
+            </form>
+
+            <div class="auth-links">
+                <a href="{% url 'joo:login' %}" class="login-link">Already have an account? Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isEmailVerified = false;
+
+        // Email verification handling
+        const emailInput = document.querySelector('#email');
+        const verifyEmailBtn = document.querySelector('#verifyEmailBtn');
+        const otpSection = document.querySelector('.otp-section');
+        const otpInputs = document.querySelectorAll('.otp-digit');
+        const verifyOtpBtn = document.querySelector('.verify-otp-btn');
+        const resendOtp = document.querySelector('.resend-otp');
+        const signupBtn = document.querySelector('#signupBtn');
+        const termsCheckbox = document.querySelector('#terms');
+
+        // Enable/disable signup button
+        function updateSignupButton() {
+            const allInputsFilled = document.querySelector('#full_name').value &&
+                                  document.querySelector('#email').value &&
+                                  document.querySelector('#phone').value &&
+                                  document.querySelector('#password').value &&
+                                  document.querySelector('#confirm_password').value;
+            
+            signupBtn.disabled = !(allInputsFilled && isEmailVerified && termsCheckbox.checked);
+            signupBtn.classList.toggle('disabled', signupBtn.disabled);
+        }
+
+        // Monitor inputs for changes
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', updateSignupButton);
+        });
+        termsCheckbox.addEventListener('change', updateSignupButton);
+
+        // Send OTP when verify button is clicked
+        verifyEmailBtn.addEventListener('click', function() {  // Changed to regular function first
+            console.log('Verify button clicked');  // Debug log
+            const email = emailInput.value;
+            
+            if (!email || !emailInput.checkValidity()) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+            // Show OTP section immediately
+            otpSection.style.display = 'block';
+            otpInputs[0].focus();
+
+            // Then send OTP
+            fetch('/send-otp/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    email: email,
+                    purpose: 'signup'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('OTP sent to your email!');
+                } else {
+                    alert(data.message);
+                    otpSection.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending OTP');
+                otpSection.style.display = 'none';
+            });
+        });
+
+        // Handle OTP input auto-focus
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                if (this.value) {
+                    if (index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && !this.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        // Verify OTP
+        verifyOtpBtn.addEventListener('click', async function() {
+            const email = emailInput.value;
+            const otp = Array.from(otpInputs).map(input => input.value).join('');
+
+            try {
+                const response = await fetch('/verify-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        otp: otp,
+                        purpose: 'signup'
+                    })
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    isEmailVerified = true;
+                    otpSection.style.display = 'none';
+                    verifyEmailBtn.style.display = 'none';
+                    emailInput.readOnly = true;
+                    updateSignupButton();
+                    alert('Email verified successfully!');
+                } else {
+                    alert(data.message);
+                    otpInputs.forEach(input => input.value = '');
+                    otpInputs[0].focus();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error verifying OTP');
+            }
+        });
+
+        // Add resend OTP functionality
+        resendOtp.addEventListener('click', async function() {
+            const email = emailInput.value;
+            try {
+                const response = await fetch('/send-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        purpose: 'signup'
+                    })
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    alert('New OTP sent to your email!');
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error sending OTP');
+            }
+        });
+
+        // Handle signup form submission
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!isEmailVerified) {
+                alert('Please verify your email first');
+                return;
+            }
+
+            const password = document.querySelector('#password').value;
+            const confirmPassword = document.querySelector('#confirm_password').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            const formData = {
+                full_name: document.querySelector('#full_name').value,
+                email: document.querySelector('#email').value,
+                phone: document.querySelector('#phone').value,
+                password: password
+            };
+
+            try {
+                const response = await fetch('/signup/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    alert('Account created successfully! Please login.');
+                    window.location.href = "{% url 'joo:login' %}";
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during registration');
+            }
+        });
+
+        // Utility function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Handle login link click
+        document.querySelector('.login-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = "{% url 'joo:login' %}";
+        });
+    </script>
+</body>
+
+</html>

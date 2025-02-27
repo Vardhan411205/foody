@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr.Foody & Ms.Foody - Food Delivery</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/food.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="inner-page food-page">
+    <!-- Header -->
+    <header>
+        <!-- Left corner logo -->
+        <div class="logo">
+            <img src="{% static 'img/logocopy.png' %}" alt="Logo" style="width: 50px; height: 50px;">
+        </div>
+
+        <!-- Centered search bar -->
+        <div class="header-content">
+            <div class="search-picker">
+                <input type="text" id="food-search" placeholder="Search for restaurants, cuisines...">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right corner profile -->
+        <div class="profile-icon">
+            <i class="fas fa-user" style="color: black;"></i>
+            <div class="profile-dropdown">
+                <ul class="profile-menu">
+                    <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
+                    <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
+                    <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
+                    <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{% url 'joo:logout' %}" class="logout"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Secondary Navigation -->
+    <nav class="secondary-nav">
+        <div class="scrolling-categories">
+            <div class="category-item">
+                <a href="#all" class="active">
+                    <img src="{% static 'img/food/all.jpg' %}" alt="All">
+                    <span>All</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#pizza">
+                    <img src="{% static 'img/food/pizza.jpg' %}" alt="Pizza">
+                    <span>Pizza</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#biryani">
+                    <img src="{% static 'img/food/biryani.jpg' %}" alt="Biryani">
+                    <span>Biryani</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#chinese">
+                    <img src="{% static 'img/food/chinese.jpg' %}" alt="Chinese">
+                    <span>Chinese</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#burger">
+                    <img src="../../static/img/food/burger.jpg" alt="Burger">
+                    <span>Burger</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#southindian">
+                    <img src="../../static/img/food/southindian.jpg" alt="South Indian">
+                    <span>South Indian</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#northindian">
+                    <img src="../../static/img/food/northindian.jpg" alt="North Indian">
+                    <span>North Indian</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#rolls">
+                    <img src="../../static/img/food/rolls.jpg" alt="Rolls">
+                    <span>Rolls</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#desserts">
+                    <img src="../../static/img/food/desserts.jpg" alt="Desserts">
+                    <span>Desserts</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#icecream">
+                    <img src="../../static/img/food/icecream.jpg" alt="Ice Cream">
+                    <span>Ice Cream</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#shakes">
+                    <img src="../../static/img/food/shakes.jpg" alt="Shakes">
+                    <span>Shakes</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#sandwich">
+                    <img src="../../static/img/food/sandwich.jpg" alt="Sandwich">
+                    <span>Sandwich</span>
+                </a>
+            </div>
+        </div>
+
+    </nav>
+
+    <main>
+        <!-- Restaurants Section -->
+        <section class="restaurants-section">
+            <h2>All Restaurants</h2>
+            <div class="restaurant-grid">
+                {% for item in food_items %}
+                <div class="restaurant-card {{ item.category|lower }}">
+                    <img src="{{ item.image_url }}" alt="{{ item.name }}">
+                    <button class="favorite-btn" data-id="food_{{ item.id }}" data-type="food" data-item='{
+                        "name": "{{ item.name }}",
+                        "restaurant": "{{ item.restaurant.restaurant_name }}",
+                        "price": {{ item.price }},
+                        "image": "{{ item.image_url }}"
+                    }'>
+                        <i class="far fa-heart"></i>
+                    </button>
+                    <div class="category-tag">{{ item.get_category_display }}</div>
+                    <div class="restaurant-info">
+                        <h3>{{ item.name }}</h3>
+                        <p class="restaurant-name">{{ item.restaurant.restaurant_name }}</p>
+                        <div class="rating">{{ item.rating }} ★</div>
+                        <div class="features">
+                            <span>25-35 min</span>
+                            <span>₹40 delivery fee</span>
+                        </div>
+                        <p class="price">₹{{ item.price }}</p>
+                        <div class="quantity-control">
+                            <button class="add-btn">ADD</button>
+                            <div class="counter" style="display: none;">
+                                <button class="decrease">-</button>
+                                <span class="count">0</span>
+                                <button class="increase">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Navigation bar -->
+    <nav class="navbar">
+        <ul>
+            <li>
+                <a href="{% url 'joo:home_page' %}">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'joo:food' %}" class="active">
+                    <i class="fas fa-utensils"></i>
+                    <span>Food</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'joo:quickbite' %}">
+                    <i class="fas fa-shopping-basket"></i>
+                    <span>QuickBite</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'joo:dinespot' %}">
+                    <i class="fas fa-chair"></i>
+                    <span>DineSpot</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'joo:buzzfest' %}">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>BuzzFest</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'joo:packages' %}">
+                    <i class="fas fa-box"></i>
+                    <span>Packages</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'joo:cart' %}" class="cart-nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Cart</span>
+                    <span class="cart-badge">0</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/common.js' %}"></script>
+    <script src="{% static 'js/search.js' %}"></script>
+    <script src="{% static 'js/secondary-nav.js' %}"></script>
+    <script src="{% static 'js/food.js' %}"></script>
+    <script src="{% static 'js/favorites-handler.js' %}"></script>
+    <script src="{% static 'js/cart-handler.js' %}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+</body>
+
+</html>

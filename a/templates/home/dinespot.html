@@ -1,0 +1,309 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr.Foody & Ms.Foody - DineSpot</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dinespot.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="inner-page dinespot-page">
+    <!-- Header -->
+    <header>
+        <!-- Left corner logo -->
+        <div class="logo">
+            <img src="{% static 'img/logocopy.png' %}" alt="Logo" style="width: 50px; height: 50px;">
+        </div>
+
+        <!-- Centered search bar -->
+        <div class="header-content">
+            <div class="search-picker">
+                <input type="text" id="restaurant-search" placeholder="Search for restaurants, cuisines...">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right corner profile -->
+        <div class="profile-icon">
+            <i class="fas fa-user" style="color: black;"></i>
+            <div class="profile-dropdown">
+                <ul class="profile-menu">
+                    <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
+                    <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
+                    <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
+                    <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{% url 'joo:logout' %}" class="logout"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Secondary Navigation -->
+    <nav class="secondary-nav">
+        <div class="scrolling-categories">
+            <div class="category-item">
+                <a href="#all" class="active">
+                    <img src="{% static 'img/dineout/all-restaurants.jpg' %}" alt="All">
+                    <span>All</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#luxury">
+                    <img src="{% static 'img/dineout/luxury.jpg' %}" alt="Luxury">
+                    <span>Luxury</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#premium">
+                    <img src="{% static 'img/dineout/premium.jpg' %}" alt="Premium">
+                    <span>Premium</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#casual">
+                    <img src="{% static 'img/dineout/casual.jpg' %}" alt="Casual">
+                    <span>Casual</span>
+                </a>
+            </div>
+            <div class="category-item">
+                <a href="#budget">
+                    <img src="{% static 'img/dineout/budget.jpg' %}" alt="Budget">
+                    <span>Budget</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Add this after the search bar and before the restaurant cards -->
+        <div class="booking-selection">
+            <h3><i class="fas fa-clock"></i> Select Date & Time</h3>
+            <div class="booking-options">
+                <div class="date-picker">
+                    <label for="booking-date">Date</label>
+                    <input type="date" id="booking-date" 
+                           min="{% now 'Y-m-d' %}" 
+                           required>
+                </div>
+                <div class="time-shifts">
+                    <label>Time Slot</label>
+                    <div class="shift-options">
+                        <label class="shift-option">
+                            <input type="radio" name="timeshift" value="morning">
+                            <span class="shift-content">
+                                <strong>Morning Shift</strong>
+                                <span>10:00 AM - 2:00 PM</span>
+                            </span>
+                        </label>
+                        <label class="shift-option">
+                            <input type="radio" name="timeshift" value="afternoon">
+                            <span class="shift-content">
+                                <strong>Afternoon Shift</strong>
+                                <span>2:00 PM - 6:00 PM</span>
+                            </span>
+                        </label>
+                        <label class="shift-option">
+                            <input type="radio" name="timeshift" value="evening">
+                            <span class="shift-content">
+                                <strong>Evening Shift</strong>
+                                <span>6:00 PM - 10:00 PM</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add these styles -->
+        <style>
+            .booking-selection {
+                background: white;
+                padding: 20px;
+                margin: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            .booking-selection h3 {
+                color: #333;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .booking-selection h3 i {
+                color: #fc8019;
+            }
+
+            .booking-options {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .date-picker, .time-shifts {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .date-picker label, .time-shifts label {
+                font-weight: bold;
+                color: #333;
+            }
+
+            .date-picker input[type="date"] {
+                padding: 10px 15px;
+                border: 2px solid #fc8019;
+                border-radius: 6px;
+                font-size: 16px;
+                color: #333;
+                outline: none;
+            }
+
+            .shift-options {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+
+            .shift-option {
+                display: block;
+                cursor: pointer;
+            }
+
+            .shift-option input[type="radio"] {
+                display: none;
+            }
+
+            .shift-content {
+                display: flex;
+                flex-direction: column;
+                padding: 15px;
+                border: 2px solid #ddd;
+                border-radius: 6px;
+                transition: all 0.3s ease;
+            }
+
+            .shift-option input[type="radio"]:checked + .shift-content {
+                border-color: #fc8019;
+                background: #fff3e6;
+            }
+
+            .shift-content strong {
+                color: #333;
+                margin-bottom: 5px;
+            }
+
+            .shift-content span {
+                color: #666;
+                font-size: 14px;
+            }
+
+            @media (min-width: 768px) {
+                .booking-options {
+                    flex-direction: row;
+                    align-items: flex-start;
+                }
+
+                .date-picker, .time-shifts {
+                    flex: 1;
+                }
+            }
+        </style>
+
+        <!-- Restaurants Section -->
+        <section class="restaurants-section">
+            <h2>All Restaurants</h2>
+            <div class="restaurant-grid">
+                {% for table in dining_tables %}
+                <div class="restaurant-card {{ table.category|lower }}" data-category="{{ table.category|lower }}">
+                    <img src="{{ table.image_url }}" alt="{{ table.restaurant.restaurant_name }}">
+                    <button class="favorite-btn" 
+                            data-id="dinespot_{{ table.id }}" 
+                            data-type="dinespot" 
+                            data-item='{
+                                "name": "{{ table.restaurant.restaurant_name }}",
+                                "cuisine": "{{ table.restaurant.cuisine_type }}",
+                                "rating": "{{ table.rating }}",
+                                "price": "₹{{ table.price }} for two",
+                                "image": "{{ table.image_url }}"
+                            }'>
+                        <i class="far fa-heart"></i>
+                    </button>
+                    <div class="category-tag">{{ table.get_category_display }}</div>
+                    <div class="restaurant-info">
+                        <h3>{{ table.restaurant.restaurant_name }}</h3>
+                        <p>{{ table.restaurant.cuisine_type }}</p>
+                        <div class="rating">{{ table.rating }} ★</div>
+                        <p class="pricing">₹{{ table.price }} for two</p>
+                        <div class="features">
+                            <span>Table {{ table.table_number }}</span>
+                            <span>{{ table.seating_capacity }} Seats</span>
+                        </div>
+                        <div class="action-button">
+                            <button class="book-btn" onclick="bookTable(this)">Book Now</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <!-- Navigation bar -->
+    <nav class="navbar">
+        <ul>
+            <li><a href="{% url 'joo:home_page' %}"><i class="fas fa-home"></i><span>Home</span></a></li>
+            <li><a href="{% url 'joo:food' %}"><i class="fas fa-utensils"></i><span>Food</span></a></li>
+            <li><a href="{% url 'joo:quickbite' %}"><i class="fas fa-shopping-basket"></i><span>QuickBite</span></a></li>
+            <li><a href="{% url 'joo:dinespot' %}" class="active"><i class="fas fa-chair"></i><span>DineSpot</span></a></li>
+            <li><a href="{% url 'joo:buzzfest' %}"><i class="fas fa-calendar-alt"></i><span>BuzzFest</span></a></li>
+            <li><a href="{% url 'joo:packages' %}"><i class="fas fa-box"></i><span>Packages</span></a></li>
+        </ul>
+    </nav>
+
+    <script src="{% static 'js/common.js' %}"></script>
+    <script src="{% static 'js/search.js' %}"></script>
+    <script src="{% static 'js/secondary-nav.js' %}"></script>
+    <script src="{% static 'js/favorites-handler.js' %}"></script>
+    <script src="{% static 'js/dinespot.js' %}"></script>
+    <script>
+    const dateInput = document.getElementById('booking-date');
+    dateInput.min = new Date().toISOString().split('T')[0];
+
+    function bookTable(button) {
+        const restaurantCard = button.closest('.restaurant-card');
+        const date = document.getElementById('booking-date').value;
+        const shift = document.querySelector('input[name="timeshift"]:checked');
+
+        if (!date || !shift) {
+            alert('Please select both date and time shift');
+            return;
+        }
+
+        const tableData = {
+            type: 'table',
+            restaurant: restaurantCard.querySelector('h3').textContent,
+            price: restaurantCard.querySelector('.pricing').textContent.match(/₹([\d,]+)/)[1].replace(',', ''),
+            image: restaurantCard.querySelector('img').src,
+            date: date,
+            timeShift: shift.value,
+            shiftTime: shift.closest('.shift-option').querySelector('span span').textContent
+        };
+        
+        localStorage.setItem('bookingData', JSON.stringify(tableData));
+        window.location.href = "{% url 'joo:payments' %}";
+    }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,448 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - {{ request.session.delivery_name }}</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/partner/dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Header Styles */
+        .header {
+            background: #fc8019;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .delivery-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-pic, .profile-pic-placeholder {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .profile-pic-placeholder {
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fc8019;
+            font-size: 24px;
+        }
+
+        .partner-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .partner-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 2px;
+        }
+
+        .delivery-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Profile Dropdown Styles */
+        .profile-info {
+            position: relative;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fc8019;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+
+        .dropdown-item.logout {
+            color: #dc3545;
+            border-top: 1px solid #eee;
+        }
+
+        /* Form Styles */
+        .edit-profile-form {
+            max-width: 600px;
+            margin: 90px auto 20px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #fc8019;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(252, 128, 25, 0.1);
+        }
+
+        .save-btn {
+            background: #fc8019;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .save-btn:hover {
+            background: #e67215;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .input-with-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-with-icon input {
+            padding-right: 40px; /* Make space for the icon */
+        }
+
+        .edit-icon, .lock-icon {
+            position: absolute;
+            right: 12px;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .edit-icon:hover {
+            color: #fc8019;
+        }
+
+        .lock-icon {
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        input.readonly {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        input.readonly:focus {
+            border-color: #ddd;
+            box-shadow: none;
+        }
+
+        /* Add focus effect for input fields */
+        .input-with-icon input:focus + .edit-icon {
+            color: #fc8019;
+        }
+
+        /* Add animation for edit icon */
+        .edit-icon {
+            transform: rotate(0);
+            transition: transform 0.3s ease;
+        }
+
+        .edit-icon:hover {
+            transform: rotate(15deg);
+        }
+
+        .password-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .password-section h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .password-match-error {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="delivery-info">
+            <a href="{% url 'joo:delivery_dashboard' %}" style="text-decoration: none; color: white; display: flex; align-items: center; gap: 15px;">
+                {% if request.session.delivery_image %}
+                    <img src="{{ request.session.delivery_image }}" alt="{{ request.session.delivery_name }}" class="profile-pic">
+                {% else %}
+                    <div class="profile-pic-placeholder">
+                        <i class="fas fa-motorcycle"></i>
+                    </div>
+                {% endif %}
+                <div class="partner-details">
+                    <span class="partner-label">Delivery Partner</span>
+                    <span class="delivery-name">{{ request.session.delivery_name }}</span>
+                </div>
+            </a>
+        </div>
+        <div class="profile-info">
+            <div class="profile-icon" id="profileIcon">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <a href="{% url 'joo:delivery_edit_profile' %}" class="dropdown-item">
+                    <i class="fas fa-user-edit"></i>
+                    Edit Profile
+                </a>
+                <a href="{% url 'joo:delivery_logout' %}" class="dropdown-item logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Form -->
+    <div class="edit-profile-form">
+        <h2>Edit Profile</h2>
+        <div id="alert" class="alert"></div>
+
+        <form id="editProfileForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <div class="input-with-icon">
+                    <input type="text" id="full_name" name="full_name" value="{{ delivery.full_name }}" required>
+                    <i class="fas fa-edit edit-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <div class="input-with-icon">
+                    <input type="email" id="email" name="email" value="{{ delivery.email }}" readonly class="readonly">
+                    <i class="fas fa-lock lock-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div class="input-with-icon">
+                    <input type="tel" id="phone" name="phone" value="{{ delivery.phone }}" required>
+                    <i class="fas fa-edit edit-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="vehicle_type">Vehicle Type</label>
+                <div class="input-with-icon">
+                    <input type="text" id="vehicle_type" name="vehicle_type" value="{{ delivery.vehicle_type }}" required>
+                    <i class="fas fa-edit edit-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="vehicle_number">Vehicle Number</label>
+                <div class="input-with-icon">
+                    <input type="text" id="vehicle_number" name="vehicle_number" value="{{ delivery.vehicle_number }}" required>
+                    <i class="fas fa-edit edit-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="license_number">License Number</label>
+                <div class="input-with-icon">
+                    <input type="text" id="license_number" name="license_number" value="{{ delivery.license_number }}" required>
+                    <i class="fas fa-edit edit-icon"></i>
+                </div>
+            </div>
+
+            <div class="password-section">
+                <h3>Update Password</h3>
+                <div class="form-group">
+                    <label for="new_password">New Password</label>
+                    <div class="input-with-icon">
+                        <input type="password" id="new_password" name="new_password" class="password-input">
+                        <i class="fas fa-key edit-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="save-btn">Save Changes</button>
+        </form>
+    </div>
+
+    <script>
+        // Profile dropdown functionality
+        const profileIcon = document.getElementById('profileIcon');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        profileIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove('show');
+            }
+        });
+
+        // Form submission
+        document.getElementById('editProfileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const alert = document.getElementById('alert');
+            const saveBtn = document.querySelector('.save-btn');
+            
+            try {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Saving...</span>';
+                
+                const formData = new FormData(this);
+                
+                const response = await fetch('{% url "joo:delivery_edit_profile" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    alert.className = 'alert alert-success';
+                    alert.innerHTML = '<i class="fas fa-check-circle"></i> Profile updated successfully!';
+                    alert.style.display = 'flex';
+                    
+                    // Clear password field after successful update
+                    document.getElementById('new_password').value = '';
+                    
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    throw new Error(data.message || 'Failed to update profile');
+                }
+            } catch (error) {
+                alert.className = 'alert alert-error';
+                alert.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
+                alert.style.display = 'flex';
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save"></i><span>Save Changes</span>';
+                
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 5000);
+            }
+        });
+
+        // Add visual feedback when clicking edit icons
+        document.querySelectorAll('.edit-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                input.focus();
+            });
+        });
+    </script>
+</body>
+</html> 

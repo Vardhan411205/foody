@@ -5,6 +5,8 @@
 set -o errexit
 # This makes the script exit immediately if any command fails (returns non-zero)
 
+cd /opt/render/project/src/
+
 # Install Python dependencies
 pip install -r requirements.txt
 # Installs all Python packages listed in requirements.txt

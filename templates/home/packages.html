@@ -9,46 +9,243 @@
     <link rel="stylesheet" href="{% static 'css/common.css' %}">
     <link rel="stylesheet" href="{% static 'css/packages.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Package Form Styles */
+        .package-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .package-form {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .package-form h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-section h3 {
+            color: #444;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-section h3 i {
+            color: #fc8019;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="tel"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #fc8019;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(252, 128, 25, 0.1);
+        }
+        
+        /* Delivery Options */
+        .delivery-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .option-card {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .option-card input[type="radio"] {
+            display: none;
+        }
+        
+        .option-content {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .option-card input[type="radio"]:checked + .option-content {
+            border-color: #fc8019;
+            background: #fff3e6;
+        }
+        
+        .option-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .option-time {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .option-price {
+            color: #fc8019;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #fc8019;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: #e67312;
+        }
+        
+        /* Package Features */
+        .package-features {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card i {
+            font-size: 30px;
+            color: #fc8019;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .feature-card p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .package-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .delivery-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body class="inner-page packages-page">
-    <!-- Header -->
-    <header>
-        <div class="header-content">
-            <div class="logo">
-                <img src="{% static 'img/logocopy.png' %}" alt="Logo" style="width: 50px; height: 50px;">
+    <!-- Secondary Navigation -->
+    <nav class="secondary-nav">
+        <div class="nav-content">
+            <div class="nav-left">
+                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
             </div>
-            <div class="service-highlight">
-                <span class="highlight-text">
-                    <i class="fas fa-bolt"></i> Fast Delivery
-                </span>
-                <span class="divider">|</span>
-                <span class="highlight-text">
-                    <i class="fas fa-piggy-bank"></i> Cost-Effective
-                </span>
-                <span class="divider">|</span>
-                <span class="highlight-text">
-                    <i class="fas fa-shield-alt"></i> Secure Packaging
-                </span>
-            </div>
-            <div class="profile-icon">
-                <i class="fas fa-user" style="color: black;"></i>
-                <div class="profile-dropdown">
-                    <ul class="profile-menu">
-                        <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
-                        <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
-                        <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
-                        <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
-                        <li class="divider"></li>
-                        <li><a href="{% url 'joo:logout' %}" class="logout"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
-                    </ul>
+            <div class="nav-right">
+                <div class="desktop-menu">
+                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                    <a href="{% url 'joo:my_orders' %}">Orders</a>
+                    <a href="{% url 'joo:favorites' %}">Favorites</a>
+                    <a href="{% url 'joo:addresses' %}">Addresses</a>
+                    <a href="{% url 'joo:logout' %}">Logout</a>
+                </div>
+                <div class="mobile-menu">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                        <a href="{% url 'joo:my_orders' %}">Orders</a>
+                        <a href="{% url 'joo:favorites' %}">Favorites</a>
+                        <a href="{% url 'joo:addresses' %}">Addresses</a>
+                        <a href="{% url 'joo:logout' %}">Logout</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <!-- Add this right after the header section -->
-    <div class="processing-banner">
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-picker">
+            <input type="text" id="package-search" placeholder="Search for packages...">
+            <button class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Not Available Banner -->
+    <div class="not-available-banner">
         <div class="banner-content">
             <i class="fas fa-map-marker-slash"></i>
             <div class="banner-text">
@@ -226,7 +423,261 @@
             margin: 0;
             font-size: 1rem;
         }
+
+        /* Secondary Navigation Styles */
+        .secondary-nav {
+            background-color: #fc8019;
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .nav-content {
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            width: 100%;
+            position: relative;
+        }
+
+        .brand {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover {
+            opacity: 0.9;
+        }
+
+        .desktop-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .desktop-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            position: relative;
+            padding: 5px 0;
+            margin: 0 5px;
+        }
+
+        .desktop-menu a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: white;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+
+        .desktop-menu a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: relative;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .menu-toggle:hover {
+            transform: rotate(90deg);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1001;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .dropdown-menu {
+                right: 0;
+                width: 200px;
+                background: white;
+                border: 1px solid rgba(252, 128, 25, 0.1);
+            }
+
+            .dropdown-menu a {
+                color: #fc8019;
+                padding: 12px 20px;
+                display: block;
+                text-decoration: none;
+                transition: all 0.2s ease;
+            }
+
+            .dropdown-menu a:hover {
+                background: #fff5ee;
+                color: #e67312;
+                transform: translateX(5px);
+            }
+        }
+
+        /* Search Bar Styles */
+        .search-container {
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+        }
+
+        .search-picker {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-picker input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .search-btn:hover {
+            color: #fc8019;
+        }
+
+        /* Adjust main content to account for search bar */
+        main {
+            margin-top: 120px;
+        }
+
+        /* Not Available Banner Styles */
+        .not-available-banner {
+            background: #fff;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+            top: 120px;
+            z-index: 998;
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .banner-content i {
+            font-size: 2.5rem;
+            color: #fc8019;
+        }
+
+        .banner-text h3 {
+            color: #fc8019;
+            margin: 0 0 8px 0;
+            font-size: 1.5rem;
+        }
+
+        .banner-text p {
+            color: #666;
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .not-available-banner {
+                margin: 20px;
+            }
+
+            .banner-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+        }
     </style>
+
+    <!-- Add the mobile menu script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                mobileMenu.classList.toggle('active');
+                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!mobileMenu.contains(e.target) && dropdownMenu.style.display === 'block') {
+                    mobileMenu.classList.remove('active');
+                    dropdownMenu.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -1,183 +1,255 @@
 {% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Addresses - Mr.Foody & Ms.Foody</title>
+    <title>Mr.Foody & Ms.Foody - Addresses</title>
     <link rel="stylesheet" href="{% static 'css/common.css' %}">
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/profile/my-orders.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * {
             box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
-        /* Header styles */
-        header {
-            width: 100%;
-            background: #fc8019;
-            height: 70px;
+        /* Secondary Navigation Styles */
+        .secondary-nav {
+            background-color: #fc8019;
+            padding: 15px 0;
             position: fixed;
             top: 0;
             left: 0;
+            right: 0;
             z-index: 1000;
-            padding: 0;
+            border-bottom: 1px solid #e8e8e8;
         }
-        
-        .header-content {
-            height: 100%;
+
+        .nav-content {
+            margin: 0 auto;
             display: flex;
+            justify-content: space-between;
             align-items: center;
             padding: 0 20px;
+            width: 100%;
             position: relative;
-            max-width: 100%;
-            justify-content: space-between;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            min-width: 50px;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-        }
-
-        .site-title {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-        }
-        
-        .site-title h2 {
+        .brand {
             color: white;
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            letter-spacing: 0.5px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            min-width: 50px;
-            justify-content: flex-end;
-        }
-
-        .profile-icon {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            text-decoration: none;
             position: relative;
+            transition: transform 0.3s ease;
         }
 
-        .profile-icon i {
-            color: #333;
-            font-size: 1.2rem;
+        .brand:hover {
+            opacity: 0.9;
         }
 
-        .profile-dropdown {
+        .desktop-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .desktop-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            position: relative;
+            padding: 5px 0;
+            margin: 0 5px;
+        }
+
+        .desktop-menu a::after {
+            content: '';
             position: absolute;
-            top: calc(100% + 5px);
-            right: 0;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: white;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+
+        .desktop-menu a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        .mobile-menu {
+            display: none;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-toggle:hover {
+            transform: rotate(90deg);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .mobile-menu.active .menu-toggle {
+            transform: rotate(180deg);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 20px;
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: none;
-            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1001;
+            animation: slideIn 0.3s ease-out;
+            border: 1px solid rgba(252, 128, 25, 0.1);
         }
 
-        .profile-icon.active .profile-dropdown,
-        .profile-icon:hover .profile-dropdown {
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-menu a {
             display: block;
-        }
-
-        .profile-menu {
-            list-style: none;
-            padding: 8px 0;
-            margin: 0;
-            width: 250px;
-        }
-
-        .profile-menu li {
-            padding: 0;
-        }
-
-        .profile-menu a {
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #333;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-
-        .profile-menu a:hover {
-            background: #f8f8f8;
-        }
-
-        .profile-menu i {
-            width: 20px;
-            color: #666;
-        }
-
-        .profile-menu .divider {
-            height: 1px;
-            background: #eee;
-            margin: 8px 0;
-        }
-
-        .profile-menu li:last-child a {
+            padding: 10px 20px;
             color: #fc8019;
+            text-decoration: none;
+            transition: all 0.2s ease-out;
+            position: relative;
+            padding-left: 30px;
+            background: transparent;
         }
 
-        .profile-menu li:last-child a:hover {
-            background: #fff0e6;
+        .dropdown-menu a:hover {
+            background: #fff5ee;
+            color: #e67312;
+            transform: translateX(5px);
         }
 
-        /* Ensure content is below fixed header */
-        body {
-            padding-top: 70px;
-            min-height: 100vh;
+        .dropdown-menu a::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            background: #fc8019;
+            border-radius: 50%;
+            transform: translateY(-50%) scale(0);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+        }
+
+        .dropdown-menu a:hover::before {
+            transform: translateY(-50%) scale(1) rotate(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+                position: relative;
+            }
+
+            .mobile-menu.active .dropdown-menu {
+                display: block;
+            }
+
+            .brand {
+                font-size: 1.4rem;
+            }
+
+            .nav-content {
+                padding: 0 15px;
+            }
+
+            .dropdown-menu {
+                right: 0;
+                left: auto;
+                width: 200px;
+                margin: 10px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .secondary-nav {
+                padding: 10px 0;
+            }
+            
+            .nav-content {
+                padding: 0 10px;
+            }
+            
+            .dropdown-menu {
+                right: 10px;
+                margin: 10px 10px;
+                max-width: calc(100% - 20px);
+            }
+        }
+
+        /* Keep your addresses-specific styles below */
+        main {
+            margin-top: 80px;
+            padding: 20px;
         }
 
         /* Address specific styles */
         .addresses-container {
-            max-width: 1200px;
-            margin-top: 30px;
-            padding: 0 16px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
         .addresses-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
         }
 
         .addresses-header h1 {
-            font-size: 24px;
-            font-weight: 500;
             color: #333;
+            font-size: 2rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .addresses-header h1 i {
@@ -185,39 +257,70 @@
         }
 
         .add-address-btn {
-            padding: 12px 24px;
             background: #fc8019;
             color: white;
             border: none;
-            border-radius: 8px;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(252, 128, 25, 0.2);
+        }
+
+        .add-address-btn:hover {
+            background: #e67312;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(252, 128, 25, 0.3);
+        }
+
+        .addresses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .address-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+            border: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .address-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .address-card h3 {
+            color: #333;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .add-address-btn:hover {
-            background: #e67312;
-        }
-
-        .addresses-grid {
-            display: grid;
-            gap: 20px;
-        }
-
-        .address-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: relative;
+        .address-card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-top: 10px;
         }
 
         .address-actions {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             display: flex;
             gap: 10px;
         }
@@ -226,11 +329,59 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.2rem;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
         }
 
-        .edit-btn { color: #666; }
-        .delete-btn { color: #ff4444; }
+        .edit-btn:hover, .delete-btn:hover {
+            background: rgba(252, 128, 25, 0.1);
+            transform: scale(1.1);
+        }
+
+        .edit-btn i {
+            color: #fc8019;
+        }
+
+        .delete-btn i {
+            color: #ff5252;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            grid-column: 1 / -1;
+            border: 2px dashed #ddd;
+        }
+
+        .empty-state p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .addresses-container {
+                padding: 0 15px;
+            }
+
+            .addresses-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .addresses-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .add-address-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
 
         /* Address Form Modal */
         .modal {
@@ -368,36 +519,36 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
-<body class="addresses-page">
-    <!-- Header -->
-    <header>
-        <div class="header-content">
-            <div class="logo-container">
-                <a href="{% url 'joo:home_page' %}">
-                    <img src="{% static 'img/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo" 
-                         style="width: 50px; height: 50px; border-radius: 50%; background: white; filter: none; object-fit: contain;">
-                </a>
+<body class="inner-page addresses-page">
+    <!-- Secondary Navigation -->
+    <nav class="secondary-nav">
+        <div class="nav-content">
+            <div class="nav-left">
+                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
             </div>
-            <div class="site-title">
-                <h2>Mr.Foody & Ms.Foody</h2>
-            </div>
-            <div class="header-right">
-                <div class="profile-icon">
-                    <i class="fas fa-user"></i>
-                    <div class="profile-dropdown">
-                        <ul class="profile-menu">
-                            <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
-                            <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
-                            <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
-                            <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
-                            <li class="divider"></li>
-                            <li><a href="{% url 'joo:logout' %}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
-                        </ul>
+            <div class="nav-right">
+                <div class="desktop-menu">
+                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                    <a href="{% url 'joo:my_orders' %}">Orders</a>
+                    <a href="{% url 'joo:favorites' %}">Favorites</a>
+                    <a href="{% url 'joo:addresses' %}" class="active">Addresses</a>
+                    <a href="{% url 'joo:logout' %}">Logout</a>
+                </div>
+                <div class="mobile-menu">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                        <a href="{% url 'joo:my_orders' %}">Orders</a>
+                        <a href="{% url 'joo:favorites' %}">Favorites</a>
+                        <a href="{% url 'joo:addresses' %}" class="active">Addresses</a>
+                        <a href="{% url 'joo:logout' %}">Logout</a>
                     </div>
                 </div>
             </div>
         </div>
-    </header>
+    </nav>
 
     <main>
         <div class="addresses-container">
@@ -419,7 +570,7 @@
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                    <h3>Address {{ forloop.counter }}</h3>
+                    <h3>{{ address.address_type|title }}</h3>
                     <p>{{ address.address }}</p>
                 </div>
                 {% empty %}
@@ -438,6 +589,15 @@
             <h2 id="modalTitle">Add New Address</h2>
             <form id="addressForm" class="address-form" onsubmit="handleAddressSubmit(event)">
                 <input type="hidden" id="addressId" name="addressId">
+                
+                <div class="form-group">
+                    <label for="addressType">Address Type</label>
+                    <select id="addressType" name="addressType" required>
+                        <option value="home">Home</option>
+                        <option value="work">Work</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
                 
                 <p class="instruction">Click on the map to select your location</p>
                 <!-- Map container -->
@@ -560,26 +720,39 @@
     // Update handleAddressSubmit to include coordinates
     async function handleAddressSubmit(event) {
         event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
+        
+        // Get form data
+        const data = {
+            address_type: document.getElementById('addressType').value,
+            address: document.getElementById('address').value,
+            latitude: document.getElementById('latitude').value,
+            longitude: document.getElementById('longitude').value,
+            addressId: document.getElementById('addressId').value || null
+        };
+
+        console.log('Sending data:', data); // Debug log
         
         try {
             const response = await fetch('{% url "joo:update_address" %}', {
                 method: 'POST',
-                body: formData,
                 headers: {
+                    'Content-Type': 'application/json',
                     'X-CSRFToken': '{{ csrf_token }}'
-                }
+                },
+                body: JSON.stringify(data)
             });
             
-            if (response.ok) {
+            const result = await response.json();
+            console.log('Response:', result); // Debug log
+            
+            if (result.status === 'success') {
                 location.reload();
             } else {
-                alert('Error updating address');
+                alert(result.message || 'Error saving address');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Error updating address');
+            alert('Error saving address');
         }
     }
 
@@ -628,36 +801,17 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const profileIcon = document.querySelector('.profile-icon');
-        const dropdown = document.querySelector('.profile-dropdown');
+        const menuToggle = document.querySelector('.menu-toggle');
+        const mobileMenu = document.querySelector('.mobile-menu');
 
-        // Toggle active class on profile icon click
-        profileIcon.addEventListener('click', function(e) {
-            e.stopPropagation();
-            this.classList.toggle('active');
+        menuToggle.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
         });
 
-        // Prevent dropdown from closing when clicking inside it
-        dropdown.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-
-        // Close dropdown only when clicking outside profile icon and dropdown
+        // Close menu when clicking outside
         document.addEventListener('click', function(e) {
-            if (!profileIcon.contains(e.target)) {
-                profileIcon.classList.remove('active');
-            }
-        });
-
-        // Keep dropdown open when hovering from icon to dropdown
-        dropdown.addEventListener('mouseover', function() {
-            profileIcon.classList.add('active');
-        });
-
-        // Keep dropdown open when moving cursor between icon and dropdown
-        profileIcon.addEventListener('mouseover', function() {
-            if (this.contains(document.activeElement)) {
-                this.classList.add('active');
+            if (!mobileMenu.contains(e.target)) {
+                mobileMenu.classList.remove('active');
             }
         });
     });

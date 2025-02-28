@@ -364,19 +364,17 @@
             <h2>Welcome Back</h2>
             <p class="subtitle">Login to your account</p>
 
-            {% if error %}
-            <div class="alert error">
-                {{ error }}
-            </div>
-            {% endif %}
+            <div class="alert" style="display: none;"></div>
 
-            <form id="loginForm" method="POST" action="{% url 'joo:login' %}">
+            <form id="loginForm">
                 {% csrf_token %}
                 <div class="form-group">
-                    <input type="email" id="email" name="email" required placeholder="Email">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" placeholder="Email" required>
                 </div>
                 <div class="form-group">
-                    <input type="password" id="password" name="password" required placeholder="Password">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
                 </div>
                 <div class="form-options">
                     <label class="remember-me">
@@ -394,11 +392,50 @@
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const submitBtn = document.querySelector('.login-btn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Logging in...';
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch('/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    window.location.href = data.redirect_url;
+                } else {
+                    alert(data.message || 'Login failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during login');
+            }
         });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
     </script>
 </body>
 

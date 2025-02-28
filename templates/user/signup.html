@@ -342,14 +342,127 @@
             margin-bottom: 20px;
             font-size: 16px;
         }
+
+        /* Add these styles */
+        .form-group {
+            position: relative;
+        }
+
+        #verificationStatus {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            background-color: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+        }
+
+        #verificationStatus i {
+            font-size: 12px;
+        }
+
+        .form-group input[readonly] {
+            background-color: #f8f8f8;
+            border-color: #28a745;
+        }
     </style>
 </head>
 
 <body class="signup-page">
     <!-- Updated Partner Button -->
-    <a href="{% url 'joo:partner' %}" class="corner-partner-btn">
+    <a href="/partner/" class="corner-partner-btn">
         <i class="fas fa-store"></i> Become Partner
     </a>
+
+    <!-- Update the loading screen div -->
+    <div id="loading-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fc8019; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;">
+        <style>
+            @keyframes logoAnimation {
+                0% {
+                    transform: scale(0.5) rotate(-180deg);
+                    opacity: 0;
+                }
+                50% {
+                    transform: scale(1.2) rotate(10deg);
+                }
+                100% {
+                    transform: scale(1) rotate(0deg);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes textAnimation {
+                0% {
+                    transform: translateY(30px);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .loading-logo {
+                width: 180px;
+                height: 180px;
+                border-radius: 50%;
+                overflow: hidden;
+                margin-bottom: 30px;
+                animation: logoAnimation 1.2s ease forwards;
+            }
+
+            .loading-logo img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                border-radius: 50%;
+                background: transparent;
+            }
+
+            .loading-text {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .loading-text span {
+                color: white;
+                font-family: 'Pacifico', cursive;
+                font-size: 32px;
+                opacity: 0;
+            }
+
+            .loading-text .mr {
+                animation: textAnimation 0.8s ease 0.5s forwards;
+            }
+
+            .loading-text .and {
+                font-size: 24px;
+                animation: textAnimation 0.8s ease 0.7s forwards;
+            }
+
+            .loading-text .ms {
+                animation: textAnimation 0.8s ease 0.9s forwards;
+            }
+        </style>
+
+        <!-- Add Pacifico font -->
+        <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
+        <div class="loading-logo">
+            <img src="{% static 'img/logocopy.png' %}" alt="Logo">
+        </div>
+        <div class="loading-text">
+            <span class="mr">Mr.Foody</span>
+            <span class="and">&</span>
+            <span class="ms">Ms.Foody</span>
+        </div>
+    </div>
 
     <div class="login-container">
         <div class="logo">
@@ -371,6 +484,9 @@
                     <i class="fas fa-envelope"></i>
                     <input type="email" id="email" name="email" placeholder="Email" required>
                     <button type="button" id="verifyEmailBtn" class="verify-btn">Verify</button>
+                    <span id="verificationStatus" style="display: none; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background-color: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        Verified
+                    </span>
                 </div>
                 <div class="otp-section" style="display: none;">
                     <h3>Enter OTP</h3>
@@ -390,9 +506,11 @@
                     <input type="tel" id="phone" placeholder="Phone Number" required>
                 </div>
                 <div class="form-group">
+                    <i class="fas fa-lock"></i>
                     <input type="password" id="password" placeholder="Password" required>
                 </div>
                 <div class="form-group">
+                    <i class="fas fa-lock"></i>
                     <input type="password" id="confirm_password" placeholder="Confirm Password" required>
                 </div>
                 <div class="terms-group">
@@ -527,6 +645,9 @@
                     otpSection.style.display = 'none';
                     verifyEmailBtn.style.display = 'none';
                     emailInput.readOnly = true;
+                    // Show verification status
+                    document.getElementById('verificationStatus').style.display = 'inline-flex';
+                    emailInput.style.paddingRight = '90px';  // Adjusted padding for the badge
                     updateSignupButton();
                     alert('Email verified successfully!');
                 } else {
@@ -635,6 +756,18 @@
         document.querySelector('.login-link').addEventListener('click', function(e) {
             e.preventDefault();
             window.location.href = "{% url 'joo:login' %}";
+        });
+
+        // Loading screen handler
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loading-screen');
+            setTimeout(function() {
+                loadingScreen.style.opacity = '0';
+                loadingScreen.style.transition = 'opacity 0.5s ease';
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 3000);
         });
     </script>
 </body>

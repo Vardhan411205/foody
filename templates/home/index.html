@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Mr.Foody & Ms.Foody</title>
     <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -31,15 +32,36 @@
             height: 100%;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             padding: 0 20px;
             margin: 0 auto;
+            position: relative;
         }
         
-        .site-title {            position: absolute;
+        .header-content > div:first-child {
+            position: absolute;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            margin: 0;
+            padding-left: 10px;
+        }
+        
+        .header-content > div:first-child img {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            object-fit: contain;
+        }
+        
+        .site-title {
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            text-align: center;
         }
         
         .site-title h2 {
@@ -68,6 +90,10 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
         }
         
         .profile-icon i {
@@ -75,20 +101,69 @@
             font-size: 1.2rem;
         }
         
-        /* Responsive styles */
+        /* Mobile styles */
         @media (max-width: 768px) {
+            header {
+                height: 50px;
+                padding: 0;
+            }
+            
+            .header-content {
+                padding: 0 10px;
+                justify-content: flex-start;
+            }
+            
+            .header-content > div:first-child {
+                width: 35px;
+                height: 35px;
+                margin-top: 8px;
+                padding-left: 5px;
+                left: 0;
+            }
+            
+            .header-content > div:first-child img {
+                width: 100%;
+                height: 100%;
+                background: transparent;
+                object-fit: contain;
+            }
+            
+            .site-title {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
             .site-title h2 {
-                font-size: 1.8rem;
+                font-size: 1.4rem;
+                margin-top: 8px;
+            }
+            
+            .profile-icon {
+                width: 35px;
+                height: 35px;
+                right: 10px;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
             }
         }
         
         @media (max-width: 480px) {
             .site-title h2 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
+                margin-top: 10px;
             }
             
             .header-content {
-                justify-content: space-between;
+                justify-content: flex-start;
+            }
+            
+            .header-content > div:first-child {
+                width: 30px;
+                height: 30px;
+                margin-top: 10px;
+                margin-left: 5px;
             }
         }
 
@@ -329,37 +404,279 @@
                 justify-content: center;
             }
         }
+
+        /* Secondary Navigation Styles */
+        .secondary-nav {
+            background-color: #fc8019;
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .nav-content {
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            width: 100%;
+            position: relative;
+        }
+
+        .brand {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover {
+            opacity: 0.9;
+        }
+
+        .desktop-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .desktop-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            position: relative;
+            padding: 5px 0;
+            margin: 0 5px;
+        }
+
+        .desktop-menu a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: white;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+
+        .desktop-menu a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        .mobile-menu {
+            display: none;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-toggle:hover {
+            transform: rotate(90deg);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .mobile-menu.active .menu-toggle {
+            transform: rotate(180deg);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1001;
+            animation: slideIn 0.3s ease-out;
+            border: 1px solid rgba(252, 128, 25, 0.1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 20px;
+            color: #fc8019;
+            text-decoration: none;
+            transition: all 0.2s ease-out;
+            position: relative;
+            padding-left: 30px;
+            background: transparent;
+        }
+
+        .dropdown-menu a:hover {
+            background: #fff5ee;
+            color: #e67312;
+            transform: translateX(5px);
+        }
+
+        .dropdown-menu a::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            background: #fc8019;
+            border-radius: 50%;
+            transform: translateY(-50%) scale(0);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+        }
+
+        .dropdown-menu a:hover::before {
+            transform: translateY(-50%) scale(1) rotate(0);
+            opacity: 1;
+        }
+
+        /* New hover effect for desktop menu */
+        .desktop-menu a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Active state for menu items */
+        .desktop-menu a.active,
+        .dropdown-menu a.active {
+            font-weight: 600;
+            color: white;
+        }
+
+        /* Subtle transition for dropdown items */
+        .dropdown-menu a {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown-menu a::after {
+            display: none;
+        }
+
+        .dropdown-menu a:not(:last-child) {
+            border-bottom: 1px solid rgba(252, 128, 25, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+                position: relative;
+            }
+
+            .mobile-menu.active .dropdown-menu {
+                display: block;
+            }
+
+            .brand {
+                font-size: 1.4rem;
+            }
+
+            .nav-content {
+                padding: 0 15px;
+            }
+
+            .dropdown-menu {
+                right: 0;
+                left: auto;
+                width: 200px;
+                margin: 10px 15px;
+                position: absolute;
+            }
+            
+            .mobile-menu {
+                position: static;
+            }
+            
+            .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                right: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .secondary-nav {
+                padding: 10px 0;
+            }
+            
+            .nav-content {
+                padding: 0 10px;
+            }
+            
+            .dropdown-menu {
+                right: 10px;
+                margin: 10px 10px;
+                max-width: calc(100% - 20px);
+            }
+        }
     </style>
 </head>
 
 <body class="index-page">
-    <!-- Header -->
-    <header>
-        <div class="header-content">
-            <div style="width: 50px; height: 50px; display: flex; align-items: center; margin-right: 20px;">
-                <img src="{% static 'img/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo" 
-                     style="width: 100%; height: 100%; border-radius: 50%; background: white; filter: none; object-fit: contain;">
+    <!-- Secondary Navigation -->
+    <nav class="secondary-nav">
+        <div class="nav-content">
+            <div class="nav-left">
+                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
             </div>
-            <div class="site-title">
-                <h2>Mr.Foody & Ms.Foody</h2>
-            </div>
-            <div class="header-right">
-                <div class="profile-icon">
-                    <i class="fas fa-user"></i>
-                    <div class="profile-dropdown">
-                        <ul class="profile-menu">
-                            <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
-                            <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
-                            <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
-                            <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
-                            <li class="divider"></li>
-                            <li><a href="{% url 'joo:logout' %}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
-                        </ul>
+            <div class="nav-right">
+                <div class="desktop-menu">
+                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                    <a href="{% url 'joo:my_orders' %}">Orders</a>
+                    <a href="{% url 'joo:favorites' %}">Favorites</a>
+                    <a href="{% url 'joo:addresses' %}">Addresses</a>
+                    <a href="{% url 'joo:logout' %}">Logout</a>
+                </div>
+                <div class="mobile-menu">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                        <a href="{% url 'joo:my_orders' %}">Orders</a>
+                        <a href="{% url 'joo:favorites' %}">Favorites</a>
+                        <a href="{% url 'joo:addresses' %}">Addresses</a>
+                        <a href="{% url 'joo:logout' %}">Logout</a>
                     </div>
                 </div>
             </div>
         </div>
-    </header>
+    </nav>
 
     <!-- Main content -->
     <main>
@@ -515,6 +832,22 @@
     </footer>
 
     <script src="{% static 'js/common.js' %}"></script>
-    <script src="{% static 'js/location.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const mobileMenu = document.querySelector('.mobile-menu');
+
+            menuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html> 

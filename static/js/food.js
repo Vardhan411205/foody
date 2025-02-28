@@ -62,8 +62,63 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Initialize cart functionality
-    initializeCart();
+    // Initialize add to cart functionality
+    const addButtons = document.querySelectorAll('.add-btn');
+    const counters = document.querySelectorAll('.counter');
+    
+    addButtons.forEach((btn, index) => {
+        btn.addEventListener('click', function() {
+            this.style.display = 'none';
+            counters[index].style.display = 'flex';
+            counters[index].querySelector('.count').textContent = '1';
+            updateCart();
+        });
+    });
+
+    counters.forEach(counter => {
+        const decreaseBtn = counter.querySelector('.decrease');
+        const increaseBtn = counter.querySelector('.increase');
+        const countDisplay = counter.querySelector('.count');
+        const addBtn = counter.parentElement.querySelector('.add-btn');
+
+        decreaseBtn.addEventListener('click', function() {
+            let count = parseInt(countDisplay.textContent);
+            count--;
+            if (count === 0) {
+                counter.style.display = 'none';
+                addBtn.style.display = 'block';
+            } else {
+                countDisplay.textContent = count;
+            }
+            updateCart();
+        });
+
+        increaseBtn.addEventListener('click', function() {
+            let count = parseInt(countDisplay.textContent);
+            count++;
+            countDisplay.textContent = count;
+            updateCart();
+        });
+    });
+
+    // Initialize favorite buttons
+    const favoriteButtons = document.querySelectorAll('.favorite-btn');
+    favoriteButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            icon.classList.toggle('far');
+            icon.classList.toggle('fas');
+            
+            // Get item data
+            const itemData = JSON.parse(this.dataset.item);
+            
+            // Update favorites in localStorage
+            updateFavorites(itemData, icon.classList.contains('fas'));
+        });
+    });
+
+    // Check and update initial favorite states
+    checkInitialFavorites();
 });
 
 // Profile dropdown functionality
@@ -108,43 +163,36 @@ function showFavoriteNotification(action) {
     }, 3000);
 }
 
-// Update the favorite button click handler
-document.querySelectorAll('.favorite-btn').forEach(button => {
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+function updateCart() {
+    const counters = document.querySelectorAll('.counter');
+    let totalItems = 0;
 
-        const itemData = JSON.parse(this.dataset.item);
-        const itemId = this.dataset.id;
-        const isActive = this.classList.contains('active');
-
-        if (!isActive) {
-            this.classList.add('active');
-            this.innerHTML = '<i class="fas fa-heart"></i>';
-            addToFavorites(itemId, itemData);
-            showFavoriteNotification('add');
-        } else {
-            this.classList.remove('active');
-            this.innerHTML = '<i class="far fa-heart"></i>';
-            removeFromFavorites(itemId);
-            showFavoriteNotification('remove');
+    counters.forEach(counter => {
+        if (counter.style.display !== 'none') {
+            totalItems += parseInt(counter.querySelector('.count').textContent);
         }
     });
-});
 
-function safeGetCart() {
-    try {
-        return JSON.parse(localStorage.getItem('foodCart') || '[]');
-    } catch (e) {
-        console.error('Error reading cart:', e);
-        return [];
+    // Update cart badge
+    const cartBadge = document.querySelector('.cart-badge');
+    if (cartBadge) {
+        cartBadge.textContent = totalItems;
+        cartBadge.style.display = totalItems > 0 ? 'block' : 'none';
     }
 }
 
-function safeSetCart(cart) {
-    try {
-        localStorage.setItem('foodCart', JSON.stringify(cart));
-    } catch (e) {
-        console.error('Error saving cart:', e);
-    }
+function checkInitialFavorites() {
+    const favoriteButtons = document.querySelectorAll('.favorite-btn');
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+    favoriteButtons.forEach(btn => {
+        const itemData = JSON.parse(btn.dataset.item);
+        const isFavorite = favorites.some(fav => fav.name === itemData.name);
+        
+        if (isFavorite) {
+            const icon = btn.querySelector('i');
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+        }
+    });
 }

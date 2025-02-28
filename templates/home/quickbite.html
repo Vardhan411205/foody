@@ -10,151 +10,237 @@
     <link rel="stylesheet" href="{% static 'css/quickbite.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* Secondary Navigation Styles */
+        .secondary-nav {
+            background-color: #fc8019;
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #e8e8e8;
+        }
+ 
+        .nav-content {
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            width: 100%;
+            position: relative;
+        }
+ 
+        .brand {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+ 
+        .brand:hover {
+            opacity: 0.9;
+        }
+ 
+        .desktop-menu {
+            display: flex;
+            gap: 25px;
+        }
+ 
+        .desktop-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            position: relative;
+            padding: 5px 0;
+            margin: 0 5px;
+        }
+ 
+        .desktop-menu a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: white;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+ 
+        .desktop-menu a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+ 
+        .mobile-menu {
+            display: none;
+            position: relative;
+        }
+ 
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+ 
+        .menu-toggle:hover {
+            transform: rotate(90deg);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+ 
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1001;
+            margin-top: 10px;
+        }
+ 
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+ 
+            .mobile-menu {
+                display: block;
+            }
+ 
+            .dropdown-menu {
+                right: 0;
+                width: 200px;
+                background: white;
+                border: 1px solid rgba(252, 128, 25, 0.1);
+            }
+ 
+            .dropdown-menu a {
+                color: #fc8019;
+                padding: 12px 20px;
+                display: block;
+                text-decoration: none;
+                transition: all 0.2s ease;
+            }
+ 
+            .dropdown-menu a:hover {
+                background: #fff5ee;
+                color: #e67312;
+                transform: translateX(5px);
+            }
+        }
+ 
+        @media (max-width: 480px) {
+            .secondary-nav {
+                padding: 10px 0;
+            }
+            
+            .nav-content {
+                padding: 0 10px;
+            }
+        }
+ 
+        /* Search Bar Styles */
+        .search-container {
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+        }
+ 
+        .search-picker {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+ 
+        .search-picker input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+        }
+ 
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+        }
+ 
+        .search-btn:hover {
+            color: #fc8019;
+        }
+ 
+        /* Adjust main content to account for search bar */
+        main {
+            margin-top: 120px;
+        }
+ 
+        @media (max-width: 768px) {
+            .search-container {
+                padding: 10px;
+            }
+ 
+            .search-picker input {
+                padding: 10px 35px 10px 12px;
+            }
+        }
+     </style>
 </head>
 
 <body class="inner-page quickbite-page">
-    <!-- Header -->
-    <header>
-        <!-- Left corner logo -->
-        <div class="logo">
-            <img src="{% static 'img/logocopy.png' %}" alt="Logo" style="width: 50px; height: 50px;">
-        </div>
-
-        <!-- Centered search bar -->
-        <div class="header-content">
-            <div class="search-picker">
-                <input type="text" id="quickbite-search" placeholder="Search for groceries, household items...">
-                <button class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Right corner profile -->
-        <div class="profile-icon">
-            <i class="fas fa-user"></i>
-            <div class="profile-dropdown">
-                <div class="profile-header">
-                    <i class="fas fa-user-circle"></i>
-                    <span>Hello, {{ user.first_name|default:user.email }}</span>
-                </div>
-                <ul class="profile-menu">
-                    <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
-                    <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
-                    <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
-                    <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#help"><i class="fas fa-question-circle"></i>Help & Support</a></li>
-                    <li><a href="{% url 'joo:logout' %}" class="logout"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
-                </ul>
-            </div>
-        </div>
-    </header>
-
     <!-- Secondary Navigation -->
     <nav class="secondary-nav">
-        <div class="scrolling-categories">
-            <div class="category-item">
-                <a href="#all" class="active">
-                    <img src="{% static 'img/instamart/all.jpg' %}" alt="All">
-                    <span>All</span>
-                </a>
+        <div class="nav-content">
+            <div class="nav-left">
+                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
             </div>
-            <div class="category-item">
-                <a href="#fruits">
-                    <img src="{% static 'img/instamart/fruits.jpg' %}" alt="Fruits & Veggies">
-                    <span>Fruits & Veggies</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#dairy">
-                    <img src="{% static 'img/instamart/dairy.jpg' %}" alt="Dairy">
-                    <span>Dairy</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#snacks">
-                    <img src="{% static 'img/instamart/snacks.jpg' %}" alt="Snacks">
-                    <span>Snacks</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#beverages">
-                    <img src="{% static 'img/instamart/beverages.jpg' %}" alt="Beverages">
-                    <span>Beverages</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#household">
-                    <img src="{% static 'img/instamart/household.jpg' %}" alt="Household">
-                    <span>Household</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#personal">
-                    <img src="{% static 'img/instamart/personal.jpg' %}" alt="Personal Care">
-                    <span>Personal Care</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#staples">
-                    <img src="{% static 'img/instamart/staples.jpg' %}" alt="Staples">
-                    <span>Staples</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#electronics">
-                    <img src="{% static 'img/instamart/electronics.jpg' %}" alt="Electronics">
-                    <span>Electronics</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#bakery">
-                    <img src="{% static 'img/instamart/bakery.jpg' %}" alt="Bakery">
-                    <span>Bakery</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#beauty">
-                    <img src="{% static 'img/instamart/beauty.jpg' %}" alt="Beauty Products">
-                    <span>Beauty</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#pets">
-                    <img src="{% static 'img/instamart/pets.jpg' %}" alt="Pet Supplies">
-                    <span>Pets</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#furniture">
-                    <img src="{% static 'img/instamart/furniture.jpg' %}" alt="Furniture">
-                    <span>Furniture</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#toys">
-                    <img src="{% static 'img/instamart/toys.jpg' %}" alt="Toys">
-                    <span>Toys</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#automotive">
-                    <img src="{% static 'img/instamart/automotive.jpg' %}" alt="Automotive">
-                    <span>Automotive</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#sports">
-                    <img src="{% static 'img/instamart/sports.jpg' %}" alt="Sports">
-                    <span>Sports</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#anime-books">
-                    <img src="{% static 'img/instamart/anime-books.jpg' %}" alt="Anime Books">
-                    <span>Anime Books</span>
-                </a>
+            <div class="nav-right">
+                <div class="desktop-menu">
+                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                    <a href="{% url 'joo:my_orders' %}">Orders</a>
+                    <a href="{% url 'joo:favorites' %}">Favorites</a>
+                    <a href="{% url 'joo:addresses' %}">Addresses</a>
+                    <a href="{% url 'joo:logout' %}">Logout</a>
+                </div>
+                <div class="mobile-menu">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                        <a href="{% url 'joo:my_orders' %}">Orders</a>
+                        <a href="{% url 'joo:favorites' %}">Favorites</a>
+                        <a href="{% url 'joo:addresses' %}">Addresses</a>
+                        <a href="{% url 'joo:logout' %}">Logout</a>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -173,6 +259,7 @@
     </nav>
 
     <main>
+    
         <!-- Products Section -->
         <section class="products-section">
             <h2>All Products</h2>
@@ -2091,6 +2178,27 @@
     <script src="{% static 'js/quickbite.js' %}"></script>
     <script src="{% static 'js/favorites-handler.js' %}"></script>
     <script src="{% static 'js/cart-handler.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                mobileMenu.classList.toggle('active');
+                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!mobileMenu.contains(e.target) && dropdownMenu.style.display === 'block') {
+                    mobileMenu.classList.remove('active');
+                    dropdownMenu.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

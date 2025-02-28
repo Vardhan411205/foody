@@ -1,34 +1,32 @@
 // Common search functionality
 function initializeSearch() {
     // Get the search elements
-    const searchInput = document.getElementById('quickbite-search');
+    const searchInput = document.getElementById('food-search');
     const searchBtn = document.querySelector('.search-btn');
+    const restaurantCards = document.querySelectorAll('.restaurants-section .restaurant-card');
     
     // Exit if we're not on a page with search functionality
-    if (!searchInput || !searchBtn) return;
+    if (!searchInput || !searchBtn || !restaurantCards.length) {
+        console.log('Search elements not found');
+        return;
+    }
 
     function performSearch() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        const items = document.querySelectorAll('.product-card');
-        let hasResults = false;
+        const searchTerm = searchInput.value.toLowerCase();
+        filterRestaurants(searchTerm);
+    }
 
-        items.forEach(item => {
-            const title = item.querySelector('h3')?.textContent?.toLowerCase() || '';
-            const category = item.querySelector('.category-tag')?.textContent?.toLowerCase() || '';
+    function filterRestaurants(searchTerm) {
+        restaurantCards.forEach(card => {
+            const name = card.querySelector('h3').textContent.toLowerCase();
+            const restaurant = card.querySelector('.restaurant-name').textContent.toLowerCase();
             
-            if (title.includes(searchTerm) || category.includes(searchTerm)) {
-                item.style.display = '';
-                hasResults = true;
+            if (name.includes(searchTerm) || restaurant.includes(searchTerm)) {
+                card.style.display = 'block';
             } else {
-                item.style.display = 'none';
+                card.style.display = 'none';
             }
         });
-
-        // Show/hide no results message if it exists
-        const noResults = document.querySelector('.no-results');
-        if (noResults) {
-            noResults.style.display = hasResults ? 'none' : 'block';
-        }
     }
 
     // Add event listeners
@@ -46,7 +44,9 @@ function initializeSearch() {
 }
 
 // Initialize search when DOM is loaded
-document.addEventListener('DOMContentLoaded', initializeSearch);
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSearch();
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     // Get search input and items based on page type

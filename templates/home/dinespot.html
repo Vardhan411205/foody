@@ -12,74 +12,45 @@
 </head>
 
 <body class="inner-page dinespot-page">
-    <!-- Header -->
-    <header>
-        <!-- Left corner logo -->
-        <div class="logo">
-            <img src="{% static 'img/logocopy.png' %}" alt="Logo" style="width: 50px; height: 50px;">
-        </div>
-
-        <!-- Centered search bar -->
-        <div class="header-content">
-            <div class="search-picker">
-                <input type="text" id="restaurant-search" placeholder="Search for restaurants, cuisines...">
-                <button class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Right corner profile -->
-        <div class="profile-icon">
-            <i class="fas fa-user" style="color: black;"></i>
-            <div class="profile-dropdown">
-                <ul class="profile-menu">
-                    <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
-                    <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
-                    <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
-                    <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
-                    <li class="divider"></li>
-                    <li><a href="{% url 'joo:logout' %}" class="logout"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
-                </ul>
-            </div>
-        </div>
-    </header>
-
     <!-- Secondary Navigation -->
     <nav class="secondary-nav">
-        <div class="scrolling-categories">
-            <div class="category-item">
-                <a href="#all" class="active">
-                    <img src="{% static 'img/dineout/all-restaurants.jpg' %}" alt="All">
-                    <span>All</span>
-                </a>
+        <div class="nav-content">
+            <div class="nav-left">
+                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
             </div>
-            <div class="category-item">
-                <a href="#luxury">
-                    <img src="{% static 'img/dineout/luxury.jpg' %}" alt="Luxury">
-                    <span>Luxury</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#premium">
-                    <img src="{% static 'img/dineout/premium.jpg' %}" alt="Premium">
-                    <span>Premium</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#casual">
-                    <img src="{% static 'img/dineout/casual.jpg' %}" alt="Casual">
-                    <span>Casual</span>
-                </a>
-            </div>
-            <div class="category-item">
-                <a href="#budget">
-                    <img src="{% static 'img/dineout/budget.jpg' %}" alt="Budget">
-                    <span>Budget</span>
-                </a>
+            <div class="nav-right">
+                <div class="desktop-menu">
+                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                    <a href="{% url 'joo:my_orders' %}">Orders</a>
+                    <a href="{% url 'joo:favorites' %}">Favorites</a>
+                    <a href="{% url 'joo:addresses' %}">Addresses</a>
+                    <a href="{% url 'joo:logout' %}">Logout</a>
+                </div>
+                <div class="mobile-menu">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                        <a href="{% url 'joo:my_orders' %}">Orders</a>
+                        <a href="{% url 'joo:favorites' %}">Favorites</a>
+                        <a href="{% url 'joo:addresses' %}">Addresses</a>
+                        <a href="{% url 'joo:logout' %}">Logout</a>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-picker">
+            <input type="text" id="dinespot-search" placeholder="Search for restaurants...">
+            <button class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
 
     <main>
         <!-- Add this after the search bar and before the restaurant cards -->
@@ -218,11 +189,192 @@
                     flex: 1;
                 }
             }
+
+            /* Secondary Navigation Styles */
+            .secondary-nav {
+                background-color: #fc8019;
+                padding: 15px 0;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                border-bottom: 1px solid #e8e8e8;
+            }
+
+            .nav-content {
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 20px;
+                width: 100%;
+                position: relative;
+            }
+
+            .brand {
+                color: white;
+                font-size: 1.8rem;
+                font-weight: bold;
+                text-decoration: none;
+                position: relative;
+                transition: transform 0.3s ease;
+            }
+
+            .brand:hover {
+                opacity: 0.9;
+            }
+
+            .desktop-menu {
+                display: flex;
+                gap: 25px;
+            }
+
+            .desktop-menu a {
+                color: white;
+                text-decoration: none;
+                font-size: 1rem;
+                position: relative;
+                padding: 5px 0;
+                margin: 0 5px;
+            }
+
+            .desktop-menu a::after {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 2px;
+                bottom: -2px;
+                left: 0;
+                background-color: white;
+                transform: scaleX(0);
+                transform-origin: bottom right;
+                transition: transform 0.3s ease-out;
+            }
+
+            .desktop-menu a:hover::after {
+                transform: scaleX(1);
+                transform-origin: bottom left;
+            }
+
+            .mobile-menu {
+                display: none;
+                position: relative;
+            }
+
+            .menu-toggle {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 5px;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .menu-toggle:hover {
+                transform: rotate(90deg);
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+            }
+
+            .dropdown-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                padding: 10px 0;
+                min-width: 200px;
+                z-index: 1001;
+                margin-top: 10px;
+            }
+
+            @media (max-width: 768px) {
+                .desktop-menu {
+                    display: none;
+                }
+
+                .mobile-menu {
+                    display: block;
+                }
+
+                .dropdown-menu {
+                    right: 0;
+                    width: 200px;
+                    background: white;
+                    border: 1px solid rgba(252, 128, 25, 0.1);
+                }
+
+                .dropdown-menu a {
+                    color: #fc8019;
+                    padding: 12px 20px;
+                    display: block;
+                    text-decoration: none;
+                    transition: all 0.2s ease;
+                }
+
+                .dropdown-menu a:hover {
+                    background: #fff5ee;
+                    color: #e67312;
+                    transform: translateX(5px);
+                }
+            }
+
+            /* Search Bar Styles */
+            .search-container {
+                padding: 20px;
+                background: white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                z-index: 999;
+            }
+
+            .search-picker {
+                max-width: 600px;
+                margin: 0 auto;
+                position: relative;
+            }
+
+            .search-picker input {
+                width: 100%;
+                padding: 12px 40px 12px 15px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 1rem;
+                outline: none;
+            }
+
+            .search-btn {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: none;
+                color: #666;
+                cursor: pointer;
+            }
+
+            .search-btn:hover {
+                color: #fc8019;
+            }
+
+            /* Adjust main content to account for search bar */
+            main {
+                margin-top: 120px;
+            }
         </style>
 
         <!-- Restaurants Section -->
         <section class="restaurants-section">
-            <h2>All Restaurants</h2>
+            <h2 style="margin-left: 20px;">All Restaurants</h2>
             <div class="restaurant-grid">
                 {% for table in dining_tables %}
                 <div class="restaurant-card {{ table.category|lower }}" data-category="{{ table.category|lower }}">
@@ -273,7 +425,6 @@
 
     <script src="{% static 'js/common.js' %}"></script>
     <script src="{% static 'js/search.js' %}"></script>
-    <script src="{% static 'js/secondary-nav.js' %}"></script>
     <script src="{% static 'js/favorites-handler.js' %}"></script>
     <script src="{% static 'js/dinespot.js' %}"></script>
     <script>
@@ -303,6 +454,26 @@
         localStorage.setItem('bookingData', JSON.stringify(tableData));
         window.location.href = "{% url 'joo:payments' %}";
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.querySelector('.menu-toggle');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileMenu.classList.toggle('active');
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!mobileMenu.contains(e.target) && dropdownMenu.style.display === 'block') {
+                mobileMenu.classList.remove('active');
+                dropdownMenu.style.display = 'none';
+            }
+        });
+    });
     </script>
 </body>
 

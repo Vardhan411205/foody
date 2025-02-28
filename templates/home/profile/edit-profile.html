@@ -4,159 +4,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile - Mr.Foody & Ms.Foody</title>
+    <title>Mr.Foody & Ms.Foody - Edit Profile</title>
     <link rel="stylesheet" href="{% static 'css/common.css' %}">
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/profile/my-orders.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
             box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
-        /* Header styles */
-        header {
-            width: 100%;
-            background: #fc8019;
-            height: 70px;
+        /* Secondary Navigation Styles */
+        .secondary-nav {
+            background-color: #fc8019;
+            padding: 15px 0;
             position: fixed;
             top: 0;
             left: 0;
+            right: 0;
             z-index: 1000;
-            padding: 0;
+            border-bottom: 1px solid #e8e8e8;
         }
         
-        .header-content {
-            height: 100%;
+        .nav-content {
+            margin: 0 auto;
             display: flex;
+            justify-content: space-between;
             align-items: center;
             padding: 0 20px;
+            width: 100%;
             position: relative;
-            max-width: 100%;
-            justify-content: space-between;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            min-width: 50px;
-        }
-
-        .site-title {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-        }
-        
-        .site-title h2 {
+        .brand {
             color: white;
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            letter-spacing: 0.5px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            min-width: 50px;
-            justify-content: flex-end;
-        }
-
-        .profile-icon {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            text-decoration: none;
             position: relative;
+            transition: transform 0.3s ease;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
-        .profile-icon i {
-            color: #333;
-            font-size: 1.2rem;
+        .brand:hover {
+            opacity: 0.9;
         }
 
-        .profile-dropdown {
+        .desktop-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .desktop-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            position: relative;
+            padding: 5px 0;
+            margin: 0 5px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .desktop-menu a::after {
+            content: '';
             position: absolute;
-            top: calc(100% + 5px);
-            right: 0;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: white;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+
+        .desktop-menu a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        .mobile-menu {
+            display: none;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-toggle:hover {
+            transform: rotate(90deg);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .mobile-menu.active .menu-toggle {
+            transform: rotate(180deg);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 20px;
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: none;
-            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1001;
+            animation: slideIn 0.3s ease-out;
+            border: 1px solid rgba(252, 128, 25, 0.1);
         }
 
-        .profile-icon.active .profile-dropdown,
-        .profile-icon:hover .profile-dropdown {
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-menu a {
             display: block;
-        }
-
-        .profile-menu {
-            list-style: none;
-            padding: 8px 0;
-            margin: 0;
-            width: 250px;
-        }
-
-        .profile-menu li {
-            padding: 0;
-        }
-
-        .profile-menu a {
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #333;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-
-        .profile-menu a:hover {
-            background: #f8f8f8;
-        }
-
-        .profile-menu i {
-            width: 20px;
-            color: #666;
-        }
-
-        .profile-menu .divider {
-            height: 1px;
-            background: #eee;
-            margin: 8px 0;
-        }
-
-        .profile-menu li:last-child a {
+            padding: 10px 20px;
             color: #fc8019;
+            text-decoration: none;
+            transition: all 0.2s ease-out;
+            position: relative;
+            padding-left: 30px;
+            background: transparent;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
-        .profile-menu li:last-child a:hover {
-            background: #fff0e6;
+        .dropdown-menu a:hover {
+            background: #fff5ee;
+            color: #e67312;
+            transform: translateX(5px);
         }
 
-        /* Ensure content is below fixed header */
-        body {
-            padding-top: 70px;
-            min-height: 100vh;
+        .dropdown-menu a::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            background: #fc8019;
+            border-radius: 50%;
+            transform: translateY(-50%) scale(0);
+            opacity: 0;
+            transition: all 0.2s ease-out;
         }
 
-        /* Edit Profile specific styles */
-        .profile-container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
+        .dropdown-menu a:hover::before {
+            transform: translateY(-50%) scale(1) rotate(0);
+            opacity: 1;
         }
 
-        .profile-header {
-            margin-bottom: 30px;
-            text-align: center;
+        /* New hover effect for desktop menu */
+        .desktop-menu a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Active state for menu items */
+        .desktop-menu a.active,
+        .dropdown-menu a.active {
+            font-weight: 600;
+            color: white;
+        }
+
+        /* Subtle transition for dropdown items */
+        .dropdown-menu a {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown-menu a::after {
+            display: none;
+        }
+
+        .dropdown-menu a:not(:last-child) {
+            border-bottom: 1px solid rgba(252, 128, 25, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+                position: relative;
+            }
+
+            .mobile-menu.active .dropdown-menu {
+                display: block;
+            }
+
+            .brand {
+                font-size: 1.4rem;
+            }
+
+            .nav-content {
+                padding: 0 15px;
+            }
+
+            .dropdown-menu {
+                right: 0;
+                left: auto;
+                width: 200px;
+                margin: 10px 15px;
+                position: absolute;
+            }
+            
+            .mobile-menu {
+                position: static;
+            }
+            
+            .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                right: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .secondary-nav {
+                padding: 10px 0;
+            }
+            
+            .nav-content {
+                padding: 0 10px;
+            }
+            
+            .dropdown-menu {
+                right: 10px;
+                margin: 10px 10px;
+                max-width: calc(100% - 20px);
+            }
         }
         
         .profile-header h1 {
@@ -166,167 +265,67 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-        }
-        
-        .profile-header h1 i {
-            color: #fc8019;
-            font-size: 1.8rem;
-        }
-
-        .profile-form {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
+            color: #666;
+            font-size: 0.95rem;
             font-weight: 500;
+            letter-spacing: 0.3px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
-        .form-group input {
+        .input-with-icon input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
-        .form-group input:disabled {
-            background: #f5f5f5;
-            cursor: not-allowed;
-        }
-
-        .password-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .password-section h3 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .form-actions {
-            margin-top: 30px;
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-        }
-
-        .save-btn {
-            padding: 12px 24px;
-            background: #fc8019;
-            color: white;
+            padding: 14px;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.3s;
-        }
-
-        .save-btn:hover {
-            background: #e67312;
-        }
-
-        .cancel-btn {
-            padding: 12px 24px;
-            background: #f5f5f5;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
             color: #333;
-            border: none;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.3s;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
-        .cancel-btn:hover {
-            background: #eee;
-        }
-
-        /* Messages */
-        .messages {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 4px;
-        }
-
-        .messages.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .messages.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .input-with-icon {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .edit-icon {
-            position: absolute;
-            right: 12px;
-            color: #fc8019;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .form-group input {
-            padding-right: 35px; /* Make space for the icon */
-        }
-
-        /* Style for disabled field icon */
-        .input-with-icon input:disabled + .edit-icon {
-            color: #999;
-            cursor: not-allowed;
+        .save-btn, .cancel-btn {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
     </style>
 </head>
-<body>
-    <!-- Header -->
-    <header>
-        <div class="header-content">
-            <div class="logo-container">
-                <a href="{% url 'joo:home_page' %}">
-                    <img src="{% static 'img/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo" 
-                         style="width: 50px; height: 50px; border-radius: 50%; background: white; filter: none; object-fit: contain;">
-                </a>
+
+<body class="inner-page profile-page">
+    <!-- Secondary Navigation -->
+    <nav class="secondary-nav">
+        <div class="nav-content">
+            <div class="nav-left">
+                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
             </div>
-            <div class="site-title">
-                <h2>Mr.Foody & Ms.Foody</h2>
+            <div class="nav-right">
+                <div class="desktop-menu">
+                    <a href="{% url 'joo:edit_profile' %}" class="active">Profile</a>
+                    <a href="{% url 'joo:my_orders' %}">Orders</a>
+                    <a href="{% url 'joo:favorites' %}">Favorites</a>
+                    <a href="{% url 'joo:addresses' %}">Addresses</a>
+                    <a href="{% url 'joo:logout' %}">Logout</a>
             </div>
-            <div class="header-right">
-                <div class="profile-icon">
-                    <i class="fas fa-user"></i>
-                    <div class="profile-dropdown">
-                        <ul class="profile-menu">
-                            <li><a href="{% url 'joo:edit_profile' %}"><i class="fas fa-user-edit"></i>Edit Profile</a></li>
-                            <li><a href="{% url 'joo:my_orders' %}"><i class="fas fa-list-alt"></i>My Orders</a></li>
-                            <li><a href="{% url 'joo:favorites' %}"><i class="fas fa-heart"></i>Favorites</a></li>
-                            <li><a href="{% url 'joo:addresses' %}"><i class="fas fa-map-marker-alt"></i>Addresses</a></li>
-                            <li class="divider"></li>
-                            <li><a href="{% url 'joo:logout' %}"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
-                        </ul>
+                <div class="mobile-menu">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'joo:edit_profile' %}" class="active" style="color: #fc8019;">Profile</a>
+                        <a href="{% url 'joo:my_orders' %}">Orders</a>
+                        <a href="{% url 'joo:favorites' %}">Favorites</a>
+                        <a href="{% url 'joo:addresses' %}">Addresses</a>
+                        <a href="{% url 'joo:logout' %}">Logout</a>
                     </div>
                 </div>
             </div>
         </div>
-    </header>
+    </nav>
 
     <main>
         <div class="profile-container">
@@ -334,9 +333,11 @@
                 <h1><i class="fas fa-user-edit"></i> Edit Profile</h1>
             </div>
             {% if messages %}
-            <div class="messages {% if message.tags %}{{ message.tags }}{% endif %}">
+            <div class="messages">
                 {% for message in messages %}
+                <div class="message {{ message.tags }}">
                     {{ message }}
+                </div>
                 {% endfor %}
             </div>
             {% endif %}
@@ -346,14 +347,14 @@
                 <div class="form-group">
                     <label for="first_name">First Name</label>
                     <div class="input-with-icon">
-                        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}">
+                        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
                         <i class="fas fa-edit edit-icon"></i>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="last_name">Last Name</label>
                     <div class="input-with-icon">
-                        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}">
+                        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
                         <i class="fas fa-edit edit-icon"></i>
                     </div>
                 </div>
@@ -366,83 +367,309 @@
                 </div>
                 
                 <div class="password-section">
-                    <h3>Change Password</h3>
+                    <h3><i class="fas fa-lock"></i> Change Password</h3>
                     <div class="form-group">
-                        <label for="current_password">Current Password</label>
-                        <input type="password" id="current_password" name="current_password">
-                    </div>
-                    <div class="form-group">
-                        <label for="new_password">New Password</label>
-                        <input type="password" id="new_password" name="new_password">
-                    </div>
-                    <div class="form-group">
-                        <label for="confirm_password">Confirm New Password</label>
-                        <input type="password" id="confirm_password" name="confirm_password">
+                        <label for="password">New Password</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="password" name="password" placeholder="Leave blank to keep current password">
+                            <i class="fas fa-eye-slash password-toggle"></i>
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <a href="{% url 'joo:home' %}" class="cancel-btn">Cancel</a>
+                    <a href="{% url 'joo:home_page' %}" class="cancel-btn">Cancel</a>
                     <button type="submit" class="save-btn">Save Changes</button>
                 </div>
             </form>
         </div>
-    </main>
+
+        <style>
+            main {
+                margin-top: 80px;
+                padding: 20px;
+            }
+
+            .profile-container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .profile-form {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                overflow: hidden;
+                padding: 30px;
+                border: 1px solid #eee;
+            }
+
+            .form-section {
+                padding: 30px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .form-section h2 {
+                color: #333;
+                font-size: 1.5rem;
+                margin-bottom: 25px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .form-section h2 i {
+                color: #fc8019;
+            }
+
+            .form-group {
+                margin-bottom: 25px;
+                position: relative;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                color: #666;
+                font-size: 0.95rem;
+                font-weight: 500;
+                letter-spacing: 0.3px;
+            }
+
+            .input-with-icon {
+                position: relative;
+                display: flex;
+                align-items: center;
+                background: #f8f8f8;
+                border-radius: 8px;
+                transition: all 0.2s ease;
+                border: 2px solid transparent;
+            }
+
+            .input-with-icon:focus-within {
+                background: white;
+                border-color: #fc8019;
+                box-shadow: 0 4px 12px rgba(252, 128, 25, 0.1);
+            }
+
+            .input-with-icon input {
+                width: 100%;
+                padding: 14px;
+                border: none;
+                background: transparent;
+                border-radius: 8px;
+                font-size: 1rem;
+                outline: none;
+                color: #333;
+            }
+
+            .input-with-icon input::placeholder {
+                color: #999;
+                font-size: 0.95rem;
+            }
+
+            .edit-icon, .password-toggle {
+                position: absolute;
+                right: 12px;
+                color: #999;
+                font-size: 1rem;
+                padding: 8px;
+                cursor: pointer;
+                transition: color 0.3s;
+                background: transparent;
+                border-radius: 50%;
+            }
+
+            .edit-icon:hover, .password-toggle:hover {
+                color: #fc8019;
+                background: rgba(252, 128, 25, 0.1);
+            }
+
+            .form-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 15px;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #eee;
+            }
+
+            .save-btn {
+                background: #fc8019;
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 25px;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 500;
+                min-width: 140px;
+                box-shadow: 0 4px 12px rgba(252, 128, 25, 0.2);
+            }
+
+            .save-btn:hover {
+                background: #e67312;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(252, 128, 25, 0.3);
+            }
+
+            .cancel-btn {
+                background: #f5f5f5;
+                color: #666;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 25px;
+                font-size: 1rem;
+                cursor: pointer;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                font-weight: 500;
+                min-width: 140px;
+                text-align: center;
+            }
+
+            .cancel-btn:hover {
+                background: #e0e0e0;
+                transform: translateY(-2px);
+            }
+
+            .messages {
+                padding: 15px 20px;
+                margin-bottom: 25px;
+                border-radius: 8px;
+                text-align: center;
+                font-weight: 500;
+                animation: slideDown 0.3s ease;
+            }
+
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-10px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .profile-container {
+                    padding: 15px;
+                }
+
+                .profile-form {
+                    padding: 20px;
+                }
+
+                .form-actions {
+                    flex-direction: column-reverse;
+                    gap: 10px;
+                }
+
+                .save-btn, .cancel-btn {
+                    width: 100%;
+                    min-width: unset;
+                }
+            }
+
+            .profile-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .profile-header h1 {
+                color: #333;
+                font-size: 2rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .profile-header h1 i {
+                color: #fc8019;
+            }
+
+            .messages.success {
+                background: #e8f5e9;
+                color: #2e7d32;
+            }
+
+            .messages.error {
+                background: #fbe9e7;
+                color: #c62828;
+            }
+        </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const profileIcon = document.querySelector('.profile-icon');
-            const dropdown = document.querySelector('.profile-dropdown');
+                const menuToggle = document.querySelector('.menu-toggle');
+                const mobileMenu = document.querySelector('.mobile-menu');
+                
+                menuToggle.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('active');
+                });
 
-            // Toggle active class on profile icon click
-            profileIcon.addEventListener('click', function(e) {
-                e.stopPropagation();
-                this.classList.toggle('active');
-            });
-
-            // Prevent dropdown from closing when clicking inside it
-            dropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-
-            // Close dropdown only when clicking outside profile icon and dropdown
+                // Close menu when clicking outside
             document.addEventListener('click', function(e) {
-                if (!profileIcon.contains(e.target)) {
-                    profileIcon.classList.remove('active');
-                }
-            });
-
-            // Keep dropdown open when hovering from icon to dropdown
-            dropdown.addEventListener('mouseover', function() {
-                profileIcon.classList.add('active');
-            });
-
-            // Keep dropdown open when moving cursor between icon and dropdown
-            profileIcon.addEventListener('mouseover', function() {
-                if (this.contains(document.activeElement)) {
-                    this.classList.add('active');
-                }
-            });
-
-            // Show success message for 3 seconds
-            const messages = document.querySelector('.messages');
-            if (messages) {
-                setTimeout(() => {
-                    messages.style.display = 'none';
-                }, 3000);
-            }
-
-            // Add click handler for edit icons
-            const editIcons = document.querySelectorAll('.edit-icon');
-            editIcons.forEach(icon => {
-                icon.addEventListener('click', function() {
-                    const input = this.previousElementSibling;
-                    if (!input.disabled) {
-                        input.focus();
+                    if (!mobileMenu.contains(e.target)) {
+                        mobileMenu.classList.remove('active');
                     }
                 });
-            });
+
+                // Password visibility toggle
+                const passwordToggle = document.querySelector('.password-toggle');
+                const passwordInput = document.getElementById('password');
+
+                passwordToggle.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                });
+
+                // Handle form submission
+                const form = document.querySelector('.profile-form');
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    const data = {
+                        first_name: formData.get('first_name'),
+                        last_name: formData.get('last_name')
+                    };
+                    
+                    if (formData.get('password')) {
+                        data.password = formData.get('password');
+                    }
+                    
+                    try {
+                        const response = await fetch('{% url "joo:edit_profile" %}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+                        
+                        const result = await response.json();
+                        if (result.status === 'success') {
+                            alert('Profile updated successfully!');
+                            window.location.reload();
+                        } else {
+                            alert(result.message || 'Error updating profile');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Error updating profile');
+                    }
+                });
         });
     </script>
+    </main>
 </body>
 </html> 

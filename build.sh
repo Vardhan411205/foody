@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Disable color output since tput is not available
+export TERM=dumb
+
 # Create and activate virtual environment
 python -m venv venv
 source venv/bin/activate

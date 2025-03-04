@@ -537,60 +537,56 @@ def quickbite(request):
 
 @login_required
 def dinespot(request):
-    """Render dinespot page with dining tables from items database"""
-    # Fetch dining tables from items database
-    with connections['items'].cursor() as cursor:
-        cursor.execute("""
-            SELECT 
-                dt.id,
-                dt.table_number,
-                dt.seating_capacity,
-                dt.price,
-                dt.image_url,
-                dt.category,
-                dt.rating,
-                dt.status,
-                dt.restaurant_id,
-                dt.restaurant_name,
-                dt.created_at,
-                dt.updated_at
-            FROM joo_diningtable dt
-            WHERE dt.status = 'available'
-            ORDER BY dt.category, dt.table_number
-        """)
-        columns = [col[0] for col in cursor.description]
-        dining_tables = [dict(zip(columns, row)) for row in cursor.fetchall()]
-
-    context = {
-        'dining_tables': dining_tables,
-        'today_date': date.today(),
-    }
-    return render(request, 'home/dinespot.html', context)
+    # Remove or modify the DiningTable query
+    return render(request, 'home/dinespot.html', {
+        'tables': []  # Return empty list or mock data
+    })
 
 @login_required
 def buzzfest(request):
-    """Render buzzfest page with venues from items database"""
-    # Fetch venues from items database
-    with connections['items'].cursor() as cursor:
-        cursor.execute("""
-            SELECT 
-                id,
-                venue_name,
-                owner_name,
-                email,
-                phone,
-                venue_type,
-                seating_capacity,
-                address,
-                venue_image,
-                price,
-                is_active
-            FROM joo_venuepartner
-            WHERE is_active = true
-            ORDER BY venue_type, venue_name
-        """)
-        columns = [col[0] for col in cursor.description]
-        venues = [dict(zip(columns, row)) for row in cursor.fetchall()]
+    """Render buzzfest page with mock data since VenuePartner model is removed"""
+    # Mock venue data
+    venues = [
+        {
+            'id': 1,
+            'venue_name': 'Grand Ballroom',
+            'owner_name': 'John Doe',
+            'email': 'john@example.com',
+            'phone': '+65 1234 5678',
+            'venue_type': 'Wedding',
+            'seating_capacity': 500,
+            'address': '123 Main Street, Singapore',
+            'venue_image': 'https://example.com/venue1.jpg',
+            'price': 5000,
+            'is_active': True
+        },
+        {
+            'id': 2,
+            'venue_name': 'Garden Paradise',
+            'owner_name': 'Jane Smith',
+            'email': 'jane@example.com',
+            'phone': '+65 8765 4321',
+            'venue_type': 'Birthday',
+            'seating_capacity': 200,
+            'address': '456 Park Road, Singapore',
+            'venue_image': 'https://example.com/venue2.jpg',
+            'price': 3000,
+            'is_active': True
+        },
+        {
+            'id': 3,
+            'venue_name': 'Conference Center',
+            'owner_name': 'Mike Johnson',
+            'email': 'mike@example.com',
+            'phone': '+65 9876 5432',
+            'venue_type': 'Corporate',
+            'seating_capacity': 300,
+            'address': '789 Business Ave, Singapore',
+            'venue_image': 'https://example.com/venue3.jpg',
+            'price': 4000,
+            'is_active': True
+        }
+    ]
 
     context = {
         'venues': venues,

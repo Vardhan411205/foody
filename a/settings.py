@@ -148,8 +148,14 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Add Whitenoise storage configuration
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+# Disable static files caching for development
+if DEBUG:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+# Whitenoise Configuration
+WHITENOISE_MAX_AGE = 31536000  # 1 year
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_USE_FINDERS = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

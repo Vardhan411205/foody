@@ -1,6 +1,12 @@
 #!/bin/bash
 
-# Redirect stderr to suppress tput errors
+# Disable all color output and terminal features
+export TERM=dumb
+export NO_COLOR=1
+export PYTHONWARNINGS=ignore
+export PYTHONUNBUFFERED=1
+
+# Redirect all stderr to /dev/null
 exec 2>/dev/null
 
 # Create and activate virtual environment

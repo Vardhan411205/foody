@@ -2,11 +2,12 @@
 
 # Create and activate virtual environment
 python -m venv venv
-. venv/bin/activate
+source venv/bin/activate
 
 # Install requirements
-pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r requirements.txt
+pip install gunicorn --no-cache-dir
 
 # Run Django migrations
 python manage.py makemigrations

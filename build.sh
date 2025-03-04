@@ -19,9 +19,8 @@ pip install gunicorn==21.2.0 --no-cache-dir
 python manage.py makemigrations
 python manage.py migrate
 
-# Collect static files
 # Clear existing staticfiles
-rm staticfiles/
+rm -rf staticfiles/*
 
 # Collect static files with clear
 python manage.py collectstatic --noinput --clear

@@ -46,4 +46,8 @@ urlpatterns = [
     path('update-address/', views.update_address, name='update_address'),
     path('delete-address/', views.delete_address, name='delete_address'),
     path('get-address/', views.get_address, name='get_address'),
+    path('save-order/', views.save_order, name='save_order'),
+    path('download-invoice/<str:booking_id>/', views.download_invoice, name='download_invoice'),
+    path('save-booking/', views.save_booking, name='save_booking'),
+    path('payment/confirm/', views.payment_confirmation_view, name='payment_confirmation'),
 ]

@@ -6,249 +6,595 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mr.Foody & Ms.Foody - Food Delivery</title>
-    <link rel="stylesheet" href="{% static 'css/common.css' %}">
-    <link rel="stylesheet" href="{% static 'css/food.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Secondary Navigation Styles */
-        .secondary-nav {
-            background-color: #fc8019;
-            padding: 15px 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #e8e8e8;
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
- 
-        .nav-content {
+        /* Main Layout */
+        main {
+            padding: 80px 20px 100px;
+            width: 100%;
             margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            width: 100%;
-            position: relative;
         }
- 
-        .brand {
-            color: white;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-decoration: none;
-            position: relative;
-            transition: transform 0.3s ease;
-        }
- 
-        .brand:hover {
-            opacity: 0.9;
-        }
- 
-        .desktop-menu {
-            display: flex;
-            gap: 25px;
-        }
- 
-        .desktop-menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 1rem;
-            position: relative;
-            padding: 5px 0;
-            margin: 0 5px;
-        }
- 
-        .desktop-menu a::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            bottom: -2px;
-            left: 0;
-            background-color: white;
-            transform: scaleX(0);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease-out;
-        }
- 
-        .desktop-menu a:hover::after {
-            transform: scaleX(1);
-            transform-origin: bottom left;
-        }
- 
-        .mobile-menu {
-            display: none;
-            position: relative;
-        }
- 
-        .menu-toggle {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
- 
-        .menu-toggle:hover {
-            transform: rotate(90deg);
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-        }
- 
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            padding: 10px 0;
-            min-width: 200px;
-            z-index: 1001;
-            margin-top: 10px;
-        }
- 
-        @media (max-width: 768px) {
-            .desktop-menu {
-                display: none;
-            }
- 
-            .mobile-menu {
-                display: block;
-            }
- 
-            .dropdown-menu {
-                right: 0;
-                width: 200px;
-                background: white;
-                border: 1px solid rgba(252, 128, 25, 0.1);
-            }
- 
-            .dropdown-menu a {
-                color: #fc8019;
-                padding: 12px 20px;
-                display: block;
-                text-decoration: none;
-                transition: all 0.2s ease;
-            }
- 
-            .dropdown-menu a:hover {
-                background: #fff5ee;
-                color: #e67312;
-                transform: translateX(5px);
-            }
-        }
- 
-        @media (max-width: 480px) {
-            .secondary-nav {
-                padding: 10px 0;
-            }
-            
-            .nav-content {
-                padding: 0 10px;
-            }
-        }
- 
+
         /* Search Bar Styles */
         .search-container {
-            padding: 20px;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             position: fixed;
-            top: 60px;
+            top: 70px;
             left: 0;
             right: 0;
-            z-index: 999;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 100;
         }
- 
+
         .search-picker {
             max-width: 600px;
             margin: 0 auto;
-            position: relative;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: #f8f8f8;
+            border-radius: 8px;
+            padding: 5px;
         }
- 
-        .search-picker input {
-            width: 100%;
-            padding: 12px 40px 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .search-input:focus {
             outline: none;
         }
- 
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
         .search-btn {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
+            background: #fc8019;
+            color: white;
             border: none;
-            color: #666;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 15px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
- 
+
         .search-btn:hover {
+            background: #e67312;
+        }
+
+        .search-btn i {
+            font-size: 18px;
+        }
+
+        /* Restaurant Section */
+        .restaurants-section {
+            margin-top: 80px;
+        }
+
+        .restaurants-section h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Food Grid */
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .food-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .food-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .food-info {
+            padding: 15px;
+        }
+
+        .food-info h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        /* Rating Stars */
+        .rating {
             color: #fc8019;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
- 
-        /* Adjust main content to account for search bar */
-        main {
-            margin-top: 120px;
+
+        .rating span {
+            background: #fff1e6;
+            padding: 4px 8px;
+            border-radius: 4px;
         }
- 
+
+        /* Price and Cart */
+        .price-cart {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .add-to-cart {
+            background: #fc8019;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .add-to-cart:hover {
+            background: #e67312;
+            transform: translateY(-2px);
+        }
+
+        /* Categories */
+        .categories {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-top: 10px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-btn {
+            padding: 8px 16px;
+            border: 1px solid #fc8019;
+            border-radius: 20px;
+            background: white;
+            color: #fc8019;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn.active {
+            background: #fc8019;
+            color: white;
+        }
+
+        .category-btn:hover {
+            background: #fff1e6;
+        }
+
+        /* Toast Message */
+        .toast-message {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, 20px); }
+            15% { opacity: 1; transform: translate(-50%, 0); }
+            85% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
+            main {
+                padding: 70px 15px 90px;
+            }
+
             .search-container {
                 padding: 10px;
             }
- 
+
+            .search-picker {
+                padding: 0 10px;
+            }
+
             .search-picker input {
-                padding: 10px 35px 10px 12px;
+                padding: 10px;
+            }
+
+            .food-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 15px;
+            }
+
+            .food-card {
+                border-radius: 8px;
+            }
+
+            .food-card img {
+                height: 160px;
+            }
+
+            .food-info {
+                padding: 10px;
+            }
+
+            .food-info h3 {
+                font-size: 16px;
+                margin-bottom: 5px;
+                line-height: 1.3;
+            }
+
+            .restaurant-name {
+                font-size: 13px;
+                margin-bottom: 5px;
+            }
+
+            .rating {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+
+            .rating span {
+                padding: 3px 6px;
+            }
+
+            .price-cart {
+                margin-top: 8px;
+            }
+
+            .price {
+                font-size: 16px;
+            }
+
+            .add-to-cart {
+                padding: 6px 16px;
+            }
+
+            .categories {
+                gap: 8px;
+                padding: 8px 0;
+                margin-top: 8px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-snap-type: x mandatory;
+                scrollbar-width: none;
+            }
+
+            .category-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+                scroll-snap-align: start;
+            }
+
+            .quantity-controls {
+                gap: 8px;
+            }
+
+            .quantity-controls button {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+            }
+
+            .quantity {
+                font-size: 14px;
+            }
+
+            .toast-message {
+                font-size: 13px;
+                padding: 10px 20px;
+                bottom: 80px;
+            }
+
+            .favorite-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+                right: 8px;
+                top: 8px;
+            }
+
+            .cart-badge {
+                font-size: 10px;
+                min-width: 16px;
+                height: 16px;
+                right: -5px;
+                top: -5px;
+            }
+
+            /* Enhanced Mobile Cart Controls */
+            .cart-controls {
+                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .quantity-controls {
+                display: flex;
+                align-items: center;
+                background: #fff5ec;
+                border-radius: 25px;
+                overflow: hidden;
+                opacity: 0;
+                transform: translateX(20px);
+                transition: all 0.3s ease;
+            }
+
+            .quantity-controls.active {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            .quantity-btn {
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: none;
+                border: none;
+                color: #fc8019;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background 0.2s ease;
+            }
+
+            .quantity-btn:active {
+                background: rgba(252, 128, 25, 0.1);
+            }
+
+            .quantity-display {
+                width: 32px;
+                text-align: center;
+                font-weight: 600;
+                color: #fc8019;
+            }
+
+            .add-to-cart {
+                padding: 8px 16px;
+                border-radius: 25px;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+            .add-to-cart.added {
+                width: 32px;
+                padding: 8px;
+                background: #fff5ec;
+                color: #fc8019;
+                border: 1px solid #fc8019;
+            }
+
+            .add-to-cart.added span {
+                display: none;
+            }
+
+            .add-to-cart.added i {
+                margin: 0;
+            }
+
+            /* Ripple effect for buttons */
+            .quantity-btn, .add-to-cart {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.7);
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+            }
+
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
             }
         }
-     </style>
+
+        /* Small Mobile Screens */
+        @media (max-width: 480px) {
+            .food-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Landscape Mode */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .navbar {
+                padding: 5px 0;
+            }
+
+            .navbar i {
+                font-size: 14px;
+                margin-bottom: 2px;
+            }
+
+            .navbar span {
+                font-size: 10px;
+            }
+
+            .food-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) {
+            .food-card:hover {
+                transform: none;
+            }
+
+            .add-to-cart:active::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 100%;
+                height: 100%;
+                background: rgba(252, 128, 25, 0.2);
+                border-radius: inherit;
+                transform: translate(-50%, -50%) scale(0);
+                animation: buttonPress 0.4s ease-out;
+            }
+
+            @keyframes buttonPress {
+                0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+                100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+            }
+        }
+
+        /* Updated Cart Icon Styles */
+        .cart-icon {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            padding: 5px;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #fff;
+            color: #fc8019;
+            font-size: 12px;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fc8019;
+            transition: all 0.3s ease;
+        }
+
+        .cart-icon:hover .cart-count {
+            transform: scale(1.1);
+        }
+
+        /* Animation for cart count update */
+        @keyframes cartBounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .cart-count.update {
+            animation: cartBounce 0.3s ease;
+        }
+
+        /* Add styles for the heart icon overlay */
+        .food-card {
+            position: relative;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .favorite-btn i {
+            color: #fc8019;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+
+        .favorite-btn.active i {
+            color: #fc8019;
+        }
+    </style>
 </head>
 
 <body class="inner-page food-page">
-    <!-- Secondary Navigation -->
-    <nav class="secondary-nav">
-        <div class="nav-content">
-            <div class="nav-left">
-                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
-            </div>
-            <div class="nav-right">
-                <div class="desktop-menu">
-                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                    <a href="{% url 'joo:my_orders' %}">Orders</a>
-                    <a href="{% url 'joo:favorites' %}">Favorites</a>
-                    <a href="{% url 'joo:addresses' %}">Addresses</a>
-                    <a href="{% url 'joo:logout' %}">Logout</a>
-                </div>
-                <div class="mobile-menu">
-                    <button class="menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                        <a href="{% url 'joo:my_orders' %}">Orders</a>
-                        <a href="{% url 'joo:favorites' %}">Favorites</a>
-                        <a href="{% url 'joo:addresses' %}">Addresses</a>
-                        <a href="{% url 'joo:logout' %}">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    {% include 'home/includes/header.html' %}
 
     <!-- Search Bar -->
     <div class="search-container">
         <div class="search-picker">
-            <input type="text" id="food-search" placeholder="Search for restaurants, cuisines...">
-            <button class="search-btn">
+            <input 
+                type="text" 
+                id="food-search" 
+                class="search-input" 
+                placeholder="Search for dishes..."
+                oninput="searchFoodItems()"
+            >
+            <button class="search-btn" onclick="searchFoodItems()">
                 <i class="fas fa-search"></i>
             </button>
         </div>
@@ -258,120 +604,399 @@
         <!-- Restaurants Section -->
         <section class="restaurants-section">
             <h2>All Restaurants</h2>
-            <div class="restaurant-grid">
-                {% for item in food_items %}
-                <div class="restaurant-card {{ item.category|lower }}">
-                    <img src="{{ item.image_url }}" alt="{{ item.name }}">
-                    <button class="favorite-btn" data-id="food_{{ item.id }}" data-type="food" data-item='{
-                        "name": "{{ item.name }}",
-                        "restaurant": "{{ item.restaurant.restaurant_name }}",
-                        "price": {{ item.price }},
-                        "image": "{{ item.image_url }}"
-                    }'>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">{{ item.get_category_display }}</div>
-                    <div class="restaurant-info">
-                        <h3>{{ item.name }}</h3>
-                        <p class="restaurant-name">{{ item.restaurant.restaurant_name }}</p>
-                        <div class="rating">{{ item.rating }} ★</div>
-                        <div class="features">
-                            <span>25-35 min</span>
-                            <span>₹40 delivery fee</span>
-                        </div>
-                        <p class="price">₹{{ item.price }}</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">0</span>
-                                <button class="increase">+</button>
+            <div class="menu-section">
+                <div class="categories">
+                    <button class="category-btn active" data-category="all">All</button>
+                    {% for category in categories %}
+                    <button class="category-btn" data-category="{{ category }}">{{ category }}</button>
+                    {% endfor %}
+                </div>
+
+                <div class="food-grid">
+                    {% for item in food_items %}
+                    <div class="food-card" data-category="{{ item.category|lower }}">
+                        <button class="favorite-btn" 
+                                data-id="food_{{ item.id }}" 
+                                data-type="food" 
+                                data-item='{
+                                    "name": "{{ item.name }}",
+                                    "restaurant": "{{ item.restaurant_name }}",
+                                    "rating": "{{ item.rating }}",
+                                    "price": "₹{{ item.price }}",
+                                    "image": "{{ item.image_url }}"
+                                }'>
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <img src="{{ item.image_url }}" alt="{{ item.name }}">
+                        <div class="food-info">
+                            <h3>{{ item.name }}</h3>
+                            <p class="restaurant-name">{{ item.restaurant_name }}</p>
+                            <div class="rating">
+                                <span>★ {{ item.rating }}</span>
+                            </div>
+                            <div class="price-cart">
+                                <span class="price">₹{{ item.price }}</span>
+                                <div class="cart-controls">
+                                    <button class="add-to-cart" 
+                                            data-id="{{ item.id }}"
+                                            data-name="{{ item.name }}"
+                                            data-price="{{ item.price }}"
+                                            data-image="{{ item.image_url }}"
+                                            data-restaurant-id="{{ item.restaurant_id }}"
+                                            data-restaurant-name="{{ item.restaurant_name }}">
+                                        Add
+                                    </button>
+                                    <div class="quantity-controls" style="display: none;">
+                                        <button class="decrease">-</button>
+                                        <span class="quantity">1</span>
+                                        <button class="increase">+</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
         </section>
 
     </main>
 
-    <!-- Navigation bar -->
-    <nav class="navbar">
-        <ul>
-            <li>
-                <a href="{% url 'joo:home_page' %}">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'joo:food' %}" class="active">
-                    <i class="fas fa-utensils"></i>
-                    <span>Food</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'joo:quickbite' %}">
-                    <i class="fas fa-shopping-basket"></i>
-                    <span>QuickBite</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'joo:dinespot' %}">
-                    <i class="fas fa-chair"></i>
-                    <span>DineSpot</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'joo:buzzfest' %}">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>BuzzFest</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'joo:packages' %}">
-                    <i class="fas fa-box"></i>
-                    <span>Packages</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'joo:cart' %}" class="cart-nav-item">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Cart</span>
-                    <span class="cart-badge">0</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+    {% include 'home/includes/nav.html' %}
 
-    <!-- Scripts -->
-    <script src="{% static 'js/common.js' %}"></script>
-    <script src="{% static 'js/cart-handler.js' %}"></script>
-    <script src="{% static 'js/search.js' %}"></script>
-    <script src="{% static 'js/food.js' %}"></script>
-    <script src="{% static 'js/favorites-handler.js' %}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const mobileMenu = document.querySelector('.mobile-menu');
-            const dropdownMenu = document.querySelector('.dropdown-menu');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize quantities from cart
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart.forEach(item => {
+            const foodCard = document.querySelector(`.food-card[data-id="${item.id}"]`);
+            if (foodCard) {
+                const addBtn = foodCard.querySelector('.add-to-cart');
+                const quantityControls = foodCard.querySelector('.quantity-controls');
+                const quantitySpan = foodCard.querySelector('.quantity');
+                
+                addBtn.style.display = 'none';
+                quantityControls.style.display = 'flex';
+                quantitySpan.textContent = item.quantity;
+            }
+        });
+    });
 
-            menuToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                mobileMenu.classList.toggle('active');
-                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-            });
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.textContent = message;
+        document.getElementById('toast-container').appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
 
-            // Close menu when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!mobileMenu.contains(e.target) && dropdownMenu.style.display === 'block') {
-                    mobileMenu.classList.remove('active');
-                    dropdownMenu.style.display = 'none';
+    function updateCartCount() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const cartBadge = document.querySelector('.cart-badge');
+        if (cartBadge) {
+            cartBadge.textContent = totalItems;
+        }
+    }
+
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', function() {
+            const foodCard = this.closest('.food-card');
+            const itemData = {
+                id: this.dataset.id,
+                name: this.dataset.name,
+                price: parseFloat(this.dataset.price),
+                image: this.dataset.image,
+                quantity: 1,
+                restaurantId: this.dataset.restaurantId,
+                restaurantName: this.dataset.restaurantName
+            };
+
+            // Get existing cart
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            
+            // Check if items from different restaurants
+            if (cart.length > 0 && cart[0].restaurantId !== itemData.restaurantId) {
+                if (confirm('Adding items from a different restaurant will clear your current cart. Continue?')) {
+                    cart = [];
+                } else {
+                    return;
+                }
+            }
+
+            // Hide add button, show quantity controls
+            this.style.display = 'none';
+            const quantityControls = foodCard.querySelector('.quantity-controls');
+            quantityControls.style.display = 'flex';
+
+            // Add item to cart
+            cart.push(itemData);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showToast(`${itemData.name} added to cart`);
+        });
+    });
+
+    document.querySelectorAll('.quantity-controls').forEach(controls => {
+        const decreaseBtn = controls.querySelector('.decrease');
+        const increaseBtn = controls.querySelector('.increase');
+        const quantitySpan = controls.querySelector('.quantity');
+        const foodCard = controls.closest('.food-card');
+        const addBtn = foodCard.querySelector('.add-to-cart');
+        const itemId = addBtn.dataset.id;
+
+        decreaseBtn.addEventListener('click', function() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const itemIndex = cart.findIndex(item => item.id === itemId);
+            
+            if (itemIndex !== -1) {
+                cart[itemIndex].quantity--;
+                if (cart[itemIndex].quantity <= 0) {
+                    cart.splice(itemIndex, 1);
+                    controls.style.display = 'none';
+                    addBtn.style.display = 'block';
+                    showToast(`${addBtn.dataset.name} removed from cart`);
+                } else {
+                    quantitySpan.textContent = cart[itemIndex].quantity;
+                    showToast(`${addBtn.dataset.name} quantity updated`);
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+            }
+        });
+
+        increaseBtn.addEventListener('click', function() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const itemIndex = cart.findIndex(item => item.id === itemId);
+            
+            if (itemIndex !== -1) {
+                cart[itemIndex].quantity++;
+                quantitySpan.textContent = cart[itemIndex].quantity;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                showToast(`${addBtn.dataset.name} quantity updated`);
+            }
+        });
+    });
+    </script>
+
+    <script>
+    function searchFoodItems() {
+        const searchInput = document.getElementById('food-search');
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const foodCards = document.querySelectorAll('.food-card');
+
+        foodCards.forEach(card => {
+            const foodName = card.querySelector('h3').textContent.toLowerCase();
+            
+            if (searchTerm === '' || foodName.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Reset category buttons when searching
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector('.category-btn[data-category="all"]').classList.add('active');
+    }
+
+    // Add event listener for Enter key
+    document.getElementById('food-search').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchFoodItems();
+        }
+    });
+
+    // Clear search when clicking the "All" category
+    document.querySelector('.category-btn[data-category="all"]').addEventListener('click', function() {
+        document.getElementById('food-search').value = '';
+        searchFoodItems();
+    });
+
+    // Update category click handlers to clear search
+    document.querySelectorAll('.category-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            document.getElementById('food-search').value = '';
+            const category = this.dataset.category;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter food items
+            document.querySelectorAll('.food-card').forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
                 }
             });
         });
+    });
+    </script>
+
+    <!-- Add this script after your existing scripts -->
+    <script>
+    // Favorites handling
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load favorites from localStorage
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        
+        // Update heart icons for existing favorites
+        favorites.forEach(fav => {
+            const btn = document.querySelector(`.favorite-btn[data-id="${fav.id}"]`);
+            if (btn) {
+                btn.classList.add('active');
+                btn.querySelector('i').classList.remove('far');
+                btn.querySelector('i').classList.add('fas');
+            }
+        });
+
+        // Add click handlers to favorite buttons
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const id = this.dataset.id;
+                const type = this.dataset.type;
+                const itemData = JSON.parse(this.dataset.item);
+                
+                let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+                const index = favorites.findIndex(fav => fav.id === id);
+                
+                if (index === -1) {
+                    // Add to favorites
+                    favorites.push({
+                        id: id,
+                        type: type,
+                        ...itemData
+                    });
+                    this.classList.add('active');
+                    this.querySelector('i').classList.remove('far');
+                    this.querySelector('i').classList.add('fas');
+                } else {
+                    // Remove from favorites
+                    favorites.splice(index, 1);
+                    this.classList.remove('active');
+                    this.querySelector('i').classList.remove('fas');
+                    this.querySelector('i').classList.add('far');
+                }
+                
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+            });
+        });
+    });
+    </script>
+
+    <script>
+    function updateCartCount(count) {
+        const cartCount = document.querySelector('.cart-count');
+        cartCount.textContent = count;
+        cartCount.classList.add('update');
+        setTimeout(() => {
+            cartCount.classList.remove('update');
+        }, 300);
+    }
+    </script>
+
+    <script>
+    function toggleFavorite(btn) {
+        const icon = btn.querySelector('i');
+        const isActive = icon.classList.contains('fas');
+        
+        // Toggle heart icon
+        icon.classList.toggle('far');
+        icon.classList.toggle('fas');
+        
+        // Get item data
+        const itemData = {
+            id: btn.dataset.id,
+            name: btn.dataset.name,
+            price: btn.dataset.price,
+            image: btn.dataset.image,
+            type: 'food'
+        };
+        
+        // Get existing favorites
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        
+        if (!isActive) {
+            // Add to favorites
+            favorites.push(itemData);
+            btn.classList.add('active');
+        } else {
+            // Remove from favorites
+            favorites = favorites.filter(item => item.id !== itemData.id);
+            btn.classList.remove('active');
+        }
+        
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+    }
+
+    // Initialize favorite buttons on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            const id = btn.dataset.id;
+            const isFavorite = favorites.some(item => item.id === id);
+            
+            if (isFavorite) {
+                btn.classList.add('active');
+                btn.querySelector('i').classList.remove('far');
+                btn.querySelector('i').classList.add('fas');
+            }
+        });
+    });
+    </script>
+
+    <!-- Add this JavaScript for the enhanced mobile interaction -->
+    <script>
+    function createRipple(event) {
+        const button = event.currentTarget;
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        
+        const diameter = Math.max(rect.width, rect.height);
+        const radius = diameter / 2;
+        
+        ripple.style.width = ripple.style.height = `${diameter}px`;
+        ripple.style.left = `${event.clientX - rect.left - radius}px`;
+        ripple.style.top = `${event.clientY - rect.top - radius}px`;
+        ripple.classList.add('ripple');
+        
+        const existingRipple = button.querySelector('.ripple');
+        if (existingRipple) {
+            existingRipple.remove();
+        }
+        
+        button.appendChild(ripple);
+    }
+
+    document.querySelectorAll('.add-to-cart, .quantity-btn').forEach(button => {
+        button.addEventListener('click', createRipple);
+    });
+
+    // Modify your existing addToCart function
+    function addToCart(button) {
+        const itemId = button.dataset.id;
+        // ... existing cart logic ...
+
+        if (window.innerWidth <= 768) {
+            button.classList.add('added');
+            const controls = button.parentElement.querySelector('.quantity-controls');
+            if (controls) {
+                controls.classList.add('active');
+            }
+        }
+    }
     </script>
 
 </body>

@@ -5,16 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Mr.Foody & Ms.Foody</title>
-    <link rel="stylesheet" href="{% static 'css/common.css' %}">
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-
         *{
             box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
         /* Header styles */
         header {
@@ -405,278 +403,132 @@
             }
         }
 
-        /* Secondary Navigation Styles */
-        .secondary-nav {
-            background-color: #fc8019;
-            padding: 15px 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #e8e8e8;
+        /* Recipe Site Section Styles */
+        .recipe-site-section {
+            padding: 60px 20px;
+            background: linear-gradient(to right, #fff5ec, #fff);
+            margin: 40px 0;
         }
 
-        .nav-content {
+        .recipe-content {
+            max-width: 1200px;
             margin: 0 auto;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
-            width: 100%;
-            position: relative;
+            gap: 40px;
         }
 
-        .brand {
-            color: white;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-decoration: none;
-            position: relative;
-            transition: transform 0.3s ease;
+        .recipe-text {
+            flex: 1;
         }
 
-        .brand:hover {
-            opacity: 0.9;
-        }
-
-        .desktop-menu {
-            display: flex;
-            gap: 25px;
-        }
-
-        .desktop-menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 1rem;
-            position: relative;
-            padding: 5px 0;
-            margin: 0 5px;
-        }
-
-        .desktop-menu a::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            bottom: -2px;
-            left: 0;
-            background-color: white;
-            transform: scaleX(0);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease-out;
-        }
-
-        .desktop-menu a:hover::after {
-            transform: scaleX(1);
-            transform-origin: bottom left;
-        }
-
-        .mobile-menu {
-            display: none;
-        }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-toggle:hover {
-            transform: rotate(90deg);
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-        }
-
-        .mobile-menu.active .menu-toggle {
-            transform: rotate(180deg);
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-        }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            padding: 10px 0;
-            min-width: 200px;
-            z-index: 1001;
-            animation: slideIn 0.3s ease-out;
-            border: 1px solid rgba(252, 128, 25, 0.1);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .dropdown-menu a {
-            display: block;
-            padding: 10px 20px;
+        .recipe-text h2 {
             color: #fc8019;
-            text-decoration: none;
-            transition: all 0.2s ease-out;
-            position: relative;
-            padding-left: 30px;
-            background: transparent;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
         }
 
-        .dropdown-menu a:hover {
-            background: #fff5ee;
-            color: #e67312;
-            transform: translateX(5px);
+        .recipe-text p {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
         }
 
-        .dropdown-menu a::before {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            width: 6px;
-            height: 6px;
+        .recipe-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 30px;
+        }
+
+        .recipe-features li {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #444;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .recipe-features li i {
+            color: #fc8019;
+            font-size: 1.2rem;
+        }
+
+        .recipe-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             background: #fc8019;
-            border-radius: 50%;
-            transform: translateY(-50%) scale(0);
-            opacity: 0;
-            transition: all 0.2s ease-out;
-        }
-
-        .dropdown-menu a:hover::before {
-            transform: translateY(-50%) scale(1) rotate(0);
-            opacity: 1;
-        }
-
-        /* New hover effect for desktop menu */
-        .desktop-menu a:hover {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* Active state for menu items */
-        .desktop-menu a.active,
-        .dropdown-menu a.active {
-            font-weight: 600;
             color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        /* Subtle transition for dropdown items */
-        .dropdown-menu a {
+        .recipe-btn:hover {
+            background: #e67312;
+            transform: translateY(-2px);
+        }
+
+        .recipe-image {
+            flex: 1;
             position: relative;
-            overflow: hidden;
         }
 
-        .dropdown-menu a::after {
-            display: none;
+        .recipe-image img {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
 
-        .dropdown-menu a:not(:last-child) {
-            border-bottom: 1px solid rgba(252, 128, 25, 0.1);
-        }
-
-        @media (max-width: 768px) {
-            .desktop-menu {
-                display: none;
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .recipe-content {
+                flex-direction: column-reverse;
+                text-align: center;
             }
 
-            .mobile-menu {
-                display: block;
-                position: relative;
+            .recipe-features li {
+                justify-content: center;
             }
 
-            .mobile-menu.active .dropdown-menu {
-                display: block;
+            .recipe-image img {
+                max-width: 100%;
+                margin-bottom: 30px;
             }
 
-            .brand {
-                font-size: 1.4rem;
-            }
-
-            .nav-content {
-                padding: 0 15px;
-            }
-
-            .dropdown-menu {
-                right: 0;
-                left: auto;
-                width: 200px;
-                margin: 10px 15px;
-                position: absolute;
-            }
-            
-            .mobile-menu {
-                position: static;
-            }
-            
-            .dropdown-menu {
-                position: absolute;
-                top: 100%;
-                right: 15px;
+            .recipe-text h2 {
+                font-size: 2rem;
             }
         }
 
         @media (max-width: 480px) {
-            .secondary-nav {
-                padding: 10px 0;
+            .recipe-text h2 {
+                font-size: 1.8rem;
             }
-            
-            .nav-content {
-                padding: 0 10px;
+
+            .recipe-text p {
+                font-size: 1rem;
             }
-            
-            .dropdown-menu {
-                right: 10px;
-                margin: 10px 10px;
-                max-width: calc(100% - 20px);
+
+            .recipe-features li {
+                font-size: 1rem;
+            }
+
+            .recipe-btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 
 <body class="index-page">
-    <!-- Secondary Navigation -->
-    <nav class="secondary-nav">
-        <div class="nav-content">
-            <div class="nav-left">
-                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
-            </div>
-            <div class="nav-right">
-                <div class="desktop-menu">
-                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                    <a href="{% url 'joo:my_orders' %}">Orders</a>
-                    <a href="{% url 'joo:favorites' %}">Favorites</a>
-                    <a href="{% url 'joo:addresses' %}">Addresses</a>
-                    <a href="{% url 'joo:logout' %}">Logout</a>
-                </div>
-                <div class="mobile-menu">
-                    <button class="menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                        <a href="{% url 'joo:my_orders' %}">Orders</a>
-                        <a href="{% url 'joo:favorites' %}">Favorites</a>
-                        <a href="{% url 'joo:addresses' %}">Addresses</a>
-                        <a href="{% url 'joo:logout' %}">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    {% include 'home/includes/header.html' %}
 
     <!-- Main content -->
     <main>
@@ -693,7 +545,7 @@
         <section class="services-grid">
             <div class="service-cards">
                 <a href="{% url 'joo:food' %}" class="service-card">
-                    <img src="{% static 'img/food/food-delivery.jpg' %}" alt="Food Delivery">
+                    <img src="https://plus.unsplash.com/premium_photo-1673108852141-e8c3c22a4a22?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Zm9vZHxlbnwwfHwwfHx8MA%3D%3D" alt="Food Delivery">
                     <div class="card-content">
                         <h3>Food Delivery</h3>
                         <p>Order from your favorite restaurants</p>
@@ -701,7 +553,7 @@
                 </a>
 
                 <a href="{% url 'joo:quickbite' %}" class="service-card">
-                    <img src="{% static 'img/quickbite/quickbite.jpg' %}" alt="QuickBite">
+                    <img src="https://media.istockphoto.com/id/171302954/photo/groceries.jpg?s=612x612&w=0&k=20&c=D3MmhT5DafwimcYyxCYXqXMxr1W25wZnyUf4PF1RYw8=" alt="QuickBite">
                     <div class="card-content">
                         <h3>QuickBite</h3>
                         <p>Instant grocery delivery</p>
@@ -709,7 +561,7 @@
                 </a>
 
                 <a href="{% url 'joo:dinespot' %}" class="service-card">
-                    <img src="{% static 'img/dinespot/dinespot.jpg' %}" alt="DineSpot">
+                    <img src="https://images-cdn.ubuy.co.in/6539964757e9011b9f381eaf-povison-round-dining-table-for-6-modern.jpg" alt="DineSpot">
                     <div class="card-content">
                         <h3>DineSpot</h3>
                         <p>Book tables and get great offers</p>
@@ -717,7 +569,7 @@
                 </a>
 
                 <a href="{% url 'joo:buzzfest' %}" class="service-card">
-                    <img src="{% static 'img/buzzfest/buzzfest.jpg' %}" alt="BuzzFest">
+                    <img src="https://images.squarespace-cdn.com/content/v1/6564afb4f0851760cfcdde58/31a3b9ae-d1df-4f69-a4c0-05d341c300ab/Naveen-Vaishali-GPN-Palace-2280.jpg" alt="BuzzFest">
                     <div class="card-content">
                         <h3>BuzzFest</h3>
                         <p>Book venues for your special occasions</p>
@@ -725,12 +577,35 @@
                 </a>
 
                 <a href="{% url 'joo:packages' %}" class="service-card">
-                    <img src="{% static 'img/packages/packages.jpg' %}" alt="Packages">
+                    <img src="https://cdn.theatlantic.com/thumbor/V6dZ4_O0a4054tchlComWJ1bWms=/0x0:2000x1125/960x540/media/img/mt/2023/07/ups_final_2/original.jpg" alt="Packages">
                     <div class="card-content">
                         <h3>Packages</h3>
                         <p>Send packages across the city</p>
                     </div>
                 </a>
+            </div>
+        </section>
+
+        <!-- Recipe Site Section -->
+        <section class="recipe-site-section">
+            <div class="recipe-content">
+                <div class="recipe-text">
+                    <h2>Explore Our Recipe Site</h2>
+                    <p>Discover a world of culinary delights with our handpicked recipes</p>
+                    <ul class="recipe-features">
+                        <li><i class="fas fa-utensils"></i> Step-by-step cooking guides</li>
+                        <li><i class="fas fa-clock"></i> Quick and easy recipes</li>
+                        <li><i class="fas fa-globe"></i> International cuisines</li>
+                        <li><i class="fas fa-star"></i> Chef's special recommendations</li>
+                    </ul>
+                    <a href="https://foodrecipe-m8wo.onrender.com/" class="recipe-btn" target="_blank">
+                        Visit Recipe Site <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="recipe-image">
+                    <img src="https://images.unsplash.com/photo-1542010589005-d1eacc3918f2?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Delicious Recipes">
+                </div>
             </div>
         </section>
 
@@ -762,30 +637,6 @@
         </section>
 
     </main>
-
-    <!-- Navigation bar -->
-    <nav class="main-nav">
-        <a href="{% url 'joo:food' %}">
-            <i class="fas fa-utensils"></i>
-            <span>Food</span>
-        </a>
-        <a href="{% url 'joo:dinespot' %}">
-            <i class="fas fa-concierge-bell"></i>
-            <span>DineSpot</span>
-        </a>
-        <a href="{% url 'joo:quickbite' %}">
-            <i class="fas fa-shopping-basket"></i>
-            <span>QuickBite</span>
-        </a>
-        <a href="{% url 'joo:buzzfest' %}">
-            <i class="fas fa-calendar-alt"></i>
-            <span>BuzzFest</span>
-        </a>
-        <a href="{% url 'joo:packages' %}">
-            <i class="fas fa-box"></i>
-            <span>Packages</span>
-        </a>
-    </nav>
 
     <!-- Footer -->
     <footer>
@@ -831,23 +682,10 @@
         </div>
     </footer>
 
-    <script src="{% static 'js/common.js' %}"></script>
+    {% include 'home/includes/nav.html' %}
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const mobileMenu = document.querySelector('.mobile-menu');
-
-            menuToggle.addEventListener('click', function() {
-                mobileMenu.classList.toggle('active');
-            });
-
-            // Close menu when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!mobileMenu.contains(e.target)) {
-                    mobileMenu.classList.remove('active');
-                }
-            });
-        });
+        // Keep other scripts
     </script>
 </body>
 </html> 

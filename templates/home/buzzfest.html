@@ -6,41 +6,246 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mr.Foody & Ms.Foody - BuzzFest</title>
-    <link rel="stylesheet" href="{% static 'css/common.css' %}">
-    <link rel="stylesheet" href="{% static 'css/buzzfest.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* Search Bar Styles */
+    .search-container {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 15px 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        z-index: 100;
+    }
+
+    .search-picker {
+        max-width: 600px;
+        margin: 0 auto;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        background: #f8f8f8;
+        border-radius: 8px;
+        padding: 5px;
+    }
+
+    .search-picker input {
+        flex: 1;
+        padding: 10px 15px;
+        border: none;
+        background: transparent;
+        font-size: 16px;
+    }
+
+    .search-btn {
+        background: none;
+        border: none;
+        color: #666;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    /* Main Content Styles */
+    main {
+        margin-top: 140px;
+        padding: 20px;
+        padding-bottom: 80px;
+    }
+
+    /* Date Selection Styles */
+    .date-selection {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .date-selection h3 {
+        color: #333;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .date-selection h3 i {
+        color: #fc8019;
+    }
+
+    .date-picker {
+        display: flex;
+        justify-content: center;
+    }
+
+    .date-picker input[type="date"] {
+        padding: 12px 20px;
+        border: 2px solid #fc8019;
+        border-radius: 8px;
+        font-size: 16px;
+        color: #333;
+        outline: none;
+    }
+
+    /* Venue Grid Styles */
+    .venue-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px 0;
+    }
+
+    .venue-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        position: relative;
+    }
+
+    .venue-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .venue-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .venue-info {
+        padding: 20px;
+    }
+
+    .venue-info h3 {
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .features {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 15px 0;
+    }
+
+    .features span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #666;
+    }
+
+    .features i {
+        color: #fc8019;
+        width: 20px;
+    }
+
+    .owner-info {
+        background: #f8f8f8;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+
+    .owner-info p {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 5px 0;
+        color: #666;
+    }
+
+    .action-button {
+        margin-top: 15px;
+    }
+
+    .book-btn {
+        width: 100%;
+        padding: 12px;
+        background: #fc8019;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .book-btn:hover {
+        background: #e67312;
+    }
+
+    /* Favorite Button Styles */
+    .favorite-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease;
+    }
+
+    .favorite-btn i {
+        color: #fc8019;
+        font-size: 20px;
+    }
+
+    .favorite-btn:hover {
+        transform: scale(1.1);
+    }
+
+    /* Sticky Book Button */
+    .sticky-book-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        z-index: 999;
+    }
+
+    .book-venue-btn {
+        background: #fc8019;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 10px rgba(252, 128, 25, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .book-venue-btn:hover {
+        background: #e67312;
+        transform: translateY(-2px);
+    }
+    </style>
 </head>
 
 <body class="inner-page buzzfest-page">
-    <!-- Secondary Navigation -->
-    <nav class="secondary-nav">
-        <div class="nav-content">
-            <div class="nav-left">
-                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
-            </div>
-            <div class="nav-right">
-                <div class="desktop-menu">
-                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                    <a href="{% url 'joo:my_orders' %}">Orders</a>
-                    <a href="{% url 'joo:favorites' %}">Favorites</a>
-                    <a href="{% url 'joo:addresses' %}">Addresses</a>
-                    <a href="{% url 'joo:logout' %}">Logout</a>
-                </div>
-                <div class="mobile-menu">
-                    <button class="menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                        <a href="{% url 'joo:my_orders' %}">Orders</a>
-                        <a href="{% url 'joo:favorites' %}">Favorites</a>
-                        <a href="{% url 'joo:addresses' %}">Addresses</a>
-                        <a href="{% url 'joo:logout' %}">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    {% include 'home/includes/header.html' %}
 
     <!-- Search Bar -->
     <div class="search-container">
@@ -65,56 +270,61 @@
 
         <!-- Venues Section -->
         <section class="venues-section">
-            <h2 style="margin-left: 20px;">All Event Venues</h2>
+            <h2 style="margin-left: 20px;">Available Event Venues</h2>
             <div class="venue-grid">
                 {% for venue in venues %}
-                <div class="venue-card {{ venue.venue_type|default:'other'|lower }}">
-                    <img src="{{ venue.image_url|default:'/static/img/events/default-venue.jpg' }}" alt="{{ venue.venue_name }}">
+                <div class="venue-card" data-type="{{ venue.venue_type|lower }}">
+                    <img src="{{ venue.venue_image|default:'/static/img/default-venue.jpg' }}" alt="{{ venue.venue_name }}">
                     <button class="favorite-btn" 
                             data-id="buzzfest_{{ venue.id }}" 
                             data-type="buzzfest" 
                             data-item='{
+                                "id": "buzzfest_{{ venue.id }}",
                                 "name": "{{ venue.venue_name }}",
-                                "type": "{{ venue.venue_type }}",
-                                "capacity": "{{ venue.capacity }}",
+                                "type": "buzzfest",
+                                "capacity": "{{ venue.seating_capacity }}",
+                                "address": "{{ venue.address }}",
                                 "price": "{{ venue.price }}",
-                                "image": "{{ venue.image_url }}"
+                                "image": "{{ venue.venue_image }}"
                             }'>
                         <i class="far fa-heart"></i>
                     </button>
                     <div class="venue-info">
                         <h3>{{ venue.venue_name }}</h3>
-                        <p>{{ venue.description }}</p>
                         <div class="features">
-                            <span><i class="fas fa-users"></i> Capacity: {{ venue.capacity }}</span>
-                            <span><i class="fas fa-map-marker-alt"></i> {{ venue.location }}</span>
+                            <span><i class="fas fa-users"></i> Capacity: {{ venue.seating_capacity }}</span>
+                            <span><i class="fas fa-map-marker-alt"></i> {{ venue.address }}</span>
+                            <span><i class="fas fa-phone"></i> {{ venue.phone }}</span>
+                            <span><i class="fas fa-rupee-sign"></i> Price: ₹{{ venue.price }}</span>
                         </div>
-                        <p class="price">₹{{ venue.price }} per event</p>
+                        <div class="owner-info">
+                            <p><i class="fas fa-user"></i> {{ venue.owner_name }}</p>
+                            <p><i class="fas fa-envelope"></i> {{ venue.email }}</p>
+                        </div>
                         <div class="action-button">
-                            <button class="book-btn" onclick="bookVenue(this)">Book Now</button>
+                            <button class="book-btn" onclick="bookVenue(this)" 
+                                    data-venue-id="{{ venue.id }}"
+                                    data-venue-name="{{ venue.venue_name }}"
+                                    data-venue-capacity="{{ venue.seating_capacity }}"
+                                    data-venue-price="{{ venue.price }}"
+                                    data-venue-image="{{ venue.venue_image }}">
+                                Book Now
+                            </button>
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="no-venues">
-                    <p>No venues available at the moment.</p>
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>No venues available</h3>
+                    <p>Please check back later for available venues</p>
                 </div>
                 {% endfor %}
             </div>
         </section>
     </main>
 
-    <!-- Navigation bar -->
-    <nav class="navbar">
-        <ul>
-            <li><a href="{% url 'joo:home_page' %}"><i class="fas fa-home"></i><span>Home</span></a></li>
-            <li><a href="{% url 'joo:food' %}"><i class="fas fa-utensils"></i><span>Food</span></a></li>
-            <li><a href="{% url 'joo:quickbite' %}"><i class="fas fa-shopping-basket"></i><span>QuickBite</span></a></li>
-            <li><a href="{% url 'joo:dinespot' %}"><i class="fas fa-chair"></i><span>DineSpot</span></a></li>
-            <li><a href="{% url 'joo:buzzfest' %}" class="active"><i class="fas fa-calendar-alt"></i><span>BuzzFest</span></a></li>
-            <li><a href="{% url 'joo:packages' %}"><i class="fas fa-box"></i><span>Packages</span></a></li>
-        </ul>
-    </nav>
+    {% include 'home/includes/nav.html' %}
 
     <!-- Add this before closing body tag, after the navbar -->
     <div class="sticky-book-btn">
@@ -123,13 +333,9 @@
             Book Venue
         </button>
     </div>
-
-    <script src="{% static 'js/common.js' %}"></script>
-    <script src="{% static 'js/search.js' %}"></script>
-    <script src="{% static 'js/secondary-nav.js' %}"></script>
     <script>
-    // Add this script to set max date to 6 months from now
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize date picker
         const dateInput = document.getElementById('event-date');
         const today = new Date();
         const sixMonthsFromNow = new Date();
@@ -137,9 +343,63 @@
         
         dateInput.min = today.toISOString().split('T')[0];
         dateInput.max = sixMonthsFromNow.toISOString().split('T')[0];
+
+        // Search functionality
+        const searchInput = document.getElementById('buzzfest-search');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const venues = document.querySelectorAll('.venue-card');
+            
+            venues.forEach(venue => {
+                const venueName = venue.querySelector('h3').textContent.toLowerCase();
+                const ownerName = venue.querySelector('.owner-info').textContent.toLowerCase();
+                const address = venue.querySelector('.features').textContent.toLowerCase();
+                
+                if (venueName.includes(searchTerm) || 
+                    ownerName.includes(searchTerm) || 
+                    address.includes(searchTerm)) {
+                    venue.style.display = 'block';
+                } else {
+                    venue.style.display = 'none';
+                }
+            });
+        });
+
+        // Load existing favorites
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        
+        // Update heart icons for existing favorites
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            const id = btn.dataset.id;
+            if (favorites.some(fav => fav.id === id)) {
+                btn.querySelector('i').classList.replace('far', 'fas');
+            }
+        });
+
+        // Add click handlers to favorite buttons
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const id = this.dataset.id;
+                const itemData = JSON.parse(this.dataset.item);
+                let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+                
+                const index = favorites.findIndex(fav => fav.id === id);
+                if (index === -1) {
+                    favorites.push(itemData);
+                    this.querySelector('i').classList.replace('far', 'fas');
+                } else {
+                    favorites.splice(index, 1);
+                    this.querySelector('i').classList.replace('fas', 'far');
+                }
+                
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+            });
+        });
     });
 
-    // Update the bookVenue function
     function bookVenue(button) {
         const date = document.getElementById('event-date').value;
         if (!date) {
@@ -147,306 +407,43 @@
             return;
         }
 
-        const venueData = {
-            type: 'venue',
-            id: button.dataset.venueId,
-            name: button.dataset.venueName,
-            price: button.dataset.venuePrice,
-            image: button.dataset.venueImage,
-            date: date
+        const card = button.closest('.venue-card');
+        const venueName = button.dataset.venueName;
+        const capacity = parseInt(button.dataset.venueCapacity);
+        const price = parseFloat(button.dataset.venuePrice);
+        const venueType = card.dataset.type || 'Standard';
+
+        const orderDetails = {
+            orderType: 'venue',
+            venueId: button.dataset.venueId,
+            venueName: venueName,
+            venueType: venueType,
+            capacity: capacity,
+            bookingDate: date,
+            duration: 4, // Default duration in hours
+            total: price,
+            price: price,
+            items: [{
+                name: `Venue Booking - ${venueName}`,
+                quantity: 1,
+                price: price,
+                details: {
+                    date: date,
+                    eventType: 'Standard Event',
+                    capacity: capacity,
+                    duration: 4,
+                    venueType: venueType,
+                    additionalServices: []
+                }
+            }]
         };
-        
-        localStorage.setItem('bookingData', JSON.stringify(venueData));
+
+        // Store booking details in session storage
+        sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
+
+        // Redirect to payment page
         window.location.href = "{% url 'joo:payments' %}";
     }
-    </script>
-
-    <!-- Add these styles -->
-    <style>
-        .date-selection {
-            background: white;
-            padding: 20px;
-            margin: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .date-selection h3 {
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .date-selection h3 i {
-            color: #fc8019;
-        }
-
-        .date-picker {
-            display: flex;
-            justify-content: center;
-        }
-
-        .date-picker input[type="date"] {
-            padding: 10px 15px;
-            border: 2px solid #fc8019;
-            border-radius: 6px;
-            font-size: 16px;
-            color: #333;
-            outline: none;
-        }
-
-        .date-picker input[type="date"]:focus {
-            border-color: #e67312;
-        }
-
-        .venue-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .venue-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .venue-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .features {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 10px 0;
-        }
-
-        .features span {
-            background: #f0f0f0;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .no-venues {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 40px;
-            background: white;
-            border-radius: 12px;
-            color: #666;
-        }
-
-        /* Secondary Navigation Styles */
-        .secondary-nav {
-            background-color: #fc8019;
-            padding: 15px 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #e8e8e8;
-        }
-
-        .nav-content {
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            width: 100%;
-            position: relative;
-        }
-
-        .brand {
-            color: white;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-decoration: none;
-            position: relative;
-            transition: transform 0.3s ease;
-        }
-
-        .brand:hover {
-            opacity: 0.9;
-        }
-
-        .desktop-menu {
-            display: flex;
-            gap: 25px;
-        }
-
-        .desktop-menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 1rem;
-            position: relative;
-            padding: 5px 0;
-            margin: 0 5px;
-        }
-
-        .desktop-menu a::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            bottom: -2px;
-            left: 0;
-            background-color: white;
-            transform: scaleX(0);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease-out;
-        }
-
-        .desktop-menu a:hover::after {
-            transform: scaleX(1);
-            transform-origin: bottom left;
-        }
-
-        .mobile-menu {
-            display: none;
-            position: relative;
-        }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .menu-toggle:hover {
-            transform: rotate(90deg);
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-        }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            padding: 10px 0;
-            min-width: 200px;
-            z-index: 1001;
-            margin-top: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .desktop-menu {
-                display: none;
-            }
-
-            .mobile-menu {
-                display: block;
-            }
-
-            .dropdown-menu {
-                right: 0;
-                width: 200px;
-                background: white;
-                border: 1px solid rgba(252, 128, 25, 0.1);
-            }
-
-            .dropdown-menu a {
-                color: #fc8019;
-                padding: 12px 20px;
-                display: block;
-                text-decoration: none;
-                transition: all 0.2s ease;
-            }
-
-            .dropdown-menu a:hover {
-                background: #fff5ee;
-                color: #e67312;
-                transform: translateX(5px);
-            }
-        }
-
-        /* Search Bar Styles */
-        .search-container {
-            padding: 20px;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: fixed;
-            top: 60px;
-            left: 0;
-            right: 0;
-            z-index: 999;
-        }
-
-        .search-picker {
-            max-width: 600px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .search-picker input {
-            width: 100%;
-            padding: 12px 40px 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        .search-btn {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-        }
-
-        .search-btn:hover {
-            color: #fc8019;
-        }
-
-        /* Adjust main content to account for search bar */
-        main {
-            margin-top: 120px;
-        }
-    </style>
-
-    <!-- Add the mobile menu script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const mobileMenu = document.querySelector('.mobile-menu');
-            const dropdownMenu = document.querySelector('.dropdown-menu');
-
-            menuToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                mobileMenu.classList.toggle('active');
-                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-            });
-
-            // Close menu when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!mobileMenu.contains(e.target) && dropdownMenu.style.display === 'block') {
-                    mobileMenu.classList.remove('active');
-                    dropdownMenu.style.display = 'none';
-                }
-            });
-        });
     </script>
 </body>
 

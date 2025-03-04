@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
@@ -8,9 +8,16 @@ from django.contrib.auth import login, authenticate, logout, update_session_auth
 import random
 import json
 from decimal import Decimal, InvalidOperation
-from datetime import date
+from datetime import date, datetime
+from django.db import connections
+from reportlab.pdfgen import canvas
+from io import BytesIO
+from django.utils import timezone
+import pytz
+import uuid
+from django.utils.dateparse import parse_datetime
 
-from .models import User, AccountOTP, ResetPasswordOTP, Address
+from .models import User, AccountOTP, ResetPasswordOTP, Address, Order, TableBooking
 
 def home(request):
     """Redirect to signup page"""
@@ -416,8 +423,40 @@ def partner(request):
 
 @login_required
 def my_orders(request):
-    """Render my orders page"""
-    return render(request, 'home/profile/my-orders.html')
+    # Get user's email
+    user_email = request.user.email
+    
+    # Fetch all orders for the user
+    orders = Order.objects.filter(
+        customer_email=user_email
+    ).order_by('-booking_date')
+
+    # Process orders to include parsed items
+    processed_orders = []
+    for order in orders:
+        try:
+            # Parse the JSON items string
+            items = json.loads(order.items) if order.items else []
+            
+            # Create processed order object
+            processed_order = {
+                'order_id': order.order_id,
+                'order_type': order.order_type,
+                'restaurant_name': order.restaurant_name,
+                'booking_date': order.booking_date,
+                'status': order.status,
+                'total_amount': order.total_amount,
+                'items': items
+            }
+            
+            processed_orders.append(processed_order)
+            
+        except json.JSONDecodeError:
+            continue
+
+    return render(request, 'home/profile/my-orders.html', {
+        'orders': processed_orders
+    })
 
 @login_required
 def favorites(request):
@@ -466,8 +505,30 @@ def addresses(request):
 
 @login_required
 def food(request):
-    """Render food delivery page"""
-    return render(request, 'home/food.html')
+    # Fetch food items from items database
+    with connections['items'].cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                id,
+                name,
+                price,
+                image_url,
+                category,
+                rating,
+                is_available,
+                restaurant_id,
+                restaurant_name
+            FROM joo_fooditem
+            WHERE is_available = true
+            ORDER BY category, name
+        """)
+        columns = [col[0] for col in cursor.description]
+        food_items = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    return render(request, 'home/food.html', {
+        'food_items': food_items,
+        'categories': {item['category'] for item in food_items}
+    })
 
 @login_required
 def quickbite(request):
@@ -476,15 +537,64 @@ def quickbite(request):
 
 @login_required
 def dinespot(request):
-    """Render dinespot page"""
-    return render(request, 'home/dinespot.html')
+    """Render dinespot page with dining tables from items database"""
+    # Fetch dining tables from items database
+    with connections['items'].cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                dt.id,
+                dt.table_number,
+                dt.seating_capacity,
+                dt.price,
+                dt.image_url,
+                dt.category,
+                dt.rating,
+                dt.status,
+                dt.restaurant_id,
+                dt.restaurant_name,
+                dt.created_at,
+                dt.updated_at
+            FROM joo_diningtable dt
+            WHERE dt.status = 'available'
+            ORDER BY dt.category, dt.table_number
+        """)
+        columns = [col[0] for col in cursor.description]
+        dining_tables = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    context = {
+        'dining_tables': dining_tables,
+        'today_date': date.today(),
+    }
+    return render(request, 'home/dinespot.html', context)
 
 @login_required
 def buzzfest(request):
-    """Render buzzfest page"""
+    """Render buzzfest page with venues from items database"""
+    # Fetch venues from items database
+    with connections['items'].cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                id,
+                venue_name,
+                owner_name,
+                email,
+                phone,
+                venue_type,
+                seating_capacity,
+                address,
+                venue_image,
+                price,
+                is_active
+            FROM joo_venuepartner
+            WHERE is_active = true
+            ORDER BY venue_type, venue_name
+        """)
+        columns = [col[0] for col in cursor.description]
+        venues = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
     context = {
+        'venues': venues,
         'today': date.today(),
-        'venues': []  # Add your venues data here
     }
     return render(request, 'home/buzzfest.html', context)
 
@@ -641,4 +751,318 @@ def get_address(request):
                     'status': 'error',
             'message': 'Address not found'
         })
+
+@csrf_exempt
+@login_required
+def save_order(request):
+    """Save order to database"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            order_id = data.get('order_id')
+            
+            # Determine order type based on order ID prefix
+            order_type = 'venue' if order_id.startswith('BZ') else data.get('order_type', 'food')
+            
+            # Convert booking_date string to datetime object
+            booking_date = data.get('booking_date')
+            if booking_date:
+                try:
+                    # Parse the date string and make it timezone-aware
+                    booking_date = timezone.make_aware(datetime.strptime(booking_date, '%Y-%m-%d'))
+                except ValueError:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'Invalid booking date format'
+                    })
+            else:
+                booking_date = timezone.now()
+            
+            # Create new order
+            order = Order.objects.create(
+                order_id=order_id,
+                customer_email=request.user.email,
+                restaurant_id=data.get('restaurant_id'),
+                restaurant_name=data.get('restaurant_name'),
+                restaurant_email=data.get('restaurant_email', ''),
+                booking_date=booking_date,  # Now using the converted datetime
+                order_type=order_type,
+                status='pending',
+                items=data.get('items'),
+                total_amount=Decimal(str(data.get('total_amount')))
+            )
+            
+            print(f"Order created successfully: {order.order_id}")
+            return JsonResponse({
+                'success': True,
+                'order_id': order.order_id,
+                'message': 'Order saved successfully'
+            })
+            
+        except Exception as e:
+            import traceback
+            print("Error saving order:", str(e))
+            print(traceback.format_exc())
+            return JsonResponse({
+                'success': False,
+                'error': str(e),
+                'message': 'Failed to save order'
+            })
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method'
+    })
+
+@login_required
+def download_invoice(request, booking_id):
+    try:
+        booking = TableBooking.objects.get(booking_id=booking_id)
+        print(f"Found booking: {booking.booking_id}")
+
+        # Create PDF
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer)
         
+        # Add content to PDF
+        p.setFont("Helvetica-Bold", 24)
+        p.drawString(50, 800, "Mr.Foody & Ms.Foody")
+        
+        p.setFont("Helvetica-Bold", 18)
+        p.drawString(50, 750, "Table Booking Invoice")
+        
+        p.setFont("Helvetica", 12)
+        p.drawString(50, 720, f"Booking ID: {booking.booking_id}")
+        p.drawString(50, 700, f"Customer: {booking.customer_email}")
+        p.drawString(50, 680, f"Restaurant: {booking.restaurant_name}")
+        p.drawString(50, 660, f"Table Number: {booking.table_number}")
+        p.drawString(50, 640, f"Seating Capacity: {booking.seating_capacity}")
+        p.drawString(50, 620, f"Date: {booking.booking_date.strftime('%d %B, %Y')}")
+        p.drawString(50, 600, f"Time Slot: {booking.time_slot.title()}")
+        p.drawString(50, 580, f"Amount: ₹{booking.total_amount}")
+        p.drawString(50, 560, f"Status: {booking.status.title()}")
+        
+        # Add footer
+        p.setFont("Helvetica-Oblique", 10)
+        p.drawString(50, 50, "Thank you for choosing Mr.Foody & Ms.Foody!")
+        
+        p.showPage()
+        p.save()
+        
+        # FileResponse for PDF
+        buffer.seek(0)
+        return FileResponse(
+            buffer,
+            as_attachment=True,
+            filename=f'booking_{booking.booking_id}.pdf',
+            content_type='application/pdf'
+        )
+        
+    except TableBooking.DoesNotExist:
+        print(f"Booking not found: {booking_id}")
+        return HttpResponse("Booking not found", status=404)
+    except Exception as e:
+        print(f"Error generating invoice: {str(e)}")
+        return HttpResponse("Error generating invoice", status=500)
+
+@csrf_exempt
+@login_required
+def save_booking(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            print("Received booking data:", data)
+
+            # Convert date string to timezone-aware datetime
+            booking_date = datetime.strptime(data['booking_date'], '%Y-%m-%d').date()
+            
+            # Create new booking
+            booking = TableBooking.objects.create(
+                booking_id=data['booking_id'],
+                customer_email=request.user.email,
+                restaurant_id=int(data['restaurant_id']),
+                restaurant_name=data['restaurant_name'],
+                table_number=int(data['table_number']),
+                seating_capacity=int(data['seating_capacity']),
+                booking_date=booking_date,
+                time_slot=data['time_slot'],
+                status='pending',
+                total_amount=Decimal(str(data['total_amount']))
+            )
+            
+            print(f"Booking created successfully: {booking.booking_id}")
+            return JsonResponse({
+                'success': True,
+                'booking_id': booking.booking_id,
+                'message': 'Booking saved successfully'
+            })
+            
+        except Exception as e:
+            import traceback
+            print("Error saving booking:", str(e))
+            print(traceback.format_exc())
+            return JsonResponse({
+                'success': False,
+                'error': str(e),
+                'message': 'Failed to save booking'
+            })
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method'
+    })
+
+def generate_order_id(order_type):
+    """Generate unique order ID based on order type"""
+    unique_id = str(uuid.uuid4().hex[:6]).upper()
+    
+    if order_type == 'FOOD':
+        return f'FD{unique_id}'
+    elif order_type == 'DINING':
+        return f'DN{unique_id}'
+    elif order_type == 'VENUE':
+        return f'BZ{unique_id}'
+    
+    return unique_id
+
+def handle_food_payment_confirmation(payment):
+    """Handle food order payment confirmation"""
+    order = Order.objects.create(
+        order_id=generate_order_id('FOOD'),
+        order_type='FOOD',
+        status='PENDING',
+        customer_email=payment.get('customer_email'),
+        restaurant_id=payment.get('restaurant_id'),
+        restaurant_email=payment.get('restaurant_email', ''),
+        restaurant_name=payment.get('restaurant_name'),
+        booking_date=timezone.now(),  # Use current time for food orders
+        items=payment.get('items'),
+        total_amount=Decimal(str(payment.get('total_amount', 0)))
+    )
+    return order
+
+def handle_dinespot_payment_confirmation(payment):
+    """Handle dinespot payment confirmation"""
+    try:
+        # Parse the booking date from payment data
+        booking_date = datetime.strptime(payment.get('booking_date'), '%Y-%m-%d')
+        booking_date = timezone.make_aware(booking_date)  # Make timezone-aware
+    except (ValueError, TypeError):
+        raise ValueError("Invalid booking date format. Expected YYYY-MM-DD")
+
+    order = Order.objects.create(
+        order_id=generate_order_id('DINING'),
+        order_type='DINING',
+        status='PENDING',
+        customer_email=payment.get('customer_email'),
+        restaurant_id=payment.get('restaurant_id'),
+        restaurant_email=payment.get('restaurant_email', ''),
+        restaurant_name=payment.get('restaurant_name'),
+        booking_date=booking_date,  # Use provided booking date
+        items=payment.get('items'),
+        total_amount=Decimal(str(payment.get('total_amount', 0)))
+    )
+    return order
+
+def handle_buzzfest_payment_confirmation(payment):
+    """Handle buzzfest venue payment confirmation"""
+    try:
+        # Parse the booking date from payment data
+        booking_date = datetime.strptime(payment.get('booking_date'), '%Y-%m-%d')
+        booking_date = timezone.make_aware(booking_date)  # Make timezone-aware
+    except (ValueError, TypeError):
+        raise ValueError("Invalid booking date format. Expected YYYY-MM-DD")
+
+    order = Order.objects.create(
+        order_id=generate_order_id('VENUE'),
+        order_type='VENUE',
+        status='PENDING',
+        customer_email=payment.get('customer_email'),
+        restaurant_id=payment.get('restaurant_id'),
+        restaurant_email=payment.get('restaurant_email', ''),
+        restaurant_name=payment.get('restaurant_name'),
+        booking_date=booking_date,  # Use provided booking date
+        items=payment.get('items'),
+        total_amount=Decimal(str(payment.get('total_amount', 0)))
+    )
+    return order
+
+@csrf_exempt
+def payment_confirmation_view(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        
+        # Generate order ID based on order type
+        order_type = data.get('order_type', 'food').lower()
+        
+        # Handle dinespot orders
+        if order_type == 'dinespot':
+            order_type = 'dining'
+            
+        # Generate prefix based on order type
+        prefix = {
+            'food': 'FD',
+            'dining': 'DS',
+            'venue': 'BZ'
+        }.get(order_type, 'FD')
+        
+        order_id = f"{prefix}{uuid.uuid4().hex[:6].upper()}"
+
+        # Ensure total_amount is not zero
+        total_amount = Decimal(str(data.get('total_amount', 0)))
+        if total_amount == 0:
+            raise ValueError("Total amount cannot be zero")
+
+        # Parse items from the request
+        items = json.loads(data.get('items', '[]'))
+        
+        # Handle booking date
+        try:
+            booking_date_str = data.get('booking_date')
+            if booking_date_str:
+                # Try to parse as datetime first
+                booking_date = parse_datetime(booking_date_str)
+                if not booking_date:
+                    # If not a datetime, try to parse as date
+                    booking_date = datetime.strptime(booking_date_str.split('T')[0], '%Y-%m-%d')
+                    booking_date = timezone.make_aware(booking_date)
+            else:
+                booking_date = timezone.now()
+        except (ValueError, TypeError):
+            booking_date = timezone.now()
+        
+        # Create order in database
+        order = Order.objects.create(
+            order_id=order_id,
+            order_type=order_type,
+            status='pending',
+            customer_email=data.get('customer_email', ''),
+            restaurant_id=data.get('restaurant_id', 0),
+            restaurant_name=data.get('restaurant_name', ''),
+            restaurant_email=data.get('restaurant_email', ''),
+            booking_date=booking_date,
+            items=json.dumps(items),
+            total_amount=total_amount
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'order_id': order.order_id,
+                'restaurant_name': order.restaurant_name,
+                'total_amount': str(order.total_amount),
+                'order_type': order.order_type,
+                'status': order.status,
+                'date': order.booking_date.strftime('%Y-%m-%d %H:%M:%S')
+            }
+        })
+            
+    except Exception as e:
+        print(f"Payment error: {str(e)}")
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)

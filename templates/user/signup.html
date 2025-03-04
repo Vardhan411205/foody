@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Mr.Foody & Ms.Foody</title>
-    <link rel="stylesheet" href="{% static 'css/common.css' %}">
-    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        *{
+            box-sizing: border-box;
+        }
         /* Page layout */
         body {
             background-color: #fc8019;
@@ -374,7 +375,7 @@
 
 <body class="signup-page">
     <!-- Updated Partner Button -->
-    <a href="/partner/" class="corner-partner-btn">
+    <a href="https://foodypartner.onrender.com/" class="corner-partner-btn">
         <i class="fas fa-store"></i> Become Partner
     </a>
 
@@ -466,7 +467,7 @@
 
     <div class="login-container">
         <div class="logo">
-            <img src="{% static 'img/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo">
+            <img src="{% static 'img/logocopy.png' %}" alt="Mr.Foody & Ms.Foody Logo" style="border-radius: 50%;">
         </div>
         <div class="login-form signup-form">
             <h2>Create Account</h2>

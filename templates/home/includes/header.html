@@ -1,0 +1,210 @@
+{% load static %}
+
+<!-- Secondary Navigation -->
+<nav class="secondary-nav">
+    <div class="nav-content">
+        <div class="nav-left">
+            <a href="{% url 'joo:home_page' %}" class="brand">
+                <i class="fas fa-utensils"></i>
+                Mr.Foody & Ms.Foody
+            </a>
+        </div>
+        <div class="nav-right">
+            <div class="desktop-menu">
+                <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                <a href="{% url 'joo:my_orders' %}">Orders</a>
+                <a href="{% url 'joo:favorites' %}">Favorites</a>
+                <a href="{% url 'joo:addresses' %}">Addresses</a>
+                <a href="{% url 'joo:logout' %}">Logout</a>
+            </div>
+            <div class="mobile-menu">
+                <button class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
+                    <a href="{% url 'joo:my_orders' %}">Orders</a>
+                    <a href="{% url 'joo:favorites' %}">Favorites</a>
+                    <a href="{% url 'joo:addresses' %}">Addresses</a>
+                    <a href="{% url 'joo:logout' %}">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<style>
+/* Secondary Navigation and Header Styles */
+.secondary-nav {
+    background-color: #fc8019;
+    padding: 15px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-content {
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    width: 100%;
+}
+
+.brand {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: opacity 0.3s ease;
+}
+
+.brand i {
+    font-size: 1.4rem;
+}
+
+.brand:hover {
+    opacity: 0.9;
+}
+
+.desktop-menu {
+    display: flex;
+    gap: 25px;
+}
+
+.desktop-menu a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    position: relative;
+    padding: 5px 0;
+}
+
+.desktop-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: white;
+    transition: width 0.3s ease;
+}
+
+.desktop-menu a:hover::after {
+    width: 100%;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    display: none;
+    position: relative;
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+}
+
+.menu-toggle:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 8px 0;
+    min-width: 180px;
+    margin-top: 10px;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 12px 20px;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.dropdown-menu a:hover {
+    background: #f5f5f5;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .secondary-nav {
+        padding: 12px 0;
+    }
+
+    .nav-content {
+        padding: 0 15px;
+    }
+
+    .brand {
+        font-size: 1.5rem;
+    }
+
+    .brand i {
+        font-size: 1.2rem;
+    }
+
+    .desktop-menu {
+        display: none;
+    }
+
+    .mobile-menu {
+        display: block;
+    }
+
+    .mobile-menu.active .dropdown-menu {
+        display: block;
+    }
+}
+
+/* Small Mobile Screens */
+@media (max-width: 360px) {
+    .brand {
+        font-size: 1.3rem;
+    }
+
+    .brand i {
+        font-size: 1.1rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const mobileMenu = document.querySelector('.mobile-menu');
+
+    menuToggle.addEventListener('click', function() {
+        mobileMenu.classList.toggle('active');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!mobileMenu.contains(e.target)) {
+            mobileMenu.classList.remove('active');
+        }
+    });
+});
+</script> 

@@ -1,0 +1,168 @@
+{% load static %}
+
+<!-- Navigation bar -->
+<nav class="navbar">
+    <ul>
+        <li>
+            <a href="{% url 'joo:home_page' %}" {% if request.resolver_match.url_name == 'home_page' %}class="active"{% endif %}>
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'joo:food' %}" {% if request.resolver_match.url_name == 'food' %}class="active"{% endif %}>
+                <i class="fas fa-utensils"></i>
+                <span>Food</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'joo:quickbite' %}" {% if request.resolver_match.url_name == 'quickbite' %}class="active"{% endif %}>
+                <i class="fas fa-shopping-basket"></i>
+                <span>QuickBite</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'joo:dinespot' %}" {% if request.resolver_match.url_name == 'dinespot' %}class="active"{% endif %}>
+                <i class="fas fa-chair"></i>
+                <span>DineSpot</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'joo:buzzfest' %}" {% if request.resolver_match.url_name == 'buzzfest' %}class="active"{% endif %}>
+                <i class="fas fa-calendar-alt"></i>
+                <span>BuzzFest</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'joo:packages' %}" {% if request.resolver_match.url_name == 'packages' %}class="active"{% endif %}>
+                <i class="fas fa-box"></i>
+                <span>Packages</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'joo:cart' %}" {% if request.resolver_match.url_name == 'cart' %}class="active"{% endif %} class="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Cart</span>
+                <span class="cart-badge">0</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<style>
+/* Navigation Bar Styles */
+.navbar {
+    background: white;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    padding: 10px 0;
+}
+
+.navbar ul {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #666;
+    font-size: 12px;
+    gap: 4px;
+    transition: color 0.3s ease;
+    padding: 5px;
+}
+
+.navbar a.active {
+    color: #fc8019;
+}
+
+.navbar i {
+    font-size: 20px;
+}
+
+.cart-icon {
+    position: relative;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background: #fc8019;
+    color: white;
+    font-size: 10px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 8px 0;
+    }
+
+    .navbar a {
+        font-size: 11px;
+        padding: 3px;
+    }
+
+    .navbar i {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 360px) {
+    .navbar a {
+        font-size: 10px;
+    }
+
+    .navbar i {
+        font-size: 16px;
+    }
+
+    .cart-badge {
+        min-width: 16px;
+        height: 16px;
+        font-size: 9px;
+    }
+}
+</style>
+
+<script>
+// Update cart badge count
+function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const cartBadge = document.querySelector('.cart-badge');
+    if (cartBadge) {
+        cartBadge.textContent = totalItems;
+        cartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
+}
+
+// Update badge on page load
+document.addEventListener('DOMContentLoaded', updateCartBadge);
+
+// Listen for cart updates
+window.addEventListener('storage', function(e) {
+    if (e.key === 'cart') {
+        updateCartBadge();
+    }
+});
+</script> 

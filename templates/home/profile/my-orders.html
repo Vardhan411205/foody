@@ -6,375 +6,295 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Mr.Foody & Ms.Foody</title>
-    <link rel="stylesheet" href="{% static 'css/common.css' %}">
-    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
-    <link rel="stylesheet" href="{% static 'css/profile/my-orders.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
             box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
-        /* Secondary Navigation Styles */
-        .secondary-nav {
-            background-color: #fc8019;
-            padding: 15px 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #e8e8e8;
+        /* Keep order-specific styles */
+        main {
+            margin-top: 80px;
+            padding: 20px;
         }
 
-        .nav-content {
-            margin: 0 auto;
+        .orders-container {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 20px;
+        }
+
+        .order-filters {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            width: 100%;
-            position: relative;
+            gap: 15px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
         }
 
-        .brand {
-            color: white;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-decoration: none;
-            position: relative;
-            transition: transform 0.3s ease;
-        }
-
-        .brand:hover {
-            opacity: 0.9;
-        }
-
-        .desktop-menu {
-            display: flex;
-            gap: 25px;
-        }
-
-        .desktop-menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 1rem;
-            position: relative;
-            padding: 5px 0;
-            margin: 0 5px;
-        }
-
-        .desktop-menu a::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            bottom: -2px;
-            left: 0;
-            background-color: white;
-            transform: scaleX(0);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease-out;
-        }
-
-        .desktop-menu a:hover::after {
-            transform: scaleX(1);
-            transform-origin: bottom left;
-        }
-
-        .mobile-menu {
-            display: none;
-        }
-
-        .menu-toggle {
-            background: none;
+        .filter-btn {
+            padding: 10px 20px;
             border: none;
-            color: white;
-            font-size: 1.5rem;
+            border-radius: 8px;
+            background: white;
+            color: #666;
             cursor: pointer;
-            padding: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            white-space: nowrap;
         }
 
-        .menu-toggle:hover {
-            transform: rotate(90deg);
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
+        .filter-btn.active {
+            background: #fc8019;
+            color: white;
         }
 
-        .mobile-menu.active .menu-toggle {
-            transform: rotate(180deg);
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-        }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 20px;
+        .order-card {
             background: white;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            padding: 10px 0;
-            min-width: 200px;
-            z-index: 1001;
-            animation: slideIn 0.3s ease-out;
-            border: 1px solid rgba(252, 128, 25, 0.1);
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .restaurant-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
         }
 
-        .dropdown-menu a {
-            display: block;
-            padding: 10px 20px;
-            color: #fc8019;
-            text-decoration: none;
-            transition: all 0.2s ease-out;
-            position: relative;
-            padding-left: 30px;
-            background: transparent;
+        .order-details {
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
         }
 
-        .dropdown-menu a:hover {
-            background: #fff5ee;
-            color: #e67312;
-            transform: translateX(5px);
+        .order-details p {
+            margin: 5px 0;
         }
 
-        .dropdown-menu a::before {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            width: 6px;
-            height: 6px;
-            background: #fc8019;
-            border-radius: 50%;
-            transform: translateY(-50%) scale(0);
-            opacity: 0;
-            transition: all 0.2s ease-out;
+        .order-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            color: #333;
         }
 
-        .dropdown-menu a:hover::before {
-            transform: translateY(-50%) scale(1) rotate(0);
-            opacity: 1;
+        .order-total {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 10px;
         }
 
-        /* New hover effect for desktop menu */
-        .desktop-menu a:hover {
-            color: rgba(255, 255, 255, 0.8);
+        .order-status {
+            float: right;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
         }
 
-        /* Active state for menu items */
-        .desktop-menu a.active,
-        .dropdown-menu a.active {
-            font-weight: 600;
+        .status-pending { background: #fff3e0; color: #f57c00; }
+        .status-confirmed { background: #e3f2fd; color: #1976d2; }
+        .status-delivered { background: #e8f5e9; color: #388e3c; }
+        .status-cancelled { background: #ffebee; color: #d32f2f; }
+
+        .no-orders {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .site-title h2 {
             color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 0.5px;
         }
 
-        /* Subtle transition for dropdown items */
-        .dropdown-menu a {
-            position: relative;
-            overflow: hidden;
+        .item-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        .dropdown-menu a::after {
-            display: none;
+        .item-name {
+            font-weight: 600;
+            color: #333;
         }
 
-        .dropdown-menu a:not(:last-child) {
-            border-bottom: 1px solid rgba(252, 128, 25, 0.1);
+        .booking-details {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .booking-details p {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 3px 0;
+        }
+
+        .booking-details i {
+            color: #fc8019;
+            width: 16px;
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: #fc8019;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
         }
 
         @media (max-width: 768px) {
-            .desktop-menu {
-                display: none;
+            .order-item {
+                flex-direction: column;
+                gap: 10px;
             }
 
-            .mobile-menu {
-                display: block;
-                position: relative;
-            }
-
-            .mobile-menu.active .dropdown-menu {
-                display: block;
-            }
-
-            .brand {
-                font-size: 1.4rem;
-            }
-
-            .nav-content {
-                padding: 0 15px;
-            }
-
-            .dropdown-menu {
-                right: 0;
-                left: auto;
-                width: 200px;
-                margin: 10px 15px;
-                position: absolute;
-            }
-            
-            .mobile-menu {
-                position: static;
-            }
-            
-            .dropdown-menu {
-                position: absolute;
-                top: 100%;
-                right: 15px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .secondary-nav {
-                padding: 10px 0;
-            }
-            
-            .nav-content {
-                padding: 0 10px;
-            }
-            
-            .dropdown-menu {
-                right: 10px;
-                margin: 10px 10px;
-                max-width: calc(100% - 20px);
+            .item-price {
+                align-self: flex-end;
             }
         }
     </style>
 </head>
 
-<body class="orders-page">
-    <!-- Header -->
-    <!-- Secondary Navigation -->
-    <nav class="secondary-nav">
-        <div class="nav-content">
-            <div class="nav-left">
-                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
-            </div>
-            <div class="nav-right">
-                <div class="desktop-menu">
-                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                    <a href="{% url 'joo:my_orders' %}">Orders</a>
-                    <a href="{% url 'joo:favorites' %}">Favorites</a>
-                    <a href="{% url 'joo:addresses' %}">Addresses</a>
-                    <a href="{% url 'joo:logout' %}">Logout</a>
-                </div>
-                <div class="mobile-menu">
-                    <button class="menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                        <a href="{% url 'joo:my_orders' %}">Orders</a>
-                        <a href="{% url 'joo:favorites' %}">Favorites</a>
-                        <a href="{% url 'joo:addresses' %}">Addresses</a>
-                        <a href="{% url 'joo:logout' %}">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="inner-page orders-page">
+    {% include 'home/includes/header.html' %}
 
     <main>
         <div class="orders-container">
-            <!-- Order Filters -->
-            <div class="form-section">
-                <div class="order-filters">
-                    <button class="filter-btn active" data-filter="all">
-                        <i class="fas fa-list"></i> All Orders
-                    </button>
-                    <button class="filter-btn" data-filter="ongoing">
-                        <i class="fas fa-clock"></i> Ongoing
-                    </button>
-                    <button class="filter-btn" data-filter="past">
-                        <i class="fas fa-history"></i> Past Orders
-                    </button>
-                </div>
+            <div class="order-filters">
+                <button class="filter-btn active" data-type="food,quickbite">
+                    <i class="fas fa-utensils"></i> Food & QuickBite
+                </button>
+                <button class="filter-btn" data-type="dinespot">
+                    <i class="fas fa-chair"></i> DineSpot
+                </button>
+                <button class="filter-btn" data-type="buzzfest">
+                    <i class="fas fa-calendar-alt"></i> BuzzFest
+                </button>
             </div>
 
-            <!-- Orders List -->
-            <div class="orders-list">
-                <!-- Sample Order Card -->
-                <div class="form-section order-card">
-                    <div class="order-header">
-                        <div class="restaurant-info">
-                            <img src="../../static/img/restaurants/sample.jpg" alt="Restaurant">
-                            <div class="details">
-                                <h3>Restaurant Name</h3>
-                                <p class="order-id">Order #123456</p>
-                                <p class="order-date">Ordered on 15 Mar, 2024</p>
+            <div id="orders-list">
+                {% for order in orders %}
+                <div class="order-card" data-type="{{ order.order_type }}">
+                    <div class="restaurant-name">
+                        {{ order.restaurant_name }}
+                        <span class="order-status status-{{ order.status }}">
+                            {{ order.status|title }}
+                        </span>
+                    </div>
+
+                    <div class="order-details">
+                        <p>Order ID: {{ order.order_id }}</p>
+                        <p>{{ order.booking_date|date:"F d, Y H:i" }}</p>
+                        
+                        {% if order.order_type == 'dining' %}
+                            <!-- DineSpot Order Details -->
+                            {% for item in order.items %}
+                            <div class="order-item">
+                                <div class="item-details">
+                                    <span class="item-name">{{ item.name }}</span>
+                                    <div class="booking-details">
+                                        <p><i class="fas fa-users"></i> Guests: {{ item.details.guests }}</p>
+                                        <p><i class="fas fa-clock"></i> Time: {{ item.details.time }}</p>
+                                        <p><i class="fas fa-chair"></i> {{ item.details.tableType }}</p>
+                                    </div>
+                                </div>
+                                <span class="item-price">₹{{ item.price }}</span>
                             </div>
-                        </div>
-                        <div class="order-status delivered">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Delivered</span>
-                        </div>
+                            {% endfor %}
+                        
+                        {% elif order.order_type == 'venue' %}
+                            <!-- BuzzFest Order Details -->
+                            {% for item in order.items %}
+                            <div class="order-item">
+                                <div class="item-details">
+                                    <span class="item-name">{{ item.name }}</span>
+                                    <div class="booking-details">
+                                        <p><i class="fas fa-calendar-alt"></i> Event: {{ item.details.eventType }}</p>
+                                        <p><i class="fas fa-users"></i> Capacity: {{ item.details.capacity }} people</p>
+                                        <p><i class="fas fa-clock"></i> Duration: {{ item.details.duration }} hours</p>
+                                        {% if item.details.additionalServices %}
+                                        <p><i class="fas fa-plus-circle"></i> Services: {{ item.details.additionalServices|join:", " }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <span class="item-price">₹{{ item.price }}</span>
+                            </div>
+                            {% endfor %}
+                        
+                        {% else %}
+                            <!-- Food Order Details -->
+                            {% for item in order.items %}
+                            <div class="order-item">
+                                {{ item.name }} × {{ item.quantity }}
+                                <span class="item-price">₹{{ item.price }}</span>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
 
-                    <div class="order-items">
-                        <div class="item">
-                            <span class="quantity">2x</span>
-                            <span class="name">Chicken Biryani</span>
-                            <span class="price">₹300</span>
-                        </div>
-                        <div class="item">
-                            <span class="quantity">1x</span>
-                            <span class="name">Butter Naan</span>
-                            <span class="price">₹150</span>
-                        </div>
-                    </div>
-
-                    <div class="order-footer">
-                        <div class="total">
-                            <span>Total Paid:</span>
-                            <span class="amount">₹450</span>
-                        </div>
-                        <div class="actions">
-                            <button class="reorder-btn">
-                                <i class="fas fa-redo"></i> Reorder
-                            </button>
-                            <button class="help-btn">
-                                <i class="fas fa-question-circle"></i> Help
-                            </button>
-                        </div>
+                    <div class="order-total">
+                        Total: ₹{{ order.total_amount }}
                     </div>
                 </div>
-
-                <!-- Add more order cards here -->
+                {% empty %}
+                <div class="no-orders">
+                    <i class="fas fa-receipt fa-3x"></i>
+                    <h3>No orders yet</h3>
+                    <p>Your order history will appear here</p>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </main>
 
-    <script src="../../static/js/common.js"></script>
     <script>
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active button
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                this.classList.add('active');
+
+                // Filter orders
+                const types = this.dataset.type.split(',');
+                document.querySelectorAll('.order-card').forEach(card => {
+                    if (types.includes(card.dataset.type) || 
+                        (types.includes('dinespot') && card.dataset.type === 'dining') ||
+                        (types.includes('buzzfest') && card.dataset.type === 'venue')) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Show all food and quickbite orders initially
         document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const mobileMenu = document.querySelector('.mobile-menu');
-
-            menuToggle.addEventListener('click', function() {
-                mobileMenu.classList.toggle('active');
-            });
-
-            // Close menu when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!mobileMenu.contains(e.target)) {
-                    mobileMenu.classList.remove('active');
-                }
-            });
+            const foodBtn = document.querySelector('.filter-btn[data-type="food,quickbite"]');
+            if (foodBtn) {
+                foodBtn.click();
+            }
         });
     </script>
 </body>

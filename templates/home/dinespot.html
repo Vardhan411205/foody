@@ -6,85 +6,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mr.Foody & Ms.Foody - DineSpot</title>
-    <link rel="stylesheet" href="{% static 'css/common.css' %}">
-    <link rel="stylesheet" href="{% static 'css/dinespot.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body class="inner-page dinespot-page">
-    <!-- Secondary Navigation -->
-    <nav class="secondary-nav">
-        <div class="nav-content">
-            <div class="nav-left">
-                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
-            </div>
-            <div class="nav-right">
-                <div class="desktop-menu">
-                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                    <a href="{% url 'joo:my_orders' %}">Orders</a>
-                    <a href="{% url 'joo:favorites' %}">Favorites</a>
-                    <a href="{% url 'joo:addresses' %}">Addresses</a>
-                    <a href="{% url 'joo:logout' %}">Logout</a>
-                </div>
-                <div class="mobile-menu">
-                    <button class="menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                        <a href="{% url 'joo:my_orders' %}">Orders</a>
-                        <a href="{% url 'joo:favorites' %}">Favorites</a>
-                        <a href="{% url 'joo:addresses' %}">Addresses</a>
-                        <a href="{% url 'joo:logout' %}">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    {% include 'home/includes/header.html' %}
 
     <!-- Search Bar -->
     <div class="search-container">
         <div class="search-picker">
             <input type="text" id="dinespot-search" placeholder="Search for restaurants...">
-            <button class="search-btn">
+            <button class="search-btn" onclick="searchTables()">
                 <i class="fas fa-search"></i>
             </button>
         </div>
     </div>
 
     <main>
-        <!-- Add this after the search bar and before the restaurant cards -->
+        <!-- Update the booking selection section -->
         <div class="booking-selection">
-            <h3><i class="fas fa-clock"></i> Select Date & Time</h3>
+            <h3><i class="far fa-calendar-alt"></i> Select Date & Time</h3>
             <div class="booking-options">
                 <div class="date-picker">
-                    <label for="booking-date">Date</label>
-                    <input type="date" id="booking-date" 
-                           min="{% now 'Y-m-d' %}" 
-                           required>
+                    <label>Select Date</label>
+                    <input type="date" id="booking-date" required min="{{ today_date|date:'Y-m-d' }}">
                 </div>
                 <div class="time-shifts">
-                    <label>Time Slot</label>
+                    <label>Select Time Slot</label>
                     <div class="shift-options">
                         <label class="shift-option">
-                            <input type="radio" name="timeshift" value="morning">
+                            <input type="radio" name="timeshift" value="morning" 
+                                   data-start="10:00" data-end="14:00" required>
                             <span class="shift-content">
                                 <strong>Morning Shift</strong>
                                 <span>10:00 AM - 2:00 PM</span>
+                                <small class="seats-left">4 hour slot</small>
                             </span>
                         </label>
                         <label class="shift-option">
-                            <input type="radio" name="timeshift" value="afternoon">
+                            <input type="radio" name="timeshift" value="afternoon" 
+                                   data-start="14:00" data-end="18:00" required>
                             <span class="shift-content">
                                 <strong>Afternoon Shift</strong>
                                 <span>2:00 PM - 6:00 PM</span>
+                                <small class="seats-left">4 hour slot</small>
                             </span>
                         </label>
                         <label class="shift-option">
-                            <input type="radio" name="timeshift" value="evening">
+                            <input type="radio" name="timeshift" value="evening" 
+                                   data-start="18:00" data-end="22:00" required>
                             <span class="shift-content">
                                 <strong>Evening Shift</strong>
                                 <span>6:00 PM - 10:00 PM</span>
+                                <small class="seats-left">4 hour slot</small>
                             </span>
                         </label>
                     </div>
@@ -94,17 +68,87 @@
 
         <!-- Add these styles -->
         <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Arial', sans-serif;
+            }
+
+            /* Search Bar Styles */
+            .search-container {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 15px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                z-index: 100;
+                width: 100%;
+            }
+
+            .search-picker {
+                width: 100%;
+                margin: 0 auto;
+                display: flex;
+                gap: 10px;
+                padding: 0 20px;
+            }
+
+            .search-picker input {
+                flex: 1;
+                padding: 12px 15px;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                font-size: 16px;
+            }
+
+            .search-btn {
+                background: #fc8019;
+                color: white;
+                border: none;
+                padding: 0 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+            .search-btn:hover {
+                background: #e67312;
+            }
+
+            /* Main Layout */
+            main {
+                padding: 80px 20px 100px;
+                width: 100%;
+                margin: 0 auto;
+            }
+
+            /* Available Tables Section */
+            .restaurants-section {
+                margin-top: 30px;
+            }
+
+            .restaurants-section h2 {
+                font-size: 24px;
+                color: #333;
+                margin-bottom: 20px;
+            }
+
+            /* Date & Time Selection */
             .booking-selection {
                 background: white;
-                padding: 20px;
-                margin: 20px;
-                border-radius: 8px;
+                padding: 25px;
+                margin: 100px 20px 20px 20px;
+                border-radius: 12px;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             }
 
             .booking-selection h3 {
                 color: #333;
-                margin-bottom: 15px;
+                font-size: 20px;
+                margin-bottom: 20px;
                 display: flex;
                 align-items: center;
                 gap: 10px;
@@ -116,293 +160,268 @@
 
             .booking-options {
                 display: flex;
-                flex-direction: column;
-                gap: 20px;
+                gap: 30px;
+                margin-top: 20px;
             }
 
-            .date-picker, .time-shifts {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
+            /* Date Picker Styling */
+            .date-picker {
+                flex: 1;
+                min-width: 200px;
+                margin-top: 10px;
             }
 
-            .date-picker label, .time-shifts label {
-                font-weight: bold;
-                color: #333;
+            .date-picker label {
+                display: block;
+                margin-bottom: 10px;
+                color: #666;
+                font-weight: 500;
             }
 
             .date-picker input[type="date"] {
-                padding: 10px 15px;
-                border: 2px solid #fc8019;
-                border-radius: 6px;
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
                 font-size: 16px;
                 color: #333;
-                outline: none;
+                background: white;
+            }
+
+            /* Time Shifts Styling */
+            .time-shifts {
+                flex: 2;
+                margin-top: 10px;
+            }
+
+            .time-shifts label {
+                display: block;
+                margin-bottom: 10px;
+                color: #666;
+                font-weight: 500;
             }
 
             .shift-options {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 gap: 15px;
+                margin-top: 15px;
             }
 
             .shift-option {
-                display: block;
+                background: white;
+                border: 2px solid #e0e0e0;
+                border-radius: 10px;
+                padding: 15px;
                 cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .shift-option:hover {
+                border-color: #fc8019;
+                background: #fff5ee;
             }
 
             .shift-option input[type="radio"] {
                 display: none;
             }
 
+            .shift-option input[type="radio"]:checked + .shift-content {
+                color: #fc8019;
+            }
+
             .shift-content {
                 display: flex;
                 flex-direction: column;
-                padding: 15px;
-                border: 2px solid #ddd;
-                border-radius: 6px;
-                transition: all 0.3s ease;
-            }
-
-            .shift-option input[type="radio"]:checked + .shift-content {
-                border-color: #fc8019;
-                background: #fff3e6;
+                gap: 5px;
             }
 
             .shift-content strong {
+                font-size: 16px;
                 color: #333;
-                margin-bottom: 5px;
             }
 
             .shift-content span {
+                font-size: 14px;
+                color: #666;
+            }
+
+            /* Restaurant Cards */
+            .restaurant-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .restaurant-card {
+                background: white;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                transition: transform 0.3s ease;
+            }
+
+            .restaurant-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            }
+
+            .restaurant-card img {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+            }
+
+            .restaurant-info {
+                padding: 20px;
+            }
+
+            .features {
+                display: flex;
+                gap: 15px;
+                margin: 10px 0;
+            }
+
+            .features span {
+                display: flex;
+                align-items: center;
+                gap: 5px;
                 color: #666;
                 font-size: 14px;
             }
 
-            @media (min-width: 768px) {
-                .booking-options {
-                    flex-direction: row;
-                    align-items: flex-start;
-                }
-
-                .date-picker, .time-shifts {
-                    flex: 1;
-                }
-            }
-
-            /* Secondary Navigation Styles */
-            .secondary-nav {
-                background-color: #fc8019;
-                padding: 15px 0;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                z-index: 1000;
-                border-bottom: 1px solid #e8e8e8;
-            }
-
-            .nav-content {
-                margin: 0 auto;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0 20px;
-                width: 100%;
-                position: relative;
-            }
-
-            .brand {
-                color: white;
-                font-size: 1.8rem;
-                font-weight: bold;
-                text-decoration: none;
-                position: relative;
-                transition: transform 0.3s ease;
-            }
-
-            .brand:hover {
-                opacity: 0.9;
-            }
-
-            .desktop-menu {
-                display: flex;
-                gap: 25px;
-            }
-
-            .desktop-menu a {
-                color: white;
-                text-decoration: none;
-                font-size: 1rem;
-                position: relative;
-                padding: 5px 0;
-                margin: 0 5px;
-            }
-
-            .desktop-menu a::after {
-                content: '';
-                position: absolute;
-                width: 100%;
-                height: 2px;
-                bottom: -2px;
-                left: 0;
-                background-color: white;
-                transform: scaleX(0);
-                transform-origin: bottom right;
-                transition: transform 0.3s ease-out;
-            }
-
-            .desktop-menu a:hover::after {
-                transform: scaleX(1);
-                transform-origin: bottom left;
-            }
-
-            .mobile-menu {
-                display: none;
-                position: relative;
-            }
-
-            .menu-toggle {
-                background: none;
-                border: none;
-                color: white;
-                font-size: 1.5rem;
-                cursor: pointer;
-                padding: 5px;
-                transition: all 0.3s ease;
-                position: relative;
-            }
-
-            .menu-toggle:hover {
-                transform: rotate(90deg);
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 50%;
-            }
-
-            .dropdown-menu {
-                display: none;
-                position: absolute;
-                top: 100%;
-                right: 0;
-                background: white;
-                border-radius: 8px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-                padding: 10px 0;
-                min-width: 200px;
-                z-index: 1001;
-                margin-top: 10px;
-            }
-
-            @media (max-width: 768px) {
-                .desktop-menu {
-                    display: none;
-                }
-
-                .mobile-menu {
-                    display: block;
-                }
-
-                .dropdown-menu {
-                    right: 0;
-                    width: 200px;
-                    background: white;
-                    border: 1px solid rgba(252, 128, 25, 0.1);
-                }
-
-                .dropdown-menu a {
-                    color: #fc8019;
-                    padding: 12px 20px;
-                    display: block;
-                    text-decoration: none;
-                    transition: all 0.2s ease;
-                }
-
-                .dropdown-menu a:hover {
-                    background: #fff5ee;
-                    color: #e67312;
-                    transform: translateX(5px);
-                }
-            }
-
-            /* Search Bar Styles */
-            .search-container {
-                padding: 20px;
-                background: white;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                position: fixed;
-                top: 60px;
-                left: 0;
-                right: 0;
-                z-index: 999;
-            }
-
-            .search-picker {
-                max-width: 600px;
-                margin: 0 auto;
-                position: relative;
-            }
-
-            .search-picker input {
-                width: 100%;
-                padding: 12px 40px 12px 15px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                font-size: 1rem;
-                outline: none;
-            }
-
-            .search-btn {
-                position: absolute;
-                right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: none;
-                border: none;
-                color: #666;
-                cursor: pointer;
-            }
-
-            .search-btn:hover {
+            .features i {
                 color: #fc8019;
             }
 
-            /* Adjust main content to account for search bar */
-            main {
-                margin-top: 120px;
+            .rating {
+                margin: 10px 0;
+            }
+
+            .rating span {
+                background: #fff1e6;
+                color: #fc8019;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+
+            .book-btn {
+                width: 100%;
+                background: #fc8019;
+                color: white;
+                border: none;
+                padding: 12px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+            .book-btn:hover {
+                background: #e67312;
+            }
+
+            /* Responsive Adjustments */
+            @media (max-width: 768px) {
+                .booking-options {
+                    flex-direction: column;
+                }
+
+                .shift-options {
+                    grid-template-columns: 1fr;
+                }
+
+                .restaurant-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                }
+
+                .booking-selection {
+                    margin: 90px 15px 20px 15px;
+                    padding: 20px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .restaurant-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .features {
+                    flex-direction: column;
+                    gap: 8px;
+                }
+            }
+
+            /* Favorite Button */
+            .favorite-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: rgba(255, 255, 255, 0.9);
+                border: none;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                z-index: 2;
+            }
+
+            .favorite-btn:hover {
+                transform: scale(1.1);
+            }
+
+            .favorite-btn i {
+                color: #fc8019;
+                font-size: 18px;
+            }
+
+            .favorite-btn.active i {
+                font-weight: 900;
             }
         </style>
 
         <!-- Restaurants Section -->
         <section class="restaurants-section">
-            <h2 style="margin-left: 20px;">All Restaurants</h2>
+            <h2 style="margin-left: 20px;">Available Tables</h2>
             <div class="restaurant-grid">
                 {% for table in dining_tables %}
-                <div class="restaurant-card {{ table.category|lower }}" data-category="{{ table.category|lower }}">
-                    <img src="{{ table.image_url }}" alt="{{ table.restaurant.restaurant_name }}">
+                <div class="restaurant-card" data-category="{{ table.category|lower }}">
+                    <img src="{{ table.image_url }}" alt="{{ table.restaurant_name }}">
                     <button class="favorite-btn" 
                             data-id="dinespot_{{ table.id }}" 
                             data-type="dinespot" 
                             data-item='{
-                                "name": "{{ table.restaurant.restaurant_name }}",
-                                "cuisine": "{{ table.restaurant.cuisine_type }}",
+                                "name": "{{ table.restaurant_name }}",
                                 "rating": "{{ table.rating }}",
                                 "price": "₹{{ table.price }} for two",
                                 "image": "{{ table.image_url }}"
                             }'>
                         <i class="far fa-heart"></i>
                     </button>
-                    <div class="category-tag">{{ table.get_category_display }}</div>
                     <div class="restaurant-info">
-                        <h3>{{ table.restaurant.restaurant_name }}</h3>
-                        <p>{{ table.restaurant.cuisine_type }}</p>
-                        <div class="rating">{{ table.rating }} ★</div>
-                        <p class="pricing">₹{{ table.price }} for two</p>
-                        <div class="features">
-                            <span>Table {{ table.table_number }}</span>
-                            <span>{{ table.seating_capacity }} Seats</span>
+                        <h3>{{ table.restaurant_name }}</h3>
+                        <div class="rating">
+                            <span>★ {{ table.rating }}</span>
                         </div>
+                        <div class="features">
+                            <span><i class="fas fa-chair"></i> Table {{ table.table_number }}</span>
+                            <span><i class="fas fa-users"></i> {{ table.seating_capacity }} Seats</span>
+                        </div>
+                        <p class="pricing">₹{{ table.price }} for two</p>
                         <div class="action-button">
-                            <button class="book-btn" onclick="bookTable(this)">Book Now</button>
+                            <button class="book-btn" onclick="bookTable(this)" 
+                                    data-table-id="{{ table.id }}"
+                                    data-restaurant-id="{{ table.restaurant_id }}">
+                                Book Now
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -411,68 +430,161 @@
         </section>
     </main>
 
-    <!-- Navigation bar -->
-    <nav class="navbar">
-        <ul>
-            <li><a href="{% url 'joo:home_page' %}"><i class="fas fa-home"></i><span>Home</span></a></li>
-            <li><a href="{% url 'joo:food' %}"><i class="fas fa-utensils"></i><span>Food</span></a></li>
-            <li><a href="{% url 'joo:quickbite' %}"><i class="fas fa-shopping-basket"></i><span>QuickBite</span></a></li>
-            <li><a href="{% url 'joo:dinespot' %}" class="active"><i class="fas fa-chair"></i><span>DineSpot</span></a></li>
-            <li><a href="{% url 'joo:buzzfest' %}"><i class="fas fa-calendar-alt"></i><span>BuzzFest</span></a></li>
-            <li><a href="{% url 'joo:packages' %}"><i class="fas fa-box"></i><span>Packages</span></a></li>
-        </ul>
-    </nav>
+    {% include 'home/includes/nav.html' %}
 
-    <script src="{% static 'js/common.js' %}"></script>
-    <script src="{% static 'js/search.js' %}"></script>
-    <script src="{% static 'js/favorites-handler.js' %}"></script>
-    <script src="{% static 'js/dinespot.js' %}"></script>
     <script>
-    const dateInput = document.getElementById('booking-date');
-    dateInput.min = new Date().toISOString().split('T')[0];
+    function validateTimeSlot(selectedDate, timeSlot) {
+        const now = new Date();
+        const selected = new Date(selectedDate);
+        selected.setHours(parseInt(timeSlot.dataset.start.split(':')[0]));
+        
+        if (selected < now) {
+            return false;
+        }
+        return true;
+    }
 
     function bookTable(button) {
-        const restaurantCard = button.closest('.restaurant-card');
-        const date = document.getElementById('booking-date').value;
-        const shift = document.querySelector('input[name="timeshift"]:checked');
-
-        if (!date || !shift) {
-            alert('Please select both date and time shift');
+        const dateInput = document.querySelector('#booking-date');
+        const timeSlot = document.querySelector('input[name="timeshift"]:checked');
+        
+        if (!dateInput.value) {
+            alert('Please select a date');
+            dateInput.focus();
+            return;
+        }
+        
+        if (!timeSlot) {
+            alert('Please select a time slot');
             return;
         }
 
-        const tableData = {
-            type: 'table',
-            restaurant: restaurantCard.querySelector('h3').textContent,
-            price: restaurantCard.querySelector('.pricing').textContent.match(/₹([\d,]+)/)[1].replace(',', ''),
-            image: restaurantCard.querySelector('img').src,
-            date: date,
-            timeShift: shift.value,
-            shiftTime: shift.closest('.shift-option').querySelector('span span').textContent
-        };
+        // Validate if selected time slot is still available
+        if (!validateTimeSlot(dateInput.value, timeSlot)) {
+            alert('This time slot is no longer available. Please select a future time slot.');
+            return;
+        }
+
+        const card = button.closest('.restaurant-card');
+        const tableNumber = parseInt(card.querySelector('.features span:first-child').textContent.match(/\d+/)[0]);
+        const seatingCapacity = parseInt(card.querySelector('.features span:nth-child(2)').textContent.match(/\d+/)[0]);
+        const price = parseFloat(card.querySelector('.pricing').textContent.match(/\d+/)[0]);
         
-        localStorage.setItem('bookingData', JSON.stringify(tableData));
+        const orderDetails = {
+            orderType: 'dining',
+            restaurantId: button.dataset.restaurantId,
+            restaurantName: card.querySelector('h3').textContent,
+            tableNumber: tableNumber,
+            tableType: `Table ${tableNumber}`,
+            guests: seatingCapacity,
+            bookingDate: dateInput.value,
+            timeSlot: timeSlot.value,
+            total: price,
+            price: price,
+            items: [{
+                name: `Table Reservation - Table ${tableNumber}`,
+                quantity: 1,
+                price: price,
+                details: {
+                    date: dateInput.value,
+                    time: timeSlot.value,
+                    guests: seatingCapacity,
+                    tableType: `Table ${tableNumber}`,
+                    specialRequests: ''
+                }
+            }]
+        };
+
+        // Store booking details in session storage
+        sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
+
+        // Redirect to payment page
         window.location.href = "{% url 'joo:payments' %}";
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const menuToggle = document.querySelector('.menu-toggle');
-        const mobileMenu = document.querySelector('.mobile-menu');
-        const dropdownMenu = document.querySelector('.dropdown-menu');
-
-        menuToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            mobileMenu.classList.toggle('active');
-            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    // Update time slot availability on date change
+    document.getElementById('booking-date').addEventListener('change', function() {
+        const slots = document.querySelectorAll('input[name="timeshift"]');
+        slots.forEach(slot => {
+            const isAvailable = validateTimeSlot(this.value, slot);
+            slot.disabled = !isAvailable;
+            slot.closest('.shift-option').style.opacity = isAvailable ? 1 : 0.5;
         });
+    });
 
-        // Close menu when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!mobileMenu.contains(e.target) && dropdownMenu.style.display === 'block') {
-                mobileMenu.classList.remove('active');
-                dropdownMenu.style.display = 'none';
+    // Favorites handling
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load favorites from localStorage
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        
+        // Update heart icons for existing favorites
+        favorites.forEach(fav => {
+            const btn = document.querySelector(`.favorite-btn[data-id="${fav.id}"]`);
+            if (btn) {
+                btn.classList.add('active');
+                btn.querySelector('i').classList.remove('far');
+                btn.querySelector('i').classList.add('fas');
             }
         });
+
+        // Add click handlers to favorite buttons
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const id = this.dataset.id;
+                const type = this.dataset.type;
+                const itemData = JSON.parse(this.dataset.item);
+                
+                let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+                const index = favorites.findIndex(fav => fav.id === id);
+                
+                if (index === -1) {
+                    // Add to favorites
+                    favorites.push({
+                        id: id,
+                        type: type,
+                        ...itemData
+                    });
+                    this.classList.add('active');
+                    this.querySelector('i').classList.remove('far');
+                    this.querySelector('i').classList.add('fas');
+                } else {
+                    // Remove from favorites
+                    favorites.splice(index, 1);
+                    this.classList.remove('active');
+                    this.querySelector('i').classList.remove('fas');
+                    this.querySelector('i').classList.add('far');
+                }
+                
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+            });
+        });
+    });
+
+    // Search functionality
+    function searchTables() {
+        const searchInput = document.getElementById('dinespot-search');
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const restaurantCards = document.querySelectorAll('.restaurant-card');
+
+        restaurantCards.forEach(card => {
+            const restaurantName = card.querySelector('h3').textContent.toLowerCase();
+            
+            if (searchTerm === '' || restaurantName.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Add event listener for Enter key in search
+    document.getElementById('dinespot-search').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchTables();
+        }
     });
     </script>
 </body>

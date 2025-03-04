@@ -6,2196 +6,350 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mr.Foody & Ms.Foody - QuickBite</title>
-    <link rel="stylesheet" href="{% static 'css/common.css' %}">
-    <link rel="stylesheet" href="{% static 'css/quickbite.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
-        /* Secondary Navigation Styles */
-        .secondary-nav {
-            background-color: #fc8019;
-            padding: 15px 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #e8e8e8;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
- 
-        .nav-content {
+
+        /* Main Layout */
+        main {
+            padding: 80px 20px 100px;
+            width: 100%;
             margin: 0 auto;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        /* Category Tag */
+        .category-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(252, 128, 25, 0.9);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        /* Product Info */
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-info h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .category {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stock {
+            color: #22c55e;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* Quantity Controls */
+        .quantity-control {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
-            width: 100%;
-            position: relative;
         }
- 
-        .brand {
+
+        .add-btn {
+            background: #fc8019;
             color: white;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-decoration: none;
-            position: relative;
-            transition: transform 0.3s ease;
-        }
- 
-        .brand:hover {
-            opacity: 0.9;
-        }
- 
-        .desktop-menu {
-            display: flex;
-            gap: 25px;
-        }
- 
-        .desktop-menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 1rem;
-            position: relative;
-            padding: 5px 0;
-            margin: 0 5px;
-        }
- 
-        .desktop-menu a::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            bottom: -2px;
-            left: 0;
-            background-color: white;
-            transform: scaleX(0);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease-out;
-        }
- 
-        .desktop-menu a:hover::after {
-            transform: scaleX(1);
-            transform-origin: bottom left;
-        }
- 
-        .mobile-menu {
-            display: none;
-            position: relative;
-        }
- 
-        .menu-toggle {
-            background: none;
             border: none;
-            color: white;
-            font-size: 1.5rem;
+            padding: 8px 24px;
+            border-radius: 6px;
             cursor: pointer;
-            padding: 5px;
+            font-weight: 500;
             transition: all 0.3s ease;
-            position: relative;
         }
- 
-        .menu-toggle:hover {
-            transform: rotate(90deg);
-            background: rgba(255, 255, 255, 0.1);
+
+        .add-btn:hover {
+            background: #e67312;
+            transform: translateY(-2px);
+        }
+
+        .counter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff1e6;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+
+        .counter button {
+            background: #fc8019;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
- 
-        .dropdown-menu {
-            display: none;
+
+        .counter .count {
+            font-weight: 600;
+            color: #333;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Favorite Button */
+        .favorite-btn {
             position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            padding: 10px 0;
-            min-width: 200px;
-            z-index: 1001;
-            margin-top: 10px;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 2;
         }
- 
-        @media (max-width: 768px) {
-            .desktop-menu {
-                display: none;
-            }
- 
-            .mobile-menu {
-                display: block;
-            }
- 
-            .dropdown-menu {
-                right: 0;
-                width: 200px;
-                background: white;
-                border: 1px solid rgba(252, 128, 25, 0.1);
-            }
- 
-            .dropdown-menu a {
-                color: #fc8019;
-                padding: 12px 20px;
-                display: block;
-                text-decoration: none;
-                transition: all 0.2s ease;
-            }
- 
-            .dropdown-menu a:hover {
-                background: #fff5ee;
-                color: #e67312;
-                transform: translateX(5px);
-            }
+
+        .favorite-btn:hover {
+            transform: scale(1.1);
         }
- 
-        @media (max-width: 480px) {
-            .secondary-nav {
-                padding: 10px 0;
-            }
-            
-            .nav-content {
-                padding: 0 10px;
-            }
+
+        .favorite-btn i {
+            color: #fc8019;
+            font-size: 18px;
         }
- 
+
+        .favorite-btn.active i {
+            font-weight: 900;
+        }
+
         /* Search Bar Styles */
         .search-container {
-            padding: 20px;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             position: fixed;
-            top: 60px;
+            top: 70px;
             left: 0;
             right: 0;
-            z-index: 999;
-        }
- 
-        .search-picker {
-            max-width: 600px;
-            margin: 0 auto;
-            position: relative;
-        }
- 
-        .search-picker input {
+            background: white;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 100;
             width: 100%;
-            padding: 12px 40px 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            outline: none;
         }
- 
+
+        .search-picker {
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+            padding: 0 20px;
+        }
+
+        .search-picker input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
         .search-btn {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
+            background: #fc8019;
+            color: white;
             border: none;
-            color: #666;
+            padding: 0 20px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: background 0.3s ease;
         }
- 
+
         .search-btn:hover {
-            color: #fc8019;
+            background: #e67312;
         }
- 
-        /* Adjust main content to account for search bar */
-        main {
-            margin-top: 120px;
-        }
- 
+
+        /* Responsive Styles */
         @media (max-width: 768px) {
+            main {
+                padding: 70px 15px 90px;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 15px;
+            }
+
+            .product-card img {
+                height: 160px;
+            }
+
+            .product-info h3 {
+                font-size: 16px;
+            }
+
+            .price {
+                font-size: 16px;
+            }
+
+            .add-btn {
+                padding: 6px 16px;
+            }
+
             .search-container {
                 padding: 10px;
             }
- 
-            .search-picker input {
-                padding: 10px 35px 10px 12px;
+
+            .search-picker {
+                padding: 0 10px;
             }
         }
-     </style>
+
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body class="inner-page quickbite-page">
-    <!-- Secondary Navigation -->
-    <nav class="secondary-nav">
-        <div class="nav-content">
-            <div class="nav-left">
-                <a href="{% url 'joo:home_page' %}" class="brand">Mr.Foody & Ms.Foody</a>
-            </div>
-            <div class="nav-right">
-                <div class="desktop-menu">
-                    <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                    <a href="{% url 'joo:my_orders' %}">Orders</a>
-                    <a href="{% url 'joo:favorites' %}">Favorites</a>
-                    <a href="{% url 'joo:addresses' %}">Addresses</a>
-                    <a href="{% url 'joo:logout' %}">Logout</a>
-                </div>
-                <div class="mobile-menu">
-                    <button class="menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'joo:edit_profile' %}">Profile</a>
-                        <a href="{% url 'joo:my_orders' %}">Orders</a>
-                        <a href="{% url 'joo:favorites' %}">Favorites</a>
-                        <a href="{% url 'joo:addresses' %}">Addresses</a>
-                        <a href="{% url 'joo:logout' %}">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    {% include 'home/includes/header.html' %}
 
-    <!-- Navigation bar -->
-    <nav class="navbar">
-        <ul style="justify-content: space-around;">
-            <li><a href="{% url 'joo:home_page' %}"><i class="fas fa-home"></i><span>Home</span></a></li>
-            <li><a href="{% url 'joo:food' %}"><i class="fas fa-utensils"></i><span>Food</span></a></li>
-            <li><a href="{% url 'joo:quickbite' %}" class="active"><i class="fas fa-shopping-basket"></i><span>QuickBite</span></a></li>
-            <li><a href="{% url 'joo:dinespot' %}"><i class="fas fa-chair"></i><span>DineSpot</span></a></li>
-            <li><a href="{% url 'joo:buzzfest' %}"><i class="fas fa-calendar-alt"></i><span>BuzzFest</span></a></li>
-            <li><a href="{% url 'joo:packages' %}"><i class="fas fa-box"></i><span>Packages</span></a></li>
-            <li><a href="{% url 'joo:cart' %}"><i class="fas fa-shopping-cart"></i><span>Cart</span></a></li>
-        </ul>
-    </nav>
+    <!-- Add search bar section after secondary nav -->
+    <div class="search-container">
+        <div class="search-picker">
+            <input type="text" id="quickbite-search" placeholder="Search for products..." oninput="searchProducts()">
+            <button class="search-btn" onclick="searchProducts()">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
 
     <main>
-    
-        <!-- Products Section -->
+        <!-- Add section title and categories -->
         <section class="products-section">
             <h2>All Products</h2>
-            <div class="product-grid">
-                <!-- Fruits & Vegetables Products -->
-                <div class="product-card fruits">
-                    <img src="../../static/img/logocopy.png" alt="Fresh Apples">
-                    <button class="favorite-btn" data-id="quickbite_1" data-type="quickbite" data-item='{ "name": "Fresh Apples", "category": "Fruits & Veggies", "price": "₹99", "image": "../../static/img/logocopy.png" }'>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Fruits & Veggies</div>
-                    <div class="product-info">
-                        <h3>Fresh Apples</h3>
-                        <p class="category">Fruits & Veggies</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹99</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
+            <div class="menu-section">
+                <div class="categories">
+                    <button class="category-btn active" data-category="all">All</button>
+                    <button class="category-btn" data-category="snacks">Snacks</button>
+                    <button class="category-btn" data-category="beverages">Beverages</button>
+                    <button class="category-btn" data-category="groceries">Groceries</button>
+                    <button class="category-btn" data-category="anime-books">Anime Books</button>
+                </div>
+
+                <!-- Rename product-grid to match food-grid structure -->
+                <div class="product-grid">
+                    <!-- Your existing product cards here -->
                 </div>
-
-                <div class="product-card fruits">
-                    <img src="../../static/img/logocopy.png" alt="Bananas">
-                    <button class="favorite-btn" data-id="quickbite_2" data-type="quickbite" data-item='{ "name": "Bananas", "category": "Fruits & Veggies", "price": "₹40", "image": "../../static/img/banana.png" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Fruits & Veggies</div>
-                    <div class="product-info">
-                        <h3>Bananas</h3>
-                        <p class="category">Fruits & Veggies</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹40</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card fruits">
-                    <img src="../../static/img/orange.png" alt="Oranges">
-                    <button class="favorite-btn" data-id="quickbite_3" data-type="quickbite" data-item='{ "name": "Oranges", "category": "Fruits & Veggies", "price": "₹80", "image": "../../static/img/orange.png" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Fruits & Veggies</div>
-                    <div class="product-info">
-                        <h3>Oranges</h3>
-                        <p class="category">Fruits & Veggies</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹80</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card fruits">
-                    <img src="../../static/img/mango.png" alt="Mangoes">
-                    <button class="favorite-btn" data-id="quickbite_4" data-type="quickbite" data-item='{ "name": "Mangoes", "category": "Fruits & Veggies", "price": "₹120", "image": "../../static/img/mango.png" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Fruits & Veggies</div>
-                    <div class="product-info">
-                        <h3>Mangoes</h3>
-                        <p class="category">Fruits & Veggies</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹120</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card fruits">
-                    <img src="../../static/img/grapes.png" alt="Grapes">
-                    <button class="favorite-btn" data-id="quickbite_5" data-type="quickbite" data-item='{ "name": "Grapes", "category": "Fruits & Veggies", "price": "₹90", "image": "../../static/img/grapes.png" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Fruits & Veggies</div>
-                    <div class="product-info">
-                        <h3>Grapes</h3>
-                        <p class="category">Fruits & Veggies</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹90</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card fruits">
-                    <img src="../../static/img/watermelon.png" alt="Watermelon">
-                    <button class="favorite-btn" data-id="quickbite_6" data-type="quickbite" data-item='{ "name": "Watermelon", "category": "Fruits & Veggies", "price": "₹150", "image": "../../static/img/watermelon.png" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Fruits & Veggies</div>
-                    <div class="product-info">
-                        <h3>Watermelon</h3>
-                        <p class="category">Fruits & Veggies</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹150</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dairy Products -->
-                <div class="product-card dairy">
-                    <img src="../../static/img/products/milk.jpg" alt="Fresh Milk">
-                    <button class="favorite-btn" data-id="quickbite_7" data-type="quickbite" data-item='{ "name": "Fresh Milk", "category": "Dairy", "price": "₹60", "image": "../../static/img/products/milk.jpg" }'>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Dairy</div>
-                    <div class="product-info">
-                        <h3>Fresh Milk</h3>
-                        <p class="category">Dairy</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹60</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card dairy">
-                    <img src="../../static/img/products/cheese.jpg" alt="Cheese">
-                    <button class="favorite-btn" data-id="quickbite_8" data-type="quickbite" data-item='{ "name": "Cheese", "category": "Dairy", "price": "₹250", "image": "../../static/img/products/cheese.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Dairy</div>
-                    <div class="product-info">
-                        <h3>Cheese</h3>
-                        <p class="category">Dairy</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹250</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card dairy">
-                    <img src="../../static/img/products/butter.jpg" alt="Butter">
-                    <button class="favorite-btn" data-id="quickbite_9" data-type="quickbite" data-item='{ "name": "Butter", "category": "Dairy", "price": "₹120", "image": "../../static/img/products/butter.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Dairy</div>
-                    <div class="product-info">
-                        <h3>Butter</h3>
-                        <p class="category">Dairy</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹120</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card dairy">
-                    <img src="../../static/img/products/yogurt.jpg" alt="Yogurt">
-                    <button class="favorite-btn" data-id="quickbite_10" data-type="quickbite" data-item='{ "name": "Yogurt", "category": "Dairy", "price": "₹80", "image": "../../static/img/products/yogurt.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Dairy</div>
-                    <div class="product-info">
-                        <h3>Yogurt</h3>
-                        <p class="category">Dairy</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹80</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card dairy">
-                    <img src="../../static/img/products/paneer.jpg" alt="Paneer">
-                    <button class="favorite-btn" data-id="quickbite_11" data-type="quickbite" data-item='{ "name": "Paneer", "category": "Dairy", "price": "₹150", "image": "../../static/img/products/paneer.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Dairy</div>
-                    <div class="product-info">
-                        <h3>Paneer</h3>
-                        <p class="category">Dairy</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹150</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card dairy">
-                    <img src="../../static/img/products/ghee.jpg" alt="Ghee">
-                    <button class="favorite-btn" data-id="quickbite_12" data-type="quickbite" data-item='{ "name": "Ghee", "category": "Dairy", "price": "₹500", "image": "../../static/img/products/ghee.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Dairy</div>
-                    <div class="product-info">
-                        <h3>Ghee</h3>
-                        <p class="category">Dairy</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹500</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card dairy">
-                    <img src="../../static/img/products/curd.jpg" alt="Fresh Curd">
-                    <button class="favorite-btn" data-id="quickbite_13" data-type="quickbite" data-item='{ "name": "Fresh Curd", "category": "Dairy", "price": "₹45", "image": "../../static/img/products/curd.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Dairy</div>
-                    <div class="product-info">
-                        <h3>Fresh Curd</h3>
-                        <p class="category">Dairy</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹45</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Beverages Products -->
-                <div class="product-card beverages">
-                    <img src="../../static/img/products/juice.jpg" alt="Orange Juice">
-                    <button class="favorite-btn" data-id="quickbite_14" data-type="quickbite" data-item='{ "name": "Orange Juice", "category": "Beverages", "price": "₹120", "image": "../../static/img/products/juice.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Beverages</div>
-                    <div class="product-info">
-                        <h3>Orange Juice</h3>
-                        <p class="category">Beverages</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹120</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card beverages">
-                    <img src="../../static/img/products/cola.jpg" alt="Cola">
-                    <button class="favorite-btn" data-id="quickbite_15" data-type="quickbite" data-item='{ "name": "Cola", "category": "Beverages", "price": "₹50", "image": "../../static/img/products/cola.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Beverages</div>
-                    <div class="product-info">
-                        <h3>Cola</h3>
-                        <p class="category">Beverages</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹50</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card beverages">
-                    <img src="../../static/img/products/tea.jpg" alt="Tea">
-                    <button class="favorite-btn" data-id="quickbite_16" data-type="quickbite" data-item='{ "name": "Tea", "category": "Beverages", "price": "₹200", "image": "../../static/img/products/tea.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Beverages</div>
-                    <div class="product-info">
-                        <h3>Tea</h3>
-                        <p class="category">Beverages</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹200</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card beverages">
-                    <img src="../../static/img/products/coffee.jpg" alt="Coffee">
-                    <button class="favorite-btn" data-id="quickbite_17" data-type="quickbite" data-item='{ "name": "Coffee", "category": "Beverages", "price": "₹300", "image": "../../static/img/products/coffee.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Beverages</div>
-                    <div class="product-info">
-                        <h3>Coffee</h3>
-                        <p class="category">Beverages</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹300</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card beverages">
-                    <img src="../../static/img/products/coconut-water.jpg" alt="Coconut Water">
-                    <button class="favorite-btn" data-id="quickbite_18" data-type="quickbite" data-item='{ "name": "Coconut Water", "category": "Beverages", "price": "₹40", "image": "../../static/img/products/coconut-water.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Beverages</div>
-                    <div class="product-info">
-                        <h3>Coconut Water</h3>
-                        <p class="category">Beverages</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹40</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card beverages">
-                    <img src="../../static/img/products/mango-juice.jpg" alt="Mango Juice">
-                    <button class="favorite-btn" data-id="quickbite_19" data-type="quickbite" data-item='{ "name": "Mango Juice", "category": "Beverages", "price": "₹130", "image": "../../static/img/products/mango-juice.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Beverages</div>
-                    <div class="product-info">
-                        <h3>Mango Juice</h3>
-                        <p class="category">Beverages</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹130</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Staples Products -->
-                <div class="product-card staples">
-                    <img src="../../static/img/products/rice.jpg" alt="Basmati Rice">
-                    <button class="favorite-btn" data-id="quickbite_20" data-type="quickbite" data-item='{ "name": "Basmati Rice", "category": "Staples", "price": "₹199", "image": "../../static/img/products/rice.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Staples</div>
-                    <div class="product-info">
-                        <h3>Basmati Rice</h3>
-                        <p class="category">Staples</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹199</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card staples">
-                    <img src="../../static/img/products/wheat.jpg" alt="Whole Wheat Flour">
-                    <button class="favorite-btn" data-id="quickbite_21" data-type="quickbite" data-item='{ "name": "Whole Wheat Flour", "category": "Staples", "price": "₹150", "image": "../../static/img/products/wheat.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Staples</div>
-                    <div class="product-info">
-                        <h3>Whole Wheat Flour</h3>
-                        <p class="category">Staples</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹150</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card staples">
-                    <img src="../../static/img/products/sugar.jpg" alt="Sugar">
-                    <button class="favorite-btn" data-id="quickbite_22" data-type="quickbite" data-item='{ "name": "Sugar", "category": "Staples", "price": "₹50", "image": "../../static/img/products/sugar.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Staples</div>
-                    <div class="product-info">
-                        <h3>Sugar</h3>
-                        <p class="category">Staples</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹50</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card staples">
-                    <img src="../../static/img/products/salt.jpg" alt="Salt">
-                    <button class="favorite-btn" data-id="quickbite_23" data-type="quickbite" data-item='{ "name": "Salt", "category": "Staples", "price": "₹20", "image": "../../static/img/products/salt.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Staples</div>
-                    <div class="product-info">
-                        <h3>Salt</h3>
-                        <p class="category">Staples</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹20</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card staples">
-                    <img src="../../static/img/products/dal.jpg" alt="Toor Dal">
-                    <button class="favorite-btn" data-id="quickbite_24" data-type="quickbite" data-item='{ "name": "Toor Dal", "category": "Staples", "price": "₹130", "image": "../../static/img/products/dal.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Staples</div>
-                    <div class="product-info">
-                        <h3>Toor Dal</h3>
-                        <p class="category">Staples</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹130</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card staples">
-                    <img src="../../static/img/products/oil.jpg" alt="Sunflower Oil">
-                    <button class="favorite-btn" data-id="quickbite_25" data-type="quickbite" data-item='{ "name": "Sunflower Oil", "category": "Staples", "price": "₹250", "image": "../../static/img/products/oil.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Staples</div>
-                    <div class="product-info">
-                        <h3>Sunflower Oil</h3>
-                        <p class="category">Staples</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹250</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Snacks Products -->
-                <div class="product-card snacks">
-                    <img src="../../static/img/products/snacks.jpg" alt="Crunchy Snacks">
-                    <button class="favorite-btn" data-id="quickbite_26" data-type="quickbite" data-item='{ "name": "Crunchy Snacks", "category": "Snacks", "price": "₹99", "image": "../../static/img/products/snacks.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Snacks</div>
-                    <div class="product-info">
-                        <h3>Crunchy Snacks</h3>
-                        <p class="category">Snacks</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹99</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card snacks">
-                    <img src="../../static/img/products/chips.jpg" alt="Potato Chips">
-                    <button class="favorite-btn" data-id="quickbite_27" data-type="quickbite" data-item='{ "name": "Potato Chips", "category": "Snacks", "price": "₹50", "image": "../../static/img/products/chips.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Snacks</div>
-                    <div class="product-info">
-                        <h3>Potato Chips</h3>
-                        <p class="category">Snacks</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹50</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card snacks">
-                    <img src="../../static/img/products/nuts.jpg" alt="Mixed Nuts">
-                    <button class="favorite-btn" data-id="quickbite_28" data-type="quickbite" data-item='{ "name": "Mixed Nuts", "category": "Snacks", "price": "₹299", "image": "../../static/img/products/nuts.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Snacks</div>
-                    <div class="product-info">
-                        <h3>Mixed Nuts</h3>
-                        <p class="category">Snacks</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹299</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card snacks">
-                    <img src="../../static/img/products/cookies.jpg" alt="Chocolate Cookies">
-                    <button class="favorite-btn" data-id="quickbite_29" data-type="quickbite" data-item='{ "name": "Chocolate Cookies", "category": "Snacks", "price": "₹120", "image": "../../static/img/products/cookies.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Snacks</div>
-                    <div class="product-info">
-                        <h3>Chocolate Cookies</h3>
-                        <p class="category">Snacks</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹120</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card snacks">
-                    <img src="../../static/img/products/popcorn.jpg" alt="Butter Popcorn">
-                    <button class="favorite-btn" data-id="quickbite_30" data-type="quickbite" data-item='{ "name": "Butter Popcorn", "category": "Snacks", "price": "₹75", "image": "../../static/img/products/popcorn.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Snacks</div>
-                    <div class="product-info">
-                        <h3>Butter Popcorn</h3>
-                        <p class="category">Snacks</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹75</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Household Products -->
-                <div class="product-card household">
-                    <img src="../../static/img/products/toilet-paper.jpg" alt="Toilet Paper">
-                    <button class="favorite-btn" data-id="quickbite_31" data-type="quickbite" data-item='{ "name": "Toilet Paper", "category": "Household", "price": "₹120", "image": "../../static/img/products/toilet-paper.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Household</div>
-                    <div class="product-info">
-                        <h3>Toilet Paper</h3>
-                        <p class="category">Household</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹120</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Household Products -->
-                <div class="product-card household">
-                    <img src="../../static/img/products/detergent.jpg" alt="Laundry Detergent">
-                    <button class="favorite-btn" data-id="quickbite_32" data-type="quickbite" data-item='{ "name": "Laundry Detergent", "category": "Household", "price": "₹250", "image": "../../static/img/products/detergent.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Household</div>
-                    <div class="product-info">
-                        <h3>Laundry Detergent</h3>
-                        <p class="category">Household</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹250</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Household Products -->
-                <div class="product-card household">
-                    <img src="../../static/img/products/cleaner.jpg" alt="Surface Cleaner">
-                    <button class="favorite-btn" data-id="quickbite_33" data-type="quickbite" data-item='{ "name": "Surface Cleaner", "category": "Household", "price": "₹99", "image": "../../static/img/products/cleaner.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Household</div>
-                    <div class="product-info">
-                        <h3>Surface Cleaner</h3>
-                        <p class="category">Household</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹99</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Household Products -->
-                <div class="product-card household">
-                    <img src="../../static/img/products/mop.jpg" alt="Floor Mop">
-                    <button class="favorite-btn" data-id="quickbite_34" data-type="quickbite" data-item='{ "name": "Floor Mop", "category": "Household", "price": "₹350", "image": "../../static/img/products/mop.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Household</div>
-                    <div class="product-info">
-                        <h3>Floor Mop</h3>
-                        <p class="category">Household</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹350</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Personal Care Products -->
-                <div class="product-card personal-care">
-                    <img src="../../static/img/products/shampoo.jpg" alt="Shampoo">
-                    <button class="favorite-btn" data-id="quickbite_35" data-type="quickbite" data-item='{ "name": "Shampoo", "category": "Personal Care", "price": "₹180", "image": "../../static/img/products/shampoo.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Personal Care</div>
-                    <div class="product-info">
-                        <h3>Shampoo</h3>
-                        <p class="category">Personal Care</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹180</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Personal Care Products -->
-                <div class="product-card personal-care">
-                    <img src="../../static/img/products/toothpaste.jpg" alt="Toothpaste">
-                    <button class="favorite-btn" data-id="quickbite_36" data-type="quickbite" data-item='{ "name": "Toothpaste", "category": "Personal Care", "price": "₹75", "image": "../../static/img/products/toothpaste.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Personal Care</div>
-                    <div class="product-info">
-                        <h3>Toothpaste</h3>
-                        <p class="category">Personal Care</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹75</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Personal Care Products -->
-                <div class="product-card personal-care">
-                    <img src="../../static/img/products/body-lotion.jpg" alt="Body Lotion">
-                    <button class="favorite-btn" data-id="quickbite_37" data-type="quickbite" data-item='{ "name": "Body Lotion", "category": "Personal Care", "price": "₹220", "image": "../../static/img/products/body-lotion.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Personal Care</div>
-                    <div class="product-info">
-                        <h3>Body Lotion</h3>
-                        <p class="category">Personal Care</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹220</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Personal Care Products -->
-                <div class="product-card personal-care">
-                    <img src="../../static/img/products/deodorant.jpg" alt="Deodorant">
-                    <button class="favorite-btn" data-id="quickbite_38" data-type="quickbite" data-item='{ "name": "Deodorant", "category": "Personal Care", "price": "₹150", "image": "../../static/img/products/deodorant.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Personal Care</div>
-                    <div class="product-info">
-                        <h3>Deodorant</h3>
-                        <p class="category">Personal Care</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹150</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Electronics Products -->
-                <div class="product-card electronics">
-                    <img src="../../static/img/products/laptop.jpg" alt="Laptop">
-                    <button class="favorite-btn" data-id="quickbite_39" data-type="quickbite" data-item='{ "name": "Laptop", "category": "Electronics", "price": "₹50,000", "image": "../../static/img/products/laptop.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Electronics</div>
-                    <div class="product-info">
-                        <h3>Laptop</h3>
-                        <p class="category">Electronics</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹50,000</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card electronics">
-                    <img src="../../static/img/products/smartphone.jpg" alt="Smartphone">
-                    <button class="favorite-btn" data-id="quickbite_40" data-type="quickbite" data-item='{ "name": "Smartphone", "category": "Electronics", "price": "₹20,000", "image": "../../static/img/products/smartphone.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Electronics</div>
-                    <div class="product-info">
-                        <h3>Smartphone</h3>
-                        <p class="category">Electronics</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹20,000</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card electronics">
-                    <img src="../../static/img/products/headphones.jpg" alt="Wireless Headphones">
-                    <button class="favorite-btn" data-id="quickbite_41" data-type="quickbite" data-item='{ "name": "Wireless Headphones", "category": "Electronics", "price": "₹3,500", "image": "../../static/img/products/headphones.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Electronics</div>
-                    <div class="product-info">
-                        <h3>Wireless Headphones</h3>
-                        <p class="category">Electronics</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹3,500</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card electronics">
-                    <img src="../../static/img/products/smartwatch.jpg" alt="Smartwatch">
-                    <button class="favorite-btn" data-id="quickbite_42" data-type="quickbite" data-item='{ "name": "Smartwatch", "category": "Electronics", "price": "₹4,999", "image": "../../static/img/products/smartwatch.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Electronics</div>
-                    <div class="product-info">
-                        <h3>Smartwatch</h3>
-                        <p class="category">Electronics</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹4,999</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bakery Products -->
-                <div class="product-card bakery">
-                    <img src="../../static/img/products/cake.jpg" alt="Chocolate Cake">
-                    <button class="favorite-btn" data-id="quickbite_43" data-type="quickbite" data-item='{ "name": "Chocolate Cake", "category": "Bakery", "price": "₹350", "image": "../../static/img/products/cake.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Bakery</div>
-                    <div class="product-info">
-                        <h3>Chocolate Cake</h3>
-                        <p class="category">Bakery</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹350</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bakery Products -->
-                <div class="product-card bakery">
-                    <img src="../../static/img/products/bread.jpg" alt="Whole Wheat Bread">
-                    <button class="favorite-btn" data-id="quickbite_44" data-type="quickbite" data-item='{ "name": "Whole Wheat Bread", "category": "Bakery", "price": "₹45", "image": "../../static/img/products/bread.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Bakery</div>
-                    <div class="product-info">
-                        <h3>Whole Wheat Bread</h3>
-                        <p class="category">Bakery</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹45</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bakery Products -->
-                <div class="product-card bakery">
-                    <img src="../../static/img/products/croissant.jpg" alt="Butter Croissant">
-                    <button class="favorite-btn" data-id="quickbite_45" data-type="quickbite" data-item='{ "name": "Butter Croissant", "category": "Bakery", "price": "₹80", "image": "../../static/img/products/croissant.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Bakery</div>
-                    <div class="product-info">
-                        <h3>Butter Croissant</h3>
-                        <p class="category">Bakery</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹80</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bakery Products -->
-                <div class="product-card bakery">
-                    <img src="../../static/img/products/muffin.jpg" alt="Blueberry Muffin">
-                    <button class="favorite-btn" data-id="quickbite_46" data-type="quickbite" data-item='{ "name": "Blueberry Muffin", "category": "Bakery", "price": "₹60", "image": "../../static/img/products/muffin.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Bakery</div>
-                    <div class="product-info">
-                        <h3>Blueberry Muffin</h3>
-                        <p class="category">Bakery</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹60</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Beauty Products -->
-                <div class="product-card beauty">
-                    <img src="../../static/img/products/skincare.jpg" alt="Skincare Cream">
-                    <button class="favorite-btn" data-id="quickbite_47" data-type="quickbite" data-item='{ "name": "Skincare Cream", "category": "Beauty", "price": "₹299", "image": "../../static/img/products/skincare.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Beauty</div>
-                    <div class="product-info">
-                        <h3>Skincare Cream</h3>
-                        <p class="category">Beauty</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹299</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card beauty">
-                    <img src="../../static/img/products/makeup.jpg" alt="Makeup Kit">
-                    <button class="favorite-btn" data-id="quickbite_48" data-type="quickbite" data-item='{ "name": "Makeup Kit", "category": "Beauty", "price": "₹350", "image": "../../static/img/products/makeup.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Beauty</div>
-                    <div class="product-info">
-                        <h3>Makeup Kit</h3>
-                        <p class="category">Beauty</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹350</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card beauty">
-                    <img src="../../static/img/products/perfume.jpg" alt="Perfume">
-                    <button class="favorite-btn" data-id="quickbite_49" data-type="quickbite" data-item='{ "name": "Perfume", "category": "Beauty", "price": "₹1,200", "image": "../../static/img/products/perfume.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Beauty</div>
-                    <div class="product-info">
-                        <h3>Perfume</h3>
-                        <p class="category">Beauty</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹1,200</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card beauty">
-                    <img src="../../static/img/products/hair-care.jpg" alt="Hair Care Set">
-                    <button class="favorite-btn" data-id="quickbite_50" data-type="quickbite" data-item='{ "name": "Hair Care Set", "category": "Beauty", "price": "₹500", "image": "../../static/img/products/hair-care.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Beauty</div>
-                    <div class="product-info">
-                        <h3>Hair Care Set</h3>
-                        <p class="category">Beauty</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹500</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pets Products -->
-                <div class="product-card pets">
-                    <img src="../../static/img/products/dog-food.jpg" alt="Dog Food">
-                    <button class="favorite-btn" data-id="quickbite_51" data-type="quickbite" data-item='{ "name": "Dog Food", "category": "Pets", "price": "₹800", "image": "../../static/img/products/dog-food.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Pets</div>
-                    <div class="product-info">
-                        <h3>Dog Food</h3>
-                        <p class="category">Pets</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹800</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card pets">
-                    <img src="../../static/img/products/cat-food.jpg" alt="Cat Food">
-                    <button class="favorite-btn" data-id="quickbite_52" data-type="quickbite" data-item='{ "name": "Cat Food", "category": "Pets", "price": "₹150", "image": "../../static/img/products/cat-food.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Pets</div>
-                    <div class="product-info">
-                        <h3>Cat Food</h3>
-                        <p class="category">Pets</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹150</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card pets">
-                    <img src="../../static/img/products/pet-toys.jpg" alt="Pet Toys">
-                    <button class="favorite-btn" data-id="quickbite_53" data-type="quickbite" data-item='{ "name": "Pet Toys", "category": "Pets", "price": "₹1,200", "image": "../../static/img/products/pet-toys.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Pets</div>
-                    <div class="product-info">
-                        <h3>Pet Toys</h3>
-                        <p class="category">Pets</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹1,200</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card pets">
-                    <img src="../../static/img/products/pet-accessories.jpg" alt="Pet Accessories">
-                    <button class="favorite-btn" data-id="quickbite_54" data-type="quickbite" data-item='{ "name": "Pet Accessories", "category": "Pets", "price": "₹250", "image": "../../static/img/products/pet-accessories.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Pets</div>
-                    <div class="product-info">
-                        <h3>Pet Accessories</h3>
-                        <p class="category">Pets</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹250</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Furniture Products -->
-                <div class="product-card furniture">
-                    <img src="../../static/img/products/sofa.jpg" alt="Sofa Set">
-                    <button class="favorite-btn" data-id="quickbite_55" data-type="quickbite" data-item='{ "name": "Sofa Set", "category": "Furniture", "price": "₹15,000", "image": "../../static/img/products/sofa.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Furniture</div>
-                    <div class="product-info">
-                        <h3>Sofa Set</h3>
-                        <p class="category">Furniture</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹15,000</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card furniture">
-                    <img src="../../static/img/products/coffee-table.jpg" alt="Coffee Table">
-                    <button class="favorite-btn" data-id="quickbite_56" data-type="quickbite" data-item='{ "name": "Coffee Table", "category": "Furniture", "price": "₹3,000", "image": "../../static/img/products/coffee-table.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Furniture</div>
-                    <div class="product-info">
-                        <h3>Coffee Table</h3>
-                        <p class="category">Furniture</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹3,000</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card furniture">
-                    <img src="../../static/img/products/dining-table.jpg" alt="Dining Table">
-                    <button class="favorite-btn" data-id="quickbite_57" data-type="quickbite" data-item='{ "name": "Dining Set", "category": "Furniture", "price": "₹8,500", "image": "../../static/img/products/dining-set.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Furniture</div>
-                    <div class="product-info">
-                        <h3>Dining Set</h3>
-                        <p class="category">Furniture</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹8,500</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card furniture">
-                    <img src="../../static/img/products/bed.jpg" alt="Bed">
-                    <button class="favorite-btn" data-id="quickbite_58" data-type="quickbite" data-item='{ "name": "Bed", "category": "Furniture", "price": "₹5,000", "image": "../../static/img/products/bed.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Furniture</div>
-                    <div class="product-info">
-                        <h3>Bed</h3>
-                        <p class="category">Furniture</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹5,000</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Toys Products -->
-                <div class="product-card toys">
-                    <img src="../../static/img/products/action-figure.jpg" alt="Action Figure">
-                    <button class="favorite-btn" data-id="quickbite_59" data-type="quickbite" data-item='{ "name": "Action Figure", "category": "Toys", "price": "₹500", "image": "../../static/img/products/action-figure.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Toys</div>
-                    <div class="product-info">
-                        <h3>Action Figure</h3>
-                        <p class="category">Toys</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹500</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Toys Products -->
-                <div class="product-card toys">
-                    <img src="../../static/img/products/doll-house.jpg" alt="Doll House">
-                    <button class="favorite-btn" data-id="quickbite_60" data-type="quickbite" data-item='{ "name": "Doll House", "category": "Toys", "price": "₹1,200", "image": "../../static/img/products/doll-house.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Toys</div>
-                    <div class="product-info">
-                        <h3>Doll House</h3>
-                        <p class="category">Toys</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹1,200</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Toys Products -->
-                <div class="product-card toys">
-                    <img src="../../static/img/products/board-game.jpg" alt="Board Game">
-                    <button class="favorite-btn" data-id="quickbite_61" data-type="quickbite" data-item='{ "name": "Board Game", "category": "Toys", "price": "₹1,000", "image": "../../static/img/products/board-game.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Toys</div>
-                    <div class="product-info">
-                        <h3>Board Game</h3>
-                        <p class="category">Toys</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹1,000</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Toys Products -->
-                <div class="product-card toys">
-                    <img src="../../static/img/products/remote-car.jpg" alt="Remote Control Car">
-                    <button class="favorite-btn" data-id="quickbite_62" data-type="quickbite" data-item='{ "name": "Remote Control Car", "category": "Toys", "price": "₹1,500", "image": "../../static/img/products/remote-car.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Toys</div>
-                    <div class="product-info">
-                        <h3>Remote Control Car</h3>
-                        <p class="category">Toys</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹1,500</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Automotive Products -->
-                <div class="product-card automotive">
-                    <img src="../../static/img/products/car-cleaner.jpg" alt="Car Cleaner">
-                    <button class="favorite-btn" data-id="quickbite_63" data-type="quickbite" data-item='{ "name": "Car Cleaner", "category": "Automotive", "price": "₹450", "image": "../../static/img/products/car-cleaner.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Automotive</div>
-                    <div class="product-info">
-                        <h3>Car Cleaner</h3>
-                        <p class="category">Automotive</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹450</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card automotive">
-                    <img src="../../static/img/products/car-freshener.jpg" alt="Car Freshener">
-                    <button class="favorite-btn" data-id="quickbite_64" data-type="quickbite" data-item='{ "name": "Car Freshener", "category": "Automotive", "price": "₹300", "image": "../../static/img/products/car-freshener.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Automotive</div>
-                    <div class="product-info">
-                        <h3>Car Freshener</h3>
-                        <p class="category">Automotive</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹300</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card automotive">
-                    <img src="../../static/img/products/engine-oil.jpg" alt="Engine Oil">
-                    <button class="favorite-btn" data-id="quickbite_65" data-type="quickbite" data-item='{ "name": "Engine Oil", "category": "Automotive", "price": "₹200", "image": "../../static/img/products/engine-oil.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Automotive</div>
-                    <div class="product-info">
-                        <h3>Engine Oil</h3>
-                        <p class="category">Automotive</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹200</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card automotive">
-                    <img src="../../static/img/products/car-polish.jpg" alt="Car Polish">
-                    <button class="favorite-btn" data-id="quickbite_66" data-type="quickbite" data-item='{ "name": "Car Polish", "category": "Automotive", "price": "₹150", "image": "../../static/img/products/car-polish.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Automotive</div>
-                    <div class="product-info">
-                        <h3>Car Polish</h3>
-                        <p class="category">Automotive</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹150</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sports Products -->
-                <div class="product-card sports">
-                    <img src="../../static/img/products/football.jpg" alt="Football">
-                    <button class="favorite-btn" data-id="quickbite_67" data-type="quickbite" data-item='{ "name": "Football", "category": "Sports", "price": "₹1,200", "image": "../../static/img/products/football.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Sports</div>
-                    <div class="product-info">
-                        <h3>Football</h3>
-                        <p class="category">Sports</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹1,200</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sports Products -->
-                <div class="product-card sports">
-                    <img src="../../static/img/products/basketball.jpg" alt="Basketball">
-                    <button class="favorite-btn" data-id="quickbite_68" data-type="quickbite" data-item='{ "name": "Basketball", "category": "Sports", "price": "₹1,200", "image": "../../static/img/products/basketball.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Sports</div>
-                    <div class="product-info">
-                        <h3>Basketball</h3>
-                        <p class="category">Sports</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹1,200</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sports Products -->
-                <div class="product-card sports">
-                    <img src="../../static/img/products/cricket-bat.jpg" alt="Cricket Bat">
-                    <button class="favorite-btn" data-id="quickbite_69" data-type="quickbite" data-item='{ "name": "Cricket Bat", "category": "Sports", "price": "₹2,500", "image": "../../static/img/products/cricket-bat.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Sports</div>
-                    <div class="product-info">
-                        <h3>Cricket Bat</h3>
-                        <p class="category">Sports</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹2,500</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sports Products -->
-                <div class="product-card sports">
-                    <img src="../../static/img/products/tennis-racket.jpg" alt="Tennis Racket">
-                    <button class="favorite-btn" data-id="quickbite_70" data-type="quickbite" data-item='{ "name": "Tennis Racket", "category": "Sports", "price": "₹1,500", "image": "../../static/img/products/tennis-racket.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Sports</div>
-                    <div class="product-info">
-                        <h3>Tennis Racket</h3>
-                        <p class="category">Sports</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹1,500</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sports Products -->
-                <div class="product-card sports">
-                    <img src="../../static/img/products/swim-goggles.jpg" alt="Swimming Goggles">
-                    <button class="favorite-btn" data-id="quickbite_71" data-type="quickbite" data-item='{ "name": "Swimming Goggles", "category": "Sports", "price": "₹400", "image": "../../static/img/products/swim-goggles.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Sports</div>
-                    <div class="product-info">
-                        <h3>Swimming Goggles</h3>
-                        <p class="category">Sports</p>
-                        <div class="stock">In Stock</div>
-                        <p class="price">₹400</p>
-                        <div class="quantity-control">
-                            <button class="add-btn">ADD</button>
-                            <div class="counter" style="display: none;">
-                                <button class="decrease">-</button>
-                                <span class="count">1</span>
-                                <button class="increase">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sports Products -->
-                <div class="product-card sports">
-                    <img src="../../static/img/products/boxing-gloves.jpg" alt="Boxing Gloves">
-                    <button class="favorite-btn" data-id="quickbite_72" data-type="quickbite" data-item='{ "name": "Boxing Gloves", "category": "Sports", "price": "₹1,800", "image": "../../static/img/products/boxing-gloves.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Sports</div>
-                    <div class="product-info">
-                        <h3>Boxing Gloves</h3>
-                        <p>Comfortable & Durable</p>
-                        <div class="price">₹1,800</div>
-                        <p>12 oz</p>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="add-btn">ADD</button>
-                        <div class="counter" style="display: none;">
-                            <button class="decrease">-</button>
-                            <span class="count">1</span>
-                            <button class="increase">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card sports">
-                    <img src="../../static/img/products/golf-club.jpg" alt="Golf Club">
-                    <button class="favorite-btn" data-id="quickbite_73" data-type="quickbite" data-item='{ "name": "Golf Club", "category": "Sports", "price": "₹5,000", "image": "../../static/img/products/golf-club.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Sports</div>
-                    <div class="product-info">
-                        <h3>Golf Club</h3>
-                        <p>High Performance</p>
-                        <div class="price">₹5,000</div>
-                        <p>Driver</p>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="add-btn">ADD</button>
-                        <div class="counter" style="display: none;">
-                            <button class="decrease">-</button>
-                            <span class="count">1</span>
-                            <button class="increase">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card sports">
-                    <img src="../../static/img/products/running-shoes.jpg" alt="Running Shoes">
-                    <button class="favorite-btn" data-id="quickbite_74" data-type="quickbite" data-item='{ "name": "Running Shoes", "category": "Sports", "price": "₹2,200", "image": "../../static/img/products/running-shoes.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Sports</div>
-                    <div class="product-info">
-                        <h3>Running Shoes</h3>
-                        <p>Comfort & Support</p>
-                        <div class="price">₹2,200</div>
-                        <p>Size 9</p>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="add-btn">ADD</button>
-                        <div class="counter" style="display: none;">
-                            <button class="decrease">-</button>
-                            <span class="count">1</span>
-                            <button class="increase">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-card sports">
-                    <img src="../../static/img/products/football-cleats.jpg" alt="Football Cleats">
-                    <button class="favorite-btn" data-id="quickbite_75" data-type="quickbite" data-item='{ "name": "Football Cleats", "category": "Sports", "price": "₹2,000", "image": "../../static/img/products/football-cleats.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Sports</div>
-                    <div class="product-info">
-                        <h3>Football Cleats</h3>
-                        <p>For Better Grip</p>
-                        <div class="price">₹2,000</div>
-                        <p>Size 10</p>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="add-btn">ADD</button>
-                        <div class="counter" style="display: none;">
-                            <button class="decrease">-</button>
-                            <span class="count">1</span>
-                            <button class="increase">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anime Books Products -->
-                <div class="product-card anime-books">
-                    <img src="../../static/img/products/naruto-manga.jpg" alt="Naruto Manga">
-                    <button class="favorite-btn" data-id="quickbite_76" data-type="quickbite" data-item='{ "name": "Naruto Vol. 1", "category": "Anime Books", "price": "₹450", "image": "../../static/img/products/naruto-manga.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Anime Books</div>
-                    <div class="product-info">
-                        <h3>Naruto Vol. 1</h3>
-                        <p>Action & Adventure</p>
-                        <div class="price">₹450</div>
-                        <p>Manga Paperback</p>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="add-btn">ADD</button>
-                        <div class="counter" style="display: none;">
-                            <button class="decrease">-</button>
-                            <span class="count">1</span>
-                            <button class="increase">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anime Books Products -->
-                <div class="product-card anime-books">
-                    <img src="../../static/img/products/one-piece-manga.jpg" alt="One Piece Manga">
-                    <button class="favorite-btn" data-id="quickbite_77" data-type="quickbite" data-item='{ "name": "One Piece Vol. 1", "category": "Anime Books", "price": "₹500", "image": "../../static/img/products/one-piece-manga.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Anime Books</div>
-                    <div class="product-info">
-                        <h3>One Piece Vol. 1</h3>
-                        <p>Pirates Adventure</p>
-                        <div class="price">₹500</div>
-                        <p>Manga Paperback</p>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="add-btn">ADD</button>
-                        <div class="counter" style="display: none;">
-                            <button class="decrease">-</button>
-                            <span class="count">1</span>
-                            <button class="increase">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anime Books Products -->
-                <div class="product-card anime-books">
-                    <img src="../../static/img/products/attack-on-titan-manga.jpg" alt="Attack on Titan Manga">
-                    <button class="favorite-btn" data-id="quickbite_78" data-type="quickbite" data-item='{ "name": "Attack on Titan Vol. 1", "category": "Anime Books", "price": "₹550", "image": "../../static/img/products/attack-on-titan-manga.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Anime Books</div>
-                    <div class="product-info">
-                        <h3>Attack on Titan Vol. 1</h3>
-                        <p>Dark Fantasy</p>
-                        <div class="price">₹550</div>
-                        <p>Manga Paperback</p>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="add-btn">ADD</button>
-                        <div class="counter" style="display: none;">
-                            <button class="decrease">-</button>
-                            <span class="count">1</span>
-                            <button class="increase">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anime Books Products -->
-                <div class="product-card anime-books">
-                    <img src="../../static/img/products/my-hero-academia-manga.jpg" alt="My Hero Academia Manga">
-                    <button class="favorite-btn" data-id="quickbite_79" data-type="quickbite" data-item='{ "name": "My Hero Academia Vol. 1", "category": "Anime Books", "price": "₹400", "image": "../../static/img/products/my-hero-academia-manga.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Anime Books</div>
-                    <div class="product-info">
-                        <h3>My Hero Academia Vol. 1</h3>
-                        <p>Superheroes & Action</p>
-                        <div class="price">₹400</div>
-                        <p>Manga Paperback</p>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="add-btn">ADD</button>
-                        <div class="counter" style="display: none;">
-                            <button class="decrease">-</button>
-                            <span class="count">1</span>
-                            <button class="increase">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anime Books Products -->
-                <div class="product-card anime-books">
-                    <img src="../../static/img/products/demon-slayer-manga.jpg" alt="Demon Slayer Manga">
-                    <button class="favorite-btn" data-id="quickbite_80" data-type="quickbite" data-item='{ "name": "Demon Slayer Vol. 1", "category": "Anime Books", "price": "₹600", "image": "../../static/img/products/demon-slayer-manga.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Anime Books</div>
-                    <div class="product-info">
-                        <h3>Demon Slayer Vol. 1</h3>
-                        <p>Action & Fantasy</p>
-                        <div class="price">₹600</div>
-                        <p>Manga Paperback</p>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="add-btn">ADD</button>
-                        <div class="counter" style="display: none;">
-                            <button class="decrease">-</button>
-                            <span class="count">1</span>
-                            <button class="increase">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anime Books Products -->
-                <div class="product-card anime-books">
-                    <img src="../../static/img/products/dragon-ball-manga.jpg" alt="Dragon Ball Manga">
-                    <button class="favorite-btn" data-id="quickbite_81" data-type="quickbite" data-item='{ "name": "Dragon Ball Vol. 1", "category": "Anime Books", "price": "₹400", "image": "../../static/img/products/dragon-ball-manga.jpg" } '>
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <div class="category-tag">Anime Books</div>
-                    <div class="product-info">
-                        <h3>Dragon Ball Vol. 1</h3>
-                        <p>Action & Adventure</p>
-                        <div class="price">₹400</div>
-                        <p>Manga Paperback</p>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="add-btn">ADD</button>
-                        <div class="counter" style="display: none;">
-                            <button class="decrease">-</button>
-                            <span class="count">1</span>
-                            <button class="increase">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anime Books Products -->
-                <div class="product-card anime-books">
-                    <img src="../../static/img/products/jojo-bizarre-adventure-manga.jpg" alt="JoJo's Bizarre Adventure Manga ">
-                    <button class="favorite-btn" data-id="quickbite_82" data-type="quickbite" data-item='{"name": "JoJo\' s Bizarre Adventure Vol. 1 ", "category ": "Anime Books ", "price ": "₹650 ", "image ": "../../static/img/products/jojo-bizarre-adventure-manga.jpg "}'>
-                        <i class="far fa-heart "></i>
-                    </button>
-                    <div class="category-tag ">Anime Books</div>
-                    <div class="product-info ">
-                        <h3>JoJo's Bizarre Adventure Vol. 1</h3>
-                        <p>Action & Supernatural</p>
-                        <div class="price ">₹650</div>
-                        <p>Manga Paperback</p>
-                    </div>
-                    <div class="quantity-control ">
-                        <button class="add-btn ">ADD</button>
-                        <div class="counter " style="display: none; ">
-                            <button class="decrease ">-</button>
-                            <span class="count ">1</span>
-                            <button class="increase ">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anime Books Products -->
-                <div class="product-card anime-books ">
-                    <img src="../../static/img/products/bleach-manga.jpg " alt="Bleach Manga ">
-                    <button class="favorite-btn " data-id="quickbite_83 " data-type="quickbite " data-item='{ "name ": "Bleach Vol. 1 ", "category ": "Anime Books ", "price ": "₹450 ", "image ": "../../static/img/products/bleach-manga.jpg " } '>
-                        <i class="far fa-heart "></i>
-                    </button>
-                    <div class="category-tag ">Anime Books</div>
-                    <div class="product-info ">
-                        <h3>Bleach Vol. 1</h3>
-                        <p>Action & Supernatural</p>
-                        <div class="price ">₹450</div>
-                        <p>Manga Paperback</p>
-                    </div>
-                    <div class="quantity-control ">
-                        <button class="add-btn ">ADD</button>
-                        <div class="counter " style="display: none; ">
-                            <button class="decrease ">-</button>
-                            <span class="count ">1</span>
-                            <button class="increase ">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anime Books Products -->
-                <div class="product-card anime-books ">
-                    <img src="../../static/img/products/fullmetal-alchemist-manga.jpg " alt="Fullmetal Alchemist Manga ">
-                    <button class="favorite-btn " data-id="quickbite_84 " data-type="quickbite " data-item='{ "name ": "Fullmetal Alchemist Vol. 1 ", "category ": "Anime Books ", "price ": "₹550 ", "image ": "../../static/img/products/fullmetal-alchemist-manga.jpg " } '>
-                        <i class="far fa-heart "></i>
-                    </button>
-                    <div class="category-tag ">Anime Books</div>
-                    <div class="product-info ">
-                        <h3>Fullmetal Alchemist Vol. 1</h3>
-                        <p>Action & Alchemy</p>
-                        <div class="price ">₹550</div>
-                        <p>Manga Paperback</p>
-                    </div>
-                    <div class="quantity-control ">
-                        <button class="add-btn ">ADD</button>
-                        <div class="counter " style="display: none; ">
-                            <button class="decrease ">-</button>
-                            <span class="count ">1</span>
-                            <button class="increase ">+</button>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </section>
     </main>
 
-    <!-- Navigation bar -->
-    <nav class="navbar">
-        <ul style="justify-content: space-around;">
-            <li><a href="{% url 'joo:home_page' %}"><i class="fas fa-home"></i><span>Home</span></a></li>
-            <li><a href="{% url 'joo:food' %}"><i class="fas fa-utensils"></i><span>Food</span></a></li>
-            <li><a href="{% url 'joo:quickbite' %}" class="active"><i class="fas fa-shopping-basket"></i><span>QuickBite</span></a></li>
-            <li><a href="{% url 'joo:dinespot' %}"><i class="fas fa-chair"></i><span>DineSpot</span></a></li>
-            <li><a href="{% url 'joo:buzzfest' %}"><i class="fas fa-calendar-alt"></i><span>BuzzFest</span></a></li>
-            <li><a href="{% url 'joo:packages' %}"><i class="fas fa-box"></i><span>Packages</span></a></li>
-            <li><a href="{% url 'joo:cart' %}"><i class="fas fa-shopping-cart"></i><span>Cart</span></a></li>
-        </ul>
-    </nav>
+    {% include 'home/includes/nav.html' %}
 
-    <!-- Scripts -->
-    <script src="{% static 'js/common.js' %}"></script>
-    <script src="{% static 'js/search.js' %}"></script>
-    <script src="{% static 'js/secondary-nav.js' %}"></script>
-    <script src="{% static 'js/quickbite.js' %}"></script>
-    <script src="{% static 'js/favorites-handler.js' %}"></script>
-    <script src="{% static 'js/cart-handler.js' %}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const mobileMenu = document.querySelector('.mobile-menu');
-            const dropdownMenu = document.querySelector('.dropdown-menu');
+        function searchProducts() {
+            const searchInput = document.getElementById('quickbite-search');
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const productCards = document.querySelectorAll('.product-card');
 
-            menuToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                mobileMenu.classList.toggle('active');
-                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+            productCards.forEach(card => {
+                const productName = card.querySelector('h3').textContent.toLowerCase();
+                
+                if (searchTerm === '' || productName.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
             });
 
-            // Close menu when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!mobileMenu.contains(e.target) && dropdownMenu.style.display === 'block') {
-                    mobileMenu.classList.remove('active');
-                    dropdownMenu.style.display = 'none';
-                }
+            // Reset category buttons when searching
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.category-btn[data-category="all"]').classList.add('active');
+        }
+
+        // Add event listener for Enter key
+        document.getElementById('quickbite-search').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchProducts();
+            }
+        });
+
+        // Category filter functionality
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('quickbite-search').value = '';
+                const category = this.dataset.category;
+                
+                // Update active button
+                document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                // Filter products
+                document.querySelectorAll('.product-card').forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
             });
         });
     </script>

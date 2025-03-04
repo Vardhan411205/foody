@@ -1,0 +1,203 @@
+<style>
+/* Add this CSS for the download button */
+.download-btn {
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: #fc8019;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.download-btn:hover {
+    background: #e67312;
+    transform: translateY(-2px);
+}
+
+.download-btn i {
+    font-size: 18px;
+}
+
+#paymentSuccessSection {
+    text-align: center;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.success-icon {
+    color: #4CAF50;
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.order-details {
+    text-align: left;
+    margin: 20px 0;
+}
+
+.order-details p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Generate PDF function
+function generatePDF(orderDetails) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Add content
+    doc.setFontSize(24);
+    doc.text("Mr.Foody & Ms.Foody", 20, 20);
+    
+    doc.setFontSize(18);
+    doc.text(orderDetails.orderType === 'dinespot' ? "Table Booking Invoice" : "Food Order Invoice", 20, 30);
+    
+    doc.setFontSize(12);
+    doc.text(`Order ID: ${orderDetails.orderId}`, 20, 50);
+    doc.text(`Restaurant: ${orderDetails.restaurantName}`, 20, 60);
+
+    if (orderDetails.orderType === 'dinespot') {
+        // For dinespot orders
+        const tableDetails = JSON.parse(orderDetails.items)[0];
+        doc.text(`${tableDetails.name}`, 20, 70);
+        doc.text(`Date: ${orderDetails.bookingDate}`, 20, 80);
+        doc.text(`Time Slot: ${orderDetails.timeSlotRange}`, 20, 90);
+    } else {
+        // For food orders
+        const items = JSON.parse(orderDetails.items);
+        let y = 70;
+        doc.text("Items:", 20, y);
+        y += 10;
+        items.forEach(item => {
+            doc.text(`- ${item.name} x ${item.quantity}`, 30, y);
+            doc.text(`₹${item.price}`, 150, y);
+            y += 10;
+        });
+    }
+
+    doc.text(`Total Amount: ₹${orderDetails.total.toFixed(2)}`, 20, 130);
+    doc.text(`Status: Confirmed`, 20, 140);
+    doc.text(`Date & Time: ${new Date().toLocaleString()}`, 20, 150);
+    
+    // Add footer
+    doc.setFontSize(10);
+    doc.text("Thank you for choosing Mr.Foody & Ms.Foody!", 20, 180);
+    
+    // Save PDF
+    doc.save(`${orderDetails.orderType}_${orderDetails.orderId}.pdf`);
+}
+
+function verifyOTP() {
+    const enteredOTP = document.getElementById('otp').value;
+    const orderDetails = JSON.parse(sessionStorage.getItem('orderDetails'));
+    
+    console.log("Order Details:", orderDetails);
+    
+    if (enteredOTP === '1234') {  // Demo OTP
+        if (orderDetails.orderType === 'dinespot') {
+            // Save table booking as order
+            const orderData = {
+                order_id: orderDetails.orderId,
+                restaurant_id: parseInt(orderDetails.restaurantId),
+                restaurant_name: orderDetails.restaurantName,
+                booking_date: orderDetails.bookingDate + ' ' + orderDetails.timeSlot,
+                order_type: 'dinespot',
+                items: orderDetails.items,
+                total_amount: orderDetails.total
+            };
+            
+            console.log("Sending order data:", orderData);
+            
+            fetch('{% url "joo:save_order" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response data:", data);
+                if (data.success) {
+                    // Hide OTP section and show success
+                    document.getElementById('otpSection').style.display = 'none';
+                    const successSection = document.getElementById('paymentSuccessSection');
+                    successSection.style.display = 'block';
+                    
+                    // Update success section details
+                    document.getElementById('orderId').textContent = orderDetails.orderId;
+                    document.getElementById('restaurantName').textContent = orderDetails.restaurantName;
+                    document.getElementById('tableNumber').textContent = `Table ${JSON.parse(orderDetails.items)[0].name.split('Table ')[1]}`;
+                    document.getElementById('timeSlot').textContent = orderDetails.timeSlotRange;
+                    document.getElementById('amountPaid').textContent = `₹${orderDetails.total.toFixed(2)}`;
+                    document.getElementById('orderDateTime').textContent = new Date().toLocaleString();
+                    
+                    // Add download button
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'download-btn';
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Invoice';
+                    downloadBtn.onclick = () => generatePDF(orderDetails);
+                    successSection.appendChild(downloadBtn);
+                    
+                    // Clear storage
+                    sessionStorage.removeItem('orderDetails');
+                } else {
+                    alert('Failed to save booking: ' + (data.message || 'Please try again'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
+            });
+        }
+    } else {
+        alert('Invalid OTP! Please try again. (Hint: Use 1234)');
+    }
+}
+</script>
+
+<div id="paymentSuccessSection" style="display: none;">
+    <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    <h2>Payment Successful!</h2>
+    <div class="order-details">
+        <p><strong>Booking ID:</strong> <span id="orderId"></span></p>
+        <p><strong>Restaurant:</strong> <span id="restaurantName"></span></p>
+        <p><strong>Table Number:</strong> <span id="tableNumber"></span></p>
+        <p><strong>Time Slot:</strong> <span id="timeSlot"></span></p>
+        <p><strong>Amount Paid:</strong> <span id="amountPaid"></span></p>
+        <p><strong>Date & Time:</strong> <span id="orderDateTime"></span></p>
+    </div>
+</div> 

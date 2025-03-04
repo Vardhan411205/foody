@@ -162,21 +162,3 @@ class TableBooking(models.Model):
 
     def __str__(self):
         return f"Booking {self.booking_id} - {self.restaurant_name}"
-
-
-class DiningTable(models.Model):
-    restaurant_id = models.IntegerField()
-    restaurant_name = models.CharField(max_length=255)
-    table_number = models.IntegerField()
-    seating_capacity = models.IntegerField()
-    is_available = models.BooleanField(default=True)
-    price_per_hour = models.DecimalField(max_digits=10, decimal_places=2)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'joo_diningtable'
-        ordering = ['restaurant_id', 'table_number']
-
-    def __str__(self):
-        return f"{self.restaurant_name} - Table {self.table_number}"

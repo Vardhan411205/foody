@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-import os
 from pathlib import Path
+import os
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -21,8 +21,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Get port from environment variable or default to 8000
-PORT = int(os.environ.get('PORT', 8000))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -150,14 +148,8 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Disable static files caching for development
-if DEBUG:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-# Whitenoise Configuration
-WHITENOISE_MAX_AGE = 31536000  # 1 year
-WHITENOISE_MANIFEST_STRICT = False
-WHITENOISE_USE_FINDERS = True
+# Add Whitenoise storage configuration
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -201,6 +193,3 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Additional Gunicorn settings
-GUNICORN_CMD_ARGS = "--timeout 60 --workers 3"

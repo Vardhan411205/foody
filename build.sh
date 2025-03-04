@@ -1,22 +1,21 @@
 #!/bin/bash
 
 # Create and activate virtual environment
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 
 # Install requirements
-python -m pip install --upgrade pip
 pip install -r requirements.txt
-pip install gunicorn --no-cache-dir
 
-# Run Django migrations for both databases
+# Run Django migrations
 python manage.py makemigrations
 python manage.py migrate
-python manage.py migrate --database=default
-python manage.py migrate --database=items
 
 # Collect static files
-python manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput
 
 # Create superuser if it doesn't exist
-python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'admin123') if not User.objects.filter(username='admin').exists() else None"
+echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'admin123') if not User.objects.filter(username='admin').exists() else None" | python manage.py shell
+
+# Start development server
+python manage.py runserver

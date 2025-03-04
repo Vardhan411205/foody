@@ -12,9 +12,17 @@ from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'a.settings')
 
+# Get the WSGI application
 application = get_wsgi_application()
 
-# Add localhost configuration
+# Development server configuration
 if __name__ == "__main__":
+    import sys
     from django.core.management import execute_from_command_line
-    execute_from_command_line(["", "runserver", "localhost:8000"])
+    
+    # Force the development server to use HTTP
+    os.environ['PYTHONHTTPSVERIFY'] = '0'
+    os.environ['wsgi.url_scheme'] = 'http'
+    
+    # Run the development server
+    execute_from_command_line(sys.argv)

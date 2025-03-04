@@ -7,7 +7,6 @@ python -m venv venv
 # Install requirements
 pip install --upgrade pip
 pip install -r requirements.txt
-pip install gunicorn
 
 # Run Django migrations
 python manage.py makemigrations

@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# Disable color output since tput is not available
-export TERM=dumb
-export NO_COLOR=1
-export NCURSES_NO_UTF8_ACS=1
+# Redirect stderr to suppress tput errors
+exec 2>/dev/null
 
 # Create and activate virtual environment
 python -m venv venv

@@ -1,6 +1,0 @@
-venv/
-staticfiles/
-.env
-*.pyc
-__pycache__/
-pyrightconfig.json 

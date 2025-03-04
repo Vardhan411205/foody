@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Create dummy tput command
+echo '#!/bin/bash' > /tmp/tput
+echo 'exit 0' >> /tmp/tput
+chmod +x /tmp/tput
+export PATH="/tmp:$PATH"
+
 # Create and activate virtual environment
 python -m venv venv
 source venv/bin/activate

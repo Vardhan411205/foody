@@ -1,20 +1,24 @@
 #!/usr/bin/env bash
 
+# Prevent tput errors by forcing non-interactive mode
+export TERM=dumb
+export CI=true
+export NONINTERACTIVE=1
+
 # Exit on error
 set -o errexit
+
+# Redirect stderr to suppress tput errors
+exec 2>/dev/null
 
 # Debugging information
 echo "Starting build process..."
 echo "Working directory: $(pwd)"
 
 # Disable all color output and terminal features
-export TERM=dumb
 export NO_COLOR=1
 export PYTHONWARNINGS=ignore
 export PYTHONUNBUFFERED=1
-
-# Redirect all stderr to /dev/null
-exec 2>/dev/null
 
 # Create and activate virtual environment
 python -m venv venv

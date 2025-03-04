@@ -1,7 +1,13 @@
 #!/bin/bash
 
+# Ensure Python 3.12 is being used
+eval "$(pyenv init -)"
+pyenv install -s 3.12.6
+pyenv global 3.12.6
+python --version
+
 # Create and activate virtual environment
-python3 -m venv venv
+python -m venv venv
 source venv/bin/activate
 
 # Install requirements

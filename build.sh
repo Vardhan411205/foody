@@ -6,6 +6,7 @@ source venv/bin/activate
 
 # Install requirements
 pip install -r requirements.txt
+pip install gunicorn --no-cache-dir
 
 # Run Django migrations
 python manage.py makemigrations

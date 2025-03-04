@@ -9,9 +9,11 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 pip install gunicorn --no-cache-dir
 
-# Run Django migrations
+# Run Django migrations for both databases
 python manage.py makemigrations
 python manage.py migrate
+python manage.py migrate --database=default
+python manage.py migrate --database=items
 
 # Collect static files
 python manage.py collectstatic --noinput --clear

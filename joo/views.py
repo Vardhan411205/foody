@@ -525,6 +525,11 @@ def food(request):
         columns = [col[0] for col in cursor.description]
         food_items = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
+        # Process image URLs to ensure they are absolute URLs
+        for item in food_items:
+            if item['image_url'] and not item['image_url'].startswith(('http://', 'https://')):
+                item['image_url'] = request.build_absolute_uri(settings.MEDIA_URL + item['image_url'])
+
     return render(request, 'home/food.html', {
         'food_items': food_items,
         'categories': {item['category'] for item in food_items}
@@ -532,8 +537,30 @@ def food(request):
 
 @login_required
 def quickbite(request):
-    """Render quickbite page"""
-    return render(request, 'home/quickbite.html')
+    """Render quickbite page with items from vk_fooditem table"""
+    # Fetch items from owner database
+    with connections['owner'].cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                id,
+                name,
+                price,
+                category,
+                image_url,
+                rating,
+                description,
+                created_at,
+                updated_at
+            FROM vk_fooditem
+            ORDER BY category, name
+        """)
+        columns = [col[0] for col in cursor.description]
+        items = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    return render(request, 'home/quickbite.html', {
+        'items': items,
+        'categories': {item['category'] for item in items}
+    })
 
 @login_required
 def dinespot(request):

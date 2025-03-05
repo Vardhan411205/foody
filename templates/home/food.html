@@ -102,7 +102,7 @@
         }
 
         .food-card {
-            background: white;
+            background: #ffffff;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -119,6 +119,30 @@
             width: 100%;
             height: 200px;
             object-fit: cover;
+            background-color: #f8f8f8;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .food-card img.loaded {
+            opacity: 1;
+        }
+
+        /* Add loading animation */
+        .food-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background-color: #f8f8f8;
+            z-index: 1;
+        }
+
+        .food-card.loaded::before {
+            display: none;
         }
 
         .food-info {
@@ -287,45 +311,62 @@
             }
 
             .price-cart {
-                margin-top: 8px;
+                flex-direction: column;
+                gap: 8px;
+                align-items: center;
             }
 
-            .price {
-                font-size: 16px;
+            .cart-controls {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                gap: 8px;
             }
 
             .add-to-cart {
-                padding: 6px 16px;
-            }
-
-            .categories {
-                gap: 8px;
-                padding: 8px 0;
-                margin-top: 8px;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                scroll-snap-type: x mandatory;
-                scrollbar-width: none;
-            }
-
-            .category-btn {
-                padding: 6px 12px;
-                font-size: 13px;
-                scroll-snap-align: start;
+                width: 100%;
+                max-width: 120px;
+                height: 36px;
+                border-radius: 25px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .quantity-controls {
-                gap: 8px;
+                width: 120px;
+                height: 36px;
+                margin: 0 auto;
+                display: none;
+                border: 2px solid #fc8019;
+                border-radius: 25px;
+            }
+
+            .quantity-controls.active {
+                display: flex;
             }
 
             .quantity-controls button {
-                width: 28px;
-                height: 28px;
-                font-size: 14px;
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+                background: #fc8019;
+                color: white;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
-            .quantity {
-                font-size: 14px;
+            .quantity-controls .quantity {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                font-weight: 600;
+                color: #333;
+                min-width: 40px;
             }
 
             .toast-message {
@@ -578,6 +619,239 @@
         .favorite-btn.active i {
             color: #fc8019;
         }
+
+        /* Quantity Controls Styles */
+        .quantity-controls {
+            display: none;
+            align-items: center;
+            background: #fff;
+            border: 2px solid #fc8019;
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            height: 36px;
+        }
+
+        .quantity-controls button {
+            background: #fc8019;
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .quantity-controls button:active {
+            background: #e67312;
+            transform: scale(0.95);
+        }
+
+        .quantity-controls .quantity {
+            padding: 0 15px;
+            font-weight: 600;
+            color: #333;
+            min-width: 40px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .cart-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .add-to-cart {
+            background: #fc8019;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Enhanced Mobile Styles */
+        @media (max-width: 768px) {
+            .food-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+                padding: 10px;
+            }
+
+            .food-card {
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            .food-info {
+                padding: 8px;
+            }
+
+            .food-info h3 {
+                font-size: 14px;
+                line-height: 1.3;
+                margin-bottom: 4px;
+                height: 36px;
+            }
+
+            .restaurant-name {
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 4px;
+            }
+
+            .price-cart {
+                flex-direction: column;
+                gap: 8px;
+                margin-top: 8px;
+            }
+
+            .cart-controls {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .quantity-controls {
+                height: 32px;
+                transform: none;
+            }
+
+            .quantity-controls button {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+
+            .quantity-controls .quantity {
+                min-width: 32px;
+                padding: 0 10px;
+                font-size: 14px;
+            }
+
+            .add-to-cart {
+                width: 100%;
+                padding: 8px;
+                font-size: 14px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .price {
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            .rating span {
+                font-size: 12px;
+                padding: 2px 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .food-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .food-card img {
+                height: 120px;
+            }
+
+            .food-info h3 {
+                font-size: 13px;
+                height: 34px;
+                -webkit-line-clamp: 2;
+            }
+
+            .restaurant-name {
+                font-size: 11px;
+                -webkit-line-clamp: 1;
+            }
+
+            .price {
+                font-size: 13px;
+            }
+
+            .quantity-controls {
+                width: 100%;
+                max-width: 120px;
+                margin: 0 auto;
+            }
+        }
+
+        /* Add smooth transitions */
+        .food-card, .add-to-cart, .quantity-controls, .category-btn {
+            transition: all 0.3s ease;
+        }
+
+        /* Loading animation for images */
+        .food-card img {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .food-card img.loaded {
+            opacity: 1;
+        }
+
+        /* Toast Message Styles */
+        .toast-message {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: fadeInOut 3s ease;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, 20px); }
+            15% { opacity: 1; transform: translate(-50%, 0); }
+            85% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
+        /* Ripple effect */
+        .quantity-controls button, .add-to-cart {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 
@@ -641,9 +915,7 @@
                                             data-id="{{ item.id }}"
                                             data-name="{{ item.name }}"
                                             data-price="{{ item.price }}"
-                                            data-image="{{ item.image_url }}"
-                                            data-restaurant-id="{{ item.restaurant_id }}"
-                                            data-restaurant-name="{{ item.restaurant_name }}">
+                                            data-image="{{ item.image_url }}">
                                         Add
                                     </button>
                                     <div class="quantity-controls" style="display: none;">
@@ -669,29 +941,174 @@
         // Initialize quantities from cart
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
         cart.forEach(item => {
-            const foodCard = document.querySelector(`.food-card[data-id="${item.id}"]`);
-            if (foodCard) {
-                const addBtn = foodCard.querySelector('.add-to-cart');
-                const quantityControls = foodCard.querySelector('.quantity-controls');
-                const quantitySpan = foodCard.querySelector('.quantity');
-                
-                addBtn.style.display = 'none';
-                quantityControls.style.display = 'flex';
-                quantitySpan.textContent = item.quantity;
+            if (item.type === 'food') {
+                const addBtn = document.querySelector(`.add-to-cart[data-id="${item.id}"]`);
+                if (addBtn) {
+                    const foodCard = addBtn.closest('.food-card');
+                    const quantityControls = foodCard.querySelector('.quantity-controls');
+                    const quantitySpan = quantityControls.querySelector('.quantity');
+                    
+                    addBtn.style.display = 'none';
+                    quantityControls.style.display = 'flex';
+                    quantityControls.classList.add('active');
+                    quantitySpan.textContent = item.quantity;
+                }
             }
         });
-    });
 
-    function showToast(message) {
-        const toast = document.createElement('div');
-        toast.className = 'toast-message';
-        toast.textContent = message;
-        document.getElementById('toast-container').appendChild(toast);
-        
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
-    }
+        // Add touch feedback for buttons
+        const addFeedback = (element) => {
+            element.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                element.style.transform = '';
+            }, 150);
+        };
+
+        document.querySelectorAll('.quantity-controls button').forEach(button => {
+            button.addEventListener('touchstart', function(e) {
+                addFeedback(this);
+            });
+        });
+
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('touchstart', function(e) {
+                addFeedback(this);
+            });
+        });
+
+        // Enhanced quantity controls with continuous press
+        document.querySelectorAll('.quantity-controls button').forEach(button => {
+            let intervalId = null;
+            let timeoutId = null;
+            let pressStartTime;
+
+            const updateQuantity = (increment, foodCard) => {
+                const quantitySpan = foodCard.querySelector('.quantity');
+                const addBtn = foodCard.querySelector('.add-to-cart');
+                const itemId = addBtn.dataset.id;
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const itemIndex = cart.findIndex(item => item.id === itemId && item.type === 'food');
+
+                if (itemIndex !== -1) {
+                    const newQuantity = increment ? 
+                        cart[itemIndex].quantity + 1 : 
+                        cart[itemIndex].quantity - 1;
+
+                    if (newQuantity <= 0) {
+                        cart.splice(itemIndex, 1);
+                        button.closest('.quantity-controls').style.display = 'none';
+                        addBtn.style.display = 'block';
+                    } else {
+                        cart[itemIndex].quantity = newQuantity;
+                        quantitySpan.textContent = newQuantity;
+                    }
+
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+                }
+            };
+
+            const startIncrement = (increment) => {
+                const foodCard = button.closest('.food-card');
+                pressStartTime = Date.now();
+
+                updateQuantity(increment, foodCard);
+
+                timeoutId = setTimeout(() => {
+                    intervalId = setInterval(() => {
+                        updateQuantity(increment, foodCard);
+                    }, 150);
+                }, 500);
+            };
+
+            const stopIncrement = () => {
+                if (intervalId) clearInterval(intervalId);
+                if (timeoutId) clearTimeout(timeoutId);
+
+                const pressDuration = Date.now() - pressStartTime;
+                if (pressDuration < 500) {
+                    // Add ripple effect for short press
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('ripple');
+                    button.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                }
+            };
+
+            if (button.classList.contains('increase')) {
+                button.addEventListener('mousedown', () => startIncrement(true));
+                button.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    startIncrement(true);
+                });
+            } else if (button.classList.contains('decrease')) {
+                button.addEventListener('mousedown', () => startIncrement(false));
+                button.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    startIncrement(false);
+                });
+            }
+
+            ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(event => {
+                button.addEventListener(event, stopIncrement);
+            });
+        });
+
+        // Add to cart functionality
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const foodCard = this.closest('.food-card');
+                const itemData = {
+                    id: this.dataset.id,
+                    name: this.dataset.name,
+                    price: parseFloat(this.dataset.price),
+                    image: this.dataset.image,
+                    quantity: 1,
+                    type: 'food'
+                };
+
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const existingItemIndex = cart.findIndex(item => item.id === itemData.id && item.type === 'food');
+                
+                if (existingItemIndex === -1) {
+                    cart.push(itemData);
+                    this.style.display = 'none';
+                    const quantityControls = foodCard.querySelector('.quantity-controls');
+                    quantityControls.style.display = 'flex';
+                    quantityControls.classList.add('active');
+                    quantityControls.querySelector('.quantity').textContent = '1';
+                } else {
+                    cart[existingItemIndex].quantity++;
+                    const quantitySpan = foodCard.querySelector('.quantity');
+                    if (quantitySpan) {
+                        quantitySpan.textContent = cart[existingItemIndex].quantity;
+                    }
+                }
+
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                showToast(`${itemData.name} added to cart`);
+            });
+        });
+
+        // Image loading handler
+        document.querySelectorAll('.food-card img').forEach(img => {
+            img.addEventListener('load', function() {
+                this.classList.add('loaded');
+                this.closest('.food-card').classList.add('loaded');
+            });
+            
+            if (img.complete) {
+                img.classList.add('loaded');
+                img.closest('.food-card').classList.add('loaded');
+            }
+            
+            // Error handling
+            img.addEventListener('error', function() {
+                this.src = '{% static "images/default-food.jpg" %}';  // Add a default image
+            });
+        });
+    });
 
     function updateCartCount() {
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -699,88 +1116,33 @@
         const cartBadge = document.querySelector('.cart-badge');
         if (cartBadge) {
             cartBadge.textContent = totalItems;
+            cartBadge.classList.add('update');
+            setTimeout(() => cartBadge.classList.remove('update'), 300);
         }
     }
 
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-        button.addEventListener('click', function() {
-            const foodCard = this.closest('.food-card');
-            const itemData = {
-                id: this.dataset.id,
-                name: this.dataset.name,
-                price: parseFloat(this.dataset.price),
-                image: this.dataset.image,
-                quantity: 1,
-                restaurantId: this.dataset.restaurantId,
-                restaurantName: this.dataset.restaurantName
-            };
+    // Enhanced toast message
+    function showToast(message) {
+        // Remove existing toast if any
+        const existingToast = document.querySelector('.toast-message');
+        if (existingToast) {
+            existingToast.remove();
+        }
 
-            // Get existing cart
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            
-            // Check if items from different restaurants
-            if (cart.length > 0 && cart[0].restaurantId !== itemData.restaurantId) {
-                if (confirm('Adding items from a different restaurant will clear your current cart. Continue?')) {
-                    cart = [];
-                } else {
-                    return;
-                }
-            }
-
-            // Hide add button, show quantity controls
-            this.style.display = 'none';
-            const quantityControls = foodCard.querySelector('.quantity-controls');
-            quantityControls.style.display = 'flex';
-
-            // Add item to cart
-            cart.push(itemData);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            showToast(`${itemData.name} added to cart`);
-        });
-    });
-
-    document.querySelectorAll('.quantity-controls').forEach(controls => {
-        const decreaseBtn = controls.querySelector('.decrease');
-        const increaseBtn = controls.querySelector('.increase');
-        const quantitySpan = controls.querySelector('.quantity');
-        const foodCard = controls.closest('.food-card');
-        const addBtn = foodCard.querySelector('.add-to-cart');
-        const itemId = addBtn.dataset.id;
-
-        decreaseBtn.addEventListener('click', function() {
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const itemIndex = cart.findIndex(item => item.id === itemId);
-            
-            if (itemIndex !== -1) {
-                cart[itemIndex].quantity--;
-                if (cart[itemIndex].quantity <= 0) {
-                    cart.splice(itemIndex, 1);
-                    controls.style.display = 'none';
-                    addBtn.style.display = 'block';
-                    showToast(`${addBtn.dataset.name} removed from cart`);
-                } else {
-                    quantitySpan.textContent = cart[itemIndex].quantity;
-                    showToast(`${addBtn.dataset.name} quantity updated`);
-                }
-                localStorage.setItem('cart', JSON.stringify(cart));
-                updateCartCount();
-            }
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        // Add touch dismiss functionality
+        toast.addEventListener('click', () => {
+            toast.remove();
         });
 
-        increaseBtn.addEventListener('click', function() {
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const itemIndex = cart.findIndex(item => item.id === itemId);
-            
-            if (itemIndex !== -1) {
-                cart[itemIndex].quantity++;
-                quantitySpan.textContent = cart[itemIndex].quantity;
-                localStorage.setItem('cart', JSON.stringify(cart));
-                updateCartCount();
-                showToast(`${addBtn.dataset.name} quantity updated`);
-            }
-        });
-    });
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
     </script>
 
     <script>

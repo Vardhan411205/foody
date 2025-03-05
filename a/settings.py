@@ -12,8 +12,19 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
-from dotenv import load_dotenv
+try:
+    import dj_database_url
+except ImportError:
+    import pip
+    pip.main(['install', 'dj-database-url'])
+    import dj_database_url
+
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    import pip
+    pip.main(['install', 'python-dotenv'])
+    from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
@@ -102,6 +113,17 @@ DATABASES = {
         'OPTIONS': {
             'sslmode': 'require',
         }
+    },
+    'owner': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('OWNER_DB_NAME'),
+        'USER': os.environ.get('OWNER_DB_USER'),
+        'PASSWORD': os.environ.get('OWNER_DB_PASSWORD'),
+        'HOST': os.environ.get('OWNER_DB_HOST'),
+        'PORT': os.environ.get('OWNER_DB_PORT'),
+        'OPTIONS': {
+            'sslmode': 'require',
+        }
     }
 }
 
@@ -152,6 +174,16 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+# Media files (Uploaded files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Create media directories if they don't exist
+RESTAURANT_IMAGE_DIR = MEDIA_ROOT / 'restaurant_images'
+FOOD_IMAGE_DIR = MEDIA_ROOT / 'food_items'
+os.makedirs(RESTAURANT_IMAGE_DIR, exist_ok=True)
+os.makedirs(FOOD_IMAGE_DIR, exist_ok=True)
 
 # Add Whitenoise storage configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'

@@ -29,6 +29,9 @@ except ImportError:
 # Load environment variables
 load_dotenv()
 
+# Python Version
+PYTHON_VERSION = os.environ.get('PYTHON_VERSION')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

@@ -12,3 +12,18 @@ reportlab==4.1.0
 pytz==2024.1
 gunicorn==21.2.0
 whitenoise==6.6.0
+psycopg2-binary==2.9.9
+# Security
+django-environ==0.11.2
+django-debug-toolbar==4.3.0
+# Testing and Development
+coverage==7.4.1
+pytest==8.0.0
+pytest-django==4.8.0
+# API
+djangorestframework==3.14.0
+markdown==3.5.2
+django-filter==23.5
+# Performance and Caching
+django-redis==5.4.0
+redis==5.0.1

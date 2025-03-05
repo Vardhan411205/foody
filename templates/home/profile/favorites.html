@@ -389,49 +389,57 @@
                 }
 
                 const favoritesHTML = filteredFavorites.map(item => {
+                    const baseCard = `
+                        <div class="favorite-card" data-type="${item.type}">
+                            <img src="${item.image || '{% static "img/default-food.jpg" %}'}" 
+                                 alt="${item.name}" 
+                                 class="favorite-image"
+                                 loading="lazy">
+                            <div class="favorite-info">
+                                <h3>${item.name}</h3>
+                                ${item.rating ? `
+                                    <div class="rating">
+                                        <span>★ ${item.rating}</span>
+                                    </div>
+                                ` : ''}`;
+
+                    let additionalContent = '';
+                    
                     if (item.type === 'buzzfest') {
-                        return `
-                            <div class="favorite-card" data-type="buzzfest">
-                                <img src="${item.image || '{% static "img/default-venue.jpg" %}'}" 
-                                     alt="${item.name}" 
-                                     class="favorite-image">
-                                <div class="favorite-info">
-                                    <h3>${item.name}</h3>
-                                    <div class="venue-details">
-                                        <p><i class="fas fa-users"></i> Capacity: ${item.capacity}</p>
-                                        <p><i class="fas fa-map-marker-alt"></i> ${item.address}</p>
-                                    </div>
-                                    <div class="action-buttons">
-                                        <button class="remove-favorite" data-id="${item.id}">
-                                            <i class="fas fa-heart"></i>
-                                        </button>
-                                        <button class="book-now" onclick="bookVenue('${item.id}', '${item.name}', '${item.capacity}')">
-                                            Book Now
-                                        </button>
-                                    </div>
-                                </div>
+                        additionalContent = `
+                            <div class="venue-details">
+                                <p><i class="fas fa-users"></i> Capacity: ${item.capacity}</p>
+                                <p><i class="fas fa-map-marker-alt"></i> ${item.address}</p>
                             </div>
-                        `;
+                            <div class="action-buttons">
+                                <button class="remove-favorite" data-id="${item.id}">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                                <button class="book-now" onclick="bookVenue('${item.id}', '${item.name}', '${item.capacity}')">
+                                    Book Now
+                                </button>
+                            </div>`;
                     } else {
-                        // Existing food/dinespot card template
-                        return `
-                            <div class="favorite-card" data-type="${item.type}">
-                                <img src="${item.image || '{% static "img/default-food.jpg" %}'}" 
-                                     alt="${item.name}" 
-                                     class="favorite-image">
-                                <div class="favorite-info">
-                                    <h3>${item.name}</h3>
-                                    ${item.restaurant ? `<p class="restaurant">${item.restaurant}</p>` : ''}
-                                    <div class="price-action">
-                                        <span class="price">₹${item.price || '0.00'}</span>
-                                        <button class="remove-favorite" data-id="${item.id}">
-                                            <i class="fas fa-heart"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                        additionalContent = `
+                            ${item.restaurant ? `<p class="restaurant">${item.restaurant}</p>` : ''}
+                            <div class="price-action">
+                                <span class="price">₹${item.price || '0.00'}</span>
+                                <button class="remove-favorite" data-id="${item.id}" title="Remove from favorites">
+                                    <i class="fas fa-heart"></i>
+                                </button>
                             </div>
-                        `;
+                            ${item.type === 'quickbite' ? `
+                                <button class="book-now add-to-cart" 
+                                        data-id="${item.id}"
+                                        data-name="${item.name}"
+                                        data-price="${item.price}"
+                                        style="margin-top: 10px;">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                            ` : ''}`;
                     }
+
+                    return baseCard + additionalContent + '</div></div>';
                 }).join('');
 
                 favoritesContainer.innerHTML = favoritesHTML;
@@ -439,17 +447,80 @@
                 // Add remove functionality
                 document.querySelectorAll('.remove-favorite').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        removeFavorite(this.dataset.id);
+                        const itemName = this.closest('.favorite-card').querySelector('h3').textContent;
+                        removeFavorite(this.dataset.id, itemName);
+                    });
+                });
+
+                // Add to cart functionality for QuickBite items
+                document.querySelectorAll('.add-to-cart').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const itemData = {
+                            id: this.dataset.id,
+                            name: this.dataset.name,
+                            price: parseFloat(this.dataset.price),
+                            quantity: 1,
+                            type: 'quickbite'
+                        };
+
+                        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                        const existingItemIndex = cart.findIndex(item => item.id === itemData.id);
+                        
+                        if (existingItemIndex === -1) {
+                            cart.push(itemData);
+                        } else {
+                            cart[existingItemIndex].quantity++;
+                        }
+
+                        localStorage.setItem('cart', JSON.stringify(cart));
+                        showToast(`${itemData.name} added to cart`);
+                        updateCartCount();
                     });
                 });
             }
 
-            // Remove favorite
-            function removeFavorite(id) {
+            // Remove favorite with toast notification
+            function removeFavorite(id, itemName) {
                 let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
                 favorites = favorites.filter(item => item.id !== id);
                 localStorage.setItem('favorites', JSON.stringify(favorites));
+                showToast(`${itemName} removed from favorites`);
                 loadFavorites();
+            }
+
+            // Show toast message
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'toast-message';
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    z-index: 1000;
+                    animation: fadeInOut 3s ease;
+                `;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+
+            // Update cart count in header
+            function updateCartCount() {
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                const cartBadge = document.querySelector('.cart-badge');
+                if (cartBadge) {
+                    cartBadge.textContent = totalItems;
+                    cartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
+                }
             }
 
             // Filter favorites

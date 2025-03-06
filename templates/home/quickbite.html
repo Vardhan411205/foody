@@ -778,10 +778,22 @@
                     price: parseFloat(this.dataset.price),
                     image: this.dataset.image,
                     quantity: 1,
-                    type: 'quickbite'
+                    type: 'quickbite',
+                    restaurantName: 'Mr.Foody & Ms.Foody'
                 };
 
                 let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                
+                // Check if items from different restaurants are being added
+                if (cart.length > 0 && cart[0].restaurantName !== itemData.restaurantName) {
+                    const confirmChange = confirm('Your cart contains items from a different restaurant. Would you like to clear your cart and add this item instead?');
+                    if (confirmChange) {
+                        cart = [];
+                    } else {
+                        return;
+                    }
+                }
+                
                 const existingItemIndex = cart.findIndex(item => item.id === itemData.id && item.type === 'quickbite');
                 
                 if (existingItemIndex === -1) {

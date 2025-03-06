@@ -128,15 +128,22 @@
             border: 2px solid #ddd;
             border-radius: 8px;
             text-align: center;
-            font-size: 1.5rem;
+            font-size: 24px;
             font-weight: bold;
             transition: all 0.3s ease;
+            background: white;
         }
 
         .otp-digit:focus {
             border-color: #fc8019;
             box-shadow: 0 0 0 2px rgba(252,128,25,0.2);
             outline: none;
+            transform: scale(1.05);
+        }
+
+        .otp-digit.filled {
+            border-color: #4CAF50;
+            background: #f0f9f0;
         }
 
         .verify-btn {
@@ -489,6 +496,18 @@
                 font-size: 16px;
             }
         }
+
+        /* Add these styles for error state */
+        .otp-digit.error {
+            border-color: #ff4444;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
     </style>
 </head>
 
@@ -531,16 +550,16 @@
                     <!-- OTP Input Section -->
                     <div id="otpSection" class="otp-section">
                         <div class="otp-inputs">
-                            <input type="text" class="otp-digit" maxlength="1" onkeyup="moveToNext(this, 0)">
-                            <input type="text" class="otp-digit" maxlength="1" onkeyup="moveToNext(this, 1)">
-                            <input type="text" class="otp-digit" maxlength="1" onkeyup="moveToNext(this, 2)">
-                            <input type="text" class="otp-digit" maxlength="1" onkeyup="moveToNext(this, 3)">
-                    </div>
-                    <p>OTP: 1234</p>
+                            <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" autofocus>
+                            <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                            <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                            <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                        </div>
+                        <p>OTP: 1234</p>
                         <button class="verify-btn" onclick="verifyOTP()">Verify OTP</button>
                     </div>
-                    </div>
                 </div>
+            </div>
 
             <!-- Success Section (Initially Hidden) -->
             <div id="paymentSuccessSection" class="payment-success" style="display: none;">
@@ -554,13 +573,13 @@
                         <span class="detail-value" id="orderId"></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Restaurant/Venue:</span>
+                        <span class="detail-label">Restaurant:</span>
                         <span class="detail-value" id="restaurantName"></span>
-                        </div>
+                    </div>
                     <div class="detail-row">
                         <span class="detail-label">Amount Paid:</span>
                         <span class="detail-value" id="amountPaid"></span>
-                        </div>
+                    </div>
                     <div class="detail-row">
                         <span class="detail-label">Date & Time:</span>
                         <span class="detail-value" id="orderDateTime"></span>
@@ -568,14 +587,14 @@
                     <div class="detail-row">
                         <span class="detail-label">Status:</span>
                         <span class="detail-value" id="orderStatus"></span>
+                    </div>
                 </div>
-            </div>
 
                 <div class="action-buttons">
                     <button class="action-btn download-btn" onclick="downloadInvoice()">
                         <i class="fas fa-download"></i>
                         Download Invoice
-                </button>
+                    </button>
                     <a href="{% url 'joo:home_page' %}" class="action-btn home-btn">
                         <i class="fas fa-home"></i>
                         Back to Home
@@ -639,169 +658,134 @@
     <!-- Update the script section -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Get order details from session storage
         const orderDetails = JSON.parse(sessionStorage.getItem('orderDetails'));
         if (!orderDetails) {
             window.location.href = "{% url 'joo:cart' %}";
             return;
         }
 
-        // Add event listener for OTP input
-        const otpInput = document.getElementById('otp');
-        otpInput.addEventListener('input', function() {
-            if (this.value === '1234') {
-                // Automatically process payment when correct OTP is entered
-                processPayment();
-            }
-        });
+        // Add OTP input handling
+        const otpDigits = document.querySelectorAll('.otp-digit');
+        
+        otpDigits.forEach((input, index) => {
+            // Allow only numbers
+            input.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                
+                if (this.value) {
+                    this.classList.add('filled');
+                    // Move to next input
+                    if (index < otpDigits.length - 1) {
+                        otpDigits[index + 1].focus();
+                    }
+                    // Auto verify if all digits are filled
+                    if (index === otpDigits.length - 1) {
+                        checkAndVerifyOTP();
+                    }
+                } else {
+                    this.classList.remove('filled');
+                }
+            });
 
-        // Add event listener for verify button
-        document.querySelector('.verify-btn').addEventListener('click', function() {
-            const otp = document.getElementById('otp').value;
-            if (otp === '1234') {
-                processPayment();
-            } else {
-                alert('Invalid OTP! Please enter 1234');
-                document.getElementById('otp').value = '';
-                document.getElementById('otp').focus();
-            }
+            // Handle backspace
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && !this.value && index > 0) {
+                    otpDigits[index - 1].focus();
+                    otpDigits[index - 1].value = '';
+                    otpDigits[index - 1].classList.remove('filled');
+                }
+            });
+
+            // Handle paste
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').slice(0, 4);
+                if (/^\d+$/.test(pastedData)) {
+                    pastedData.split('').forEach((digit, i) => {
+                        if (otpDigits[i]) {
+                            otpDigits[i].value = digit;
+                            otpDigits[i].classList.add('filled');
+                        }
+                    });
+                    if (pastedData.length === 4) {
+                        checkAndVerifyOTP();
+                    }
+                }
+            });
         });
     });
 
-    function initializePaymentFlow(orderDetails) {
-        // Show payment options section by default
-        document.getElementById('paymentOptionsSection').style.display = 'block';
-        document.getElementById('otpSection').style.display = 'none';
-        document.getElementById('paymentSuccessSection').style.display = 'none';
-    }
-
-    function showPaymentFields(method) {
-        // Hide all payment fields
-        document.querySelectorAll('.payment-fields').forEach(field => {
-            field.style.display = 'none';
-        });
+    function checkAndVerifyOTP() {
+        const otpDigits = document.querySelectorAll('.otp-digit');
+        const enteredOTP = Array.from(otpDigits).map(input => input.value).join('');
         
-        // Remove selected class from all methods
-        document.querySelectorAll('.payment-method').forEach(el => {
-            el.classList.remove('selected');
-        });
-        
-        // Show selected payment fields
-        document.getElementById(`${method}Fields`).style.display = 'block';
-        
-        // Add selected class to clicked method
-        event.currentTarget.classList.add('selected');
-    }
-
-    function proceedToOTP() {
-        document.getElementById('paymentOptionsSection').style.display = 'none';
-        document.getElementById('otpSection').style.display = 'block';
-        document.getElementById('otp').focus();
+        if (enteredOTP === '1234') {
+            processPayment();
+        } else if (enteredOTP.length === 4) {
+            // Show error for wrong OTP
+            otpDigits.forEach(input => {
+                input.classList.add('error');
+                input.value = '';
+                input.classList.remove('filled');
+            });
+            otpDigits[0].focus();
+            alert('Invalid OTP! Please enter 1234');
+        }
     }
 
     function verifyOTP() {
-        const verifyBtn = document.querySelector('.verify-btn');
-        if (verifyBtn.disabled) return;
+        const otpDigits = document.querySelectorAll('.otp-digit');
+        const enteredOTP = Array.from(otpDigits).map(input => input.value).join('');
+        
+        if (enteredOTP === '1234') {
+            processPayment();
+        } else {
+            otpDigits.forEach(input => {
+                input.value = '';
+                input.classList.remove('filled');
+            });
+            otpDigits[0].focus();
+            alert('Invalid OTP! Please enter 1234');
+        }
+    }
 
+    function processPayment() {
         const orderDetails = JSON.parse(sessionStorage.getItem('orderDetails'));
         if (!orderDetails) {
             console.error('No order details found');
             return;
         }
 
-        const otpDigits = document.querySelectorAll('.otp-digit');
-        const enteredOTP = Array.from(otpDigits).map(input => input.value).join('');
-
-        if (enteredOTP === '1234') {
-            verifyBtn.textContent = 'Processing...';
-            verifyBtn.disabled = true;
-
-            // Prepare payment data
-            const paymentData = {
-                order_type: orderDetails.orderType,
-                restaurant_id: parseInt(orderDetails.restaurantId || orderDetails.venueId || 0),
-                restaurant_name: orderDetails.restaurantName || orderDetails.venueName || '',
-                restaurant_email: orderDetails.restaurantEmail || '',
-                items: JSON.stringify(orderDetails.items || []),
-                total_amount: parseFloat(orderDetails.total || orderDetails.price || 0),
-                customer_email: '{{ request.user.email }}',
-                booking_date: orderDetails.bookingDate || new Date().toISOString()
-            };
-
-            // Send to server
-            fetch('{% url "joo:payment_confirmation" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify(paymentData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Hide OTP section
-                    document.getElementById('paymentSection').style.display = 'none';
-                    
-                    // Show success section
-                    const successSection = document.getElementById('paymentSuccessSection');
-                    successSection.style.display = 'block';
-
-                    // Update success details
-                    document.getElementById('orderId').textContent = data.data.order_id;
-                    document.getElementById('restaurantName').textContent = orderDetails.restaurantName || orderDetails.venueName;
-                    document.getElementById('amountPaid').textContent = `₹${parseFloat(orderDetails.total || orderDetails.price).toFixed(2)}`;
-                    document.getElementById('orderDateTime').textContent = new Date(data.data.date).toLocaleString();
-                    document.getElementById('orderStatus').textContent = data.data.status;
-
-                    // Store invoice details
-                    const invoiceData = {
-                        ...orderDetails,
-                        orderId: data.data.order_id,
-                        orderDate: data.data.date,
-                        status: data.data.status
-                    };
-                    sessionStorage.setItem('invoiceDetails', JSON.stringify(invoiceData));
-
-                    // Clear cart if food order
-                    if (orderDetails.orderType === 'food') {
-                        localStorage.removeItem('cart');
-                    }
-                    sessionStorage.removeItem('orderDetails');
-                } else {
-                    throw new Error(data.message || 'Payment failed');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Payment failed. Please try again.');
-            })
-            .finally(() => {
-                verifyBtn.textContent = 'Verify OTP';
-                verifyBtn.disabled = false;
-            });
-        } else {
-            alert('Invalid OTP! Please enter 1234');
-            otpDigits.forEach(input => input.value = '');
-            otpDigits[0].focus();
-        }
-    }
-
-    function processPayment() {
-        const orderDetails = JSON.parse(sessionStorage.getItem('orderDetails'));
-        
-        const paymentData = {
-            payment_source: orderDetails.orderType.toLowerCase(),
-            customer_email: '{{ request.user.email }}',
-            restaurant_id: parseInt(orderDetails.restaurantId || orderDetails.venueId || 0),
-            restaurant_name: orderDetails.restaurantName || orderDetails.venueName,
-            items: JSON.stringify(orderDetails.items || []),
-            total_amount: parseFloat(orderDetails.total || orderDetails.price || 0)
-        };
-
         // Show processing message
         document.querySelector('.verify-btn').textContent = 'Processing...';
+        document.querySelector('.verify-btn').disabled = true;
 
+        // Prepare payment data based on order type
+        const paymentData = {
+            order_type: orderDetails.orderType,
+            restaurant_id: parseInt(orderDetails.venueId || orderDetails.restaurantId || 0),
+            restaurant_name: '', // Will be set based on order type
+            items: JSON.stringify(orderDetails.items),
+            total_amount: orderDetails.total,
+            customer_email: '{{ request.user.email }}',
+            booking_date: orderDetails.bookingDate || new Date().toISOString()
+        };
+
+        // Set restaurant_name based on order type
+        if (orderDetails.orderType === 'venue' || orderDetails.orderType === 'buzzfest') {
+            // For venue bookings, use the venue name as restaurant name
+            paymentData.restaurant_name = orderDetails.venueName;
+        } else if (orderDetails.orderType === 'dinespot' || orderDetails.orderType === 'dining') {
+            // For dinespot bookings, use the restaurant name
+            paymentData.restaurant_name = orderDetails.restaurantName;
+        } else {
+            // For food/quickbite orders, use the restaurant name or default
+            paymentData.restaurant_name = orderDetails.restaurantName || 'Mr.Foody & Ms.Foody';
+        }
+
+        console.log('Payment Data:', paymentData); // For debugging
+
+        // Send to server
         fetch('{% url "joo:payment_confirmation" %}', {
             method: 'POST',
             headers: {
@@ -813,97 +797,190 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                // Hide OTP section
-                document.getElementById('otpSection').style.display = 'none';
+                // Hide payment section
+                document.getElementById('paymentSection').style.display = 'none';
                 
                 // Show success section
                 const successSection = document.getElementById('paymentSuccessSection');
                 successSection.style.display = 'block';
-                
-                // Update receipt details
-                document.getElementById('orderId').textContent = data.data.order_id;
-                document.getElementById('restaurantName').textContent = data.data.restaurant_name;
-                document.getElementById('orderDateTime').textContent = new Date().toLocaleString();
-                document.getElementById('amountPaid').textContent = `₹${data.data.total_amount}`;
-                
-                // Show venue details if applicable
-                if (data.data.order_type === 'VENUE') {
-                    document.getElementById('venueDetails').style.display = 'block';
-                }
 
-                // Clear order from session storage
+                // Update success details with venue name for buzzfest orders
+                document.getElementById('orderId').textContent = data.data.order_id;
+                document.getElementById('restaurantName').textContent = 
+                    orderDetails.orderType === 'venue' || orderDetails.orderType === 'buzzfest' 
+                        ? orderDetails.venueName 
+                        : paymentData.restaurant_name;
+                document.getElementById('amountPaid').textContent = `₹${orderDetails.total.toFixed(2)}`;
+                document.getElementById('orderDateTime').textContent = new Date(data.data.date).toLocaleString();
+                document.getElementById('orderStatus').textContent = data.data.status;
+
+                // Store invoice details
+                const invoiceData = {
+                    ...orderDetails,
+                    orderId: data.data.order_id,
+                    orderDate: data.data.date,
+                    status: data.data.status,
+                    // Ensure venue name is stored for buzzfest orders
+                    restaurantName: paymentData.restaurant_name
+                };
+                sessionStorage.setItem('invoiceDetails', JSON.stringify(invoiceData));
+
+                // Clear cart and order details
+                localStorage.removeItem('cart');
                 sessionStorage.removeItem('orderDetails');
-        } else {
+            } else {
                 throw new Error(data.message || 'Payment failed');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert(error.message || 'Payment failed. Please try again.');
+            alert('Payment failed. Please try again.');
         })
         .finally(() => {
             document.querySelector('.verify-btn').textContent = 'Verify OTP';
+            document.querySelector('.verify-btn').disabled = false;
         });
     }
 
-    function showPaymentSuccess(orderData) {
+    function downloadInvoice() {
         try {
-            console.log('Order Data:', orderData); // Debug log
-            
-            // Hide OTP section and payment options
-            document.getElementById('otpSection').style.display = 'none';
-            document.getElementById('paymentOptionsSection').style.display = 'none';
-            
-            // Show success section
-            const successSection = document.getElementById('paymentSuccessSection');
-            successSection.style.display = 'block';
-
-            // Get the stored order details
-            const orderDetails = JSON.parse(sessionStorage.getItem('orderDetails'));
-            console.log('Stored Order Details:', orderDetails); // Debug log
-
-            // Update basic order details
-            updateElementText('orderId', orderData.order_id);
-            updateElementText('restaurantName', orderData.restaurant_name);
-            updateElementText('orderDateTime', new Date().toLocaleString());
-            updateElementText('amountPaid', `₹${orderData.total_amount}`);
-
-            // Handle venue-specific details
-            const venueDetails = document.getElementById('venueDetails');
-            if (orderData.order_type === 'VENUE') {
-                venueDetails.style.display = 'block';
-                if (orderDetails) {
-                    updateElementText('venueCapacity', orderDetails.capacity || 'N/A');
-                    updateElementText('eventDate', orderData.booking_date || 'N/A');
-                }
-            } else {
-                venueDetails.style.display = 'none';
+            const invoiceDetails = JSON.parse(sessionStorage.getItem('invoiceDetails'));
+            if (!invoiceDetails) {
+                alert('Invoice details not found. Please try again.');
+                return;
             }
 
-            // Add success message
-            const successMessage = document.createElement('p');
-            successMessage.className = 'success-message';
-            successMessage.style.color = '#4CAF50';
-            successMessage.style.marginTop = '10px';
-            successMessage.textContent = `Your ${orderData.order_type.toLowerCase()} order has been confirmed!`;
-            successSection.querySelector('.payment-details').appendChild(successMessage);
+            console.log('Invoice Details:', invoiceDetails); // For debugging
 
-            // Clear order details from session storage
-            sessionStorage.removeItem('orderDetails');
+            // Initialize jsPDF
+            window.jspdf = window.jspdf || {};
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) {
+                throw new Error('jsPDF library not loaded properly');
+            }
+
+            const doc = new jsPDF();
+            let yPos = 20;
+
+            // Add header
+            doc.setFontSize(20);
+            doc.setTextColor(252, 128, 25);
+            doc.text('Mr.Foody & Ms.Foody', 105, yPos, { align: 'center' });
+            
+            yPos += 20;
+            doc.setFontSize(16);
+            doc.setTextColor(51, 51, 51);
+            
+            // Set appropriate title based on order type
+            const title = invoiceDetails.orderType === 'venue' || invoiceDetails.orderType === 'buzzfest' 
+                ? 'Venue Booking Invoice' 
+                : 'Order Invoice';
+            doc.text(title, 105, yPos, { align: 'center' });
+
+            // Add order details
+            yPos += 20;
+            doc.setFontSize(12);
+            doc.setTextColor(68, 68, 68);
+
+            const orderDate = new Date(invoiceDetails.orderDate).toLocaleString();
+            const orderDetails = [
+                `Order ID: ${invoiceDetails.orderId}`,
+                `Date: ${orderDate}`
+            ];
+
+            // Add type-specific details
+            if (invoiceDetails.orderType === 'venue' || invoiceDetails.orderType === 'buzzfest') {
+                orderDetails.push(
+                    `Venue: ${invoiceDetails.venueName || invoiceDetails.restaurantName}`,
+                    `Event Date: ${new Date(invoiceDetails.bookingDate).toLocaleDateString()}`
+                );
+            } else {
+                orderDetails.push(`Restaurant: ${invoiceDetails.restaurantName}`);
+            }
+            orderDetails.push(`Status: ${invoiceDetails.status}`);
+
+            orderDetails.forEach(detail => {
+                doc.text(detail, 20, yPos);
+                yPos += 10;
+            });
+
+            // Add items table
+            yPos += 10;
+            doc.text(invoiceDetails.orderType === 'venue' ? 'Booking Details:' : 'Order Items:', 20, yPos);
+            yPos += 10;
+
+            // Prepare table data based on order type
+            let tableHeaders = [];
+            let tableData = [];
+
+            if (invoiceDetails.orderType === 'venue' || invoiceDetails.orderType === 'buzzfest') {
+                tableHeaders = ['Venue', 'Event Date', 'Amount'];
+                tableData = [[
+                    invoiceDetails.venueName || invoiceDetails.restaurantName,
+                    new Date(invoiceDetails.bookingDate).toLocaleDateString(),
+                    `₹${parseFloat(invoiceDetails.total).toFixed(2)}`
+                ]];
+            } else {
+                tableHeaders = ['Item', 'Quantity', 'Price', 'Total'];
+                tableData = invoiceDetails.items.map(item => [
+                    item.name,
+                    item.quantity.toString(),
+                    `₹${parseFloat(item.price).toFixed(2)}`,
+                    `₹${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2)}`
+                ]);
+            }
+
+            // Add table
+            doc.autoTable({
+                startY: yPos,
+                head: [tableHeaders],
+                body: tableData,
+                theme: 'grid',
+                styles: { fontSize: 10, cellPadding: 5 },
+                headStyles: { fillColor: [252, 128, 25], textColor: [255, 255, 255] }
+            });
+
+            // Add summary
+            yPos = doc.lastAutoTable.finalY + 20;
+            let summaryText = [];
+
+            if (invoiceDetails.orderType === 'venue' || invoiceDetails.orderType === 'buzzfest') {
+                const baseAmount = parseFloat(invoiceDetails.total) / 1.18;
+                const gst = parseFloat(invoiceDetails.total) - baseAmount;
+                summaryText = [
+                    `Base Amount: ₹${baseAmount.toFixed(2)}`,
+                    `GST (18%): ₹${gst.toFixed(2)}`,
+                    `Total Amount: ₹${parseFloat(invoiceDetails.total).toFixed(2)}`
+                ];
+            } else {
+                summaryText = [
+                    `Subtotal: ₹${parseFloat(invoiceDetails.subtotal).toFixed(2)}`,
+                    `Delivery Fee: ₹${parseFloat(invoiceDetails.deliveryFee).toFixed(2)}`,
+                    `Total Amount: ₹${parseFloat(invoiceDetails.total).toFixed(2)}`
+                ];
+            }
+
+            summaryText.forEach(text => {
+                doc.text(text, 20, yPos);
+                yPos += 10;
+            });
+
+            // Add footer
+            doc.setFontSize(10);
+            doc.setTextColor(128, 128, 128);
+            const footerText = invoiceDetails.orderType === 'venue' || invoiceDetails.orderType === 'buzzfest'
+                ? 'Thank you for choosing our venue! Please bring this invoice as proof of booking.'
+                : 'Thank you for choosing Mr.Foody & Ms.Foody!';
+            doc.text(footerText, 105, doc.internal.pageSize.height - 20, { align: 'center' });
+
+            // Save with appropriate filename
+            const fileName = `${invoiceDetails.orderType}_invoice_${invoiceDetails.orderId}.pdf`;
+            doc.save(fileName);
 
         } catch (error) {
-            console.error('Error showing payment success:', error);
-            alert('Error displaying order details. Please check your order history.');
-        }
-    }
-
-    // Helper function to safely update element text content
-    function updateElementText(elementId, text) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.textContent = text || 'N/A';
-        } else {
-            console.warn(`Element with id '${elementId}' not found`);
+            console.error('PDF Generation Error:', error);
+            console.log('Invoice Details:', JSON.parse(sessionStorage.getItem('invoiceDetails')));
+            alert('Error generating invoice. Please try again.');
         }
     }
 
@@ -922,172 +999,6 @@
         }
         return cookieValue;
     }
-
-    function downloadInvoice() {
-        const invoiceDetails = JSON.parse(sessionStorage.getItem('invoiceDetails'));
-        if (!invoiceDetails) return;
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        // Add header
-        doc.setFontSize(24);
-        doc.setTextColor(252, 128, 25);
-        doc.text('Mr.Foody & Ms.Foody', 105, 20, { align: 'center' });
-
-        // Add invoice title
-        doc.setFontSize(18);
-        doc.setTextColor(51, 51, 51);
-        doc.text('INVOICE', 105, 35, { align: 'center' });
-
-        // Add line separator
-        doc.setLineWidth(0.5);
-        doc.line(20, 40, 190, 40);
-
-        // Add order details
-        doc.setFontSize(12);
-        doc.setTextColor(51, 51, 51);
-        let yPos = 50;
-
-        // Order info section
-        doc.text(`Order ID: ${invoiceDetails.orderId}`, 20, yPos);
-        doc.text(`Date: ${new Date(invoiceDetails.orderDate).toLocaleString()}`, 120, yPos);
-        yPos += 10;
-
-        // Location name based on order type
-        const locationName = invoiceDetails.orderType === 'venue' ? 
-            `Venue: ${invoiceDetails.venueName}` : 
-            `Restaurant: ${invoiceDetails.restaurantName}`;
-        doc.text(locationName, 20, yPos);
-        yPos += 15;
-
-        // Add order type specific details
-        if (invoiceDetails.items && invoiceDetails.items.length > 0) {
-            const item = invoiceDetails.items[0];
-            const details = item.details || {};
-
-            if (invoiceDetails.orderType === 'dining') {
-                doc.text(`Booking Date: ${new Date(details.date).toLocaleString()}`, 20, yPos);
-                yPos += 10;
-                doc.text(`Number of Guests: ${details.guests}`, 20, yPos);
-                yPos += 10;
-                doc.text(`Table Type: ${details.tableType}`, 20, yPos);
-                yPos += 10;
-                doc.text(`Time Slot: ${details.time}`, 20, yPos);
-                yPos += 10;
-                if (details.specialRequests) {
-                    doc.text(`Special Requests: ${details.specialRequests}`, 20, yPos);
-                    yPos += 10;
-                }
-            } else if (invoiceDetails.orderType === 'venue') {
-                doc.text(`Event Type: ${details.eventType}`, 20, yPos);
-                yPos += 10;
-                doc.text(`Capacity: ${details.capacity} people`, 20, yPos);
-                yPos += 10;
-                doc.text(`Duration: ${details.duration} hours`, 20, yPos);
-                yPos += 10;
-                doc.text(`Booking Date: ${new Date(details.date).toLocaleString()}`, 20, yPos);
-                yPos += 10;
-                if (details.additionalServices && details.additionalServices.length > 0) {
-                    doc.text(`Additional Services: ${details.additionalServices.join(', ')}`, 20, yPos);
-                    yPos += 10;
-                }
-            }
-        }
-
-        // Add payment details
-        yPos += 10;
-        doc.setLineWidth(0.3);
-        doc.line(20, yPos, 190, yPos);
-        yPos += 15;
-
-        doc.setFont(undefined, 'bold');
-        doc.text('Total Amount:', 120, yPos);
-        doc.text(`₹${parseFloat(invoiceDetails.total || invoiceDetails.price || 0).toFixed(2)}`, 170, yPos);
-        doc.setFont(undefined, 'normal');
-
-        // Add footer
-        yPos += 30;
-        doc.setFontSize(10);
-        doc.setTextColor(128, 128, 128);
-        doc.text('Thank you for choosing Mr.Foody & Ms.Foody!', 105, yPos, { align: 'center' });
-        yPos += 10;
-        doc.text('For any queries, please contact our customer support.', 105, yPos, { align: 'center' });
-
-        // Save the PDF
-        doc.save(`invoice_${invoiceDetails.orderId}.pdf`);
-    }
-
-    // Add keyboard support for OTP input
-    document.addEventListener('DOMContentLoaded', function() {
-        const otpInput = document.getElementById('otp');
-        
-        // Auto-verify when 4 digits are entered
-        otpInput.addEventListener('input', function() {
-            if (this.value.length === 4) {
-                if (this.value === '1234') {
-                    processPayment();
-                } else {
-                    alert('Invalid OTP! Please enter 1234');
-                    this.value = '';
-                    this.focus();
-                }
-            }
-        });
-
-        // Handle Enter key
-        otpInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                if (this.value === '1234') {
-                    processPayment();
-                } else {
-                    alert('Invalid OTP! Please enter 1234');
-                    this.value = '';
-                    this.focus();
-                }
-            }
-        });
-    });
-
-    // Add this function to handle OTP digit input
-    function moveToNext(input, index) {
-        const otpDigits = document.querySelectorAll('.otp-digit');
-        
-        // Only allow numbers
-        input.value = input.value.replace(/[^0-9]/g, '');
-        
-        if (input.value.length === 1) {
-            if (index < 3) {
-                // Move to next input
-                otpDigits[index + 1].focus();
-            } else {
-                // Check if complete OTP is entered
-                const enteredOTP = Array.from(otpDigits).map(input => input.value).join('');
-                if (enteredOTP === '1234' && !document.querySelector('.verify-btn').disabled) {
-                    verifyOTP();
-                }
-            }
-        }
-    }
-
-    // Add event listeners when document loads
-    document.addEventListener('DOMContentLoaded', function() {
-        const otpDigits = document.querySelectorAll('.otp-digit');
-        
-        otpDigits.forEach((input, index) => {
-            // Handle input
-            input.addEventListener('input', function() {
-                moveToNext(this, index);
-            });
-
-            // Handle backspace
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace' && !this.value && index > 0) {
-                    otpDigits[index - 1].focus();
-                }
-            });
-        });
-    });
     </script>
 </body>
 

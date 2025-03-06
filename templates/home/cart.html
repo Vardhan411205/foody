@@ -1,0 +1,66 @@
+function updateCart() {
+    const cartContainer = document.getElementById('cart-items-container');
+    const emptyCart = document.querySelector('.empty-cart');
+    const orderSummary = document.querySelector('.order-summary');
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    if (cart.length === 0) {
+        cartContainer.innerHTML = '';
+        emptyCart.style.display = 'flex';
+        orderSummary.style.display = 'none';
+        return;
+    }
+
+    emptyCart.style.display = 'none';
+    orderSummary.style.display = 'block';
+
+    // Group items by restaurant
+    const restaurantGroups = cart.reduce((groups, item) => {
+        const group = groups[item.restaurantName] || [];
+        group.push(item);
+        groups[item.restaurantName] = group;
+        return groups;
+    }, {});
+
+    let cartHTML = '';
+    let subtotal = 0;
+
+    // Generate HTML for each restaurant group
+    Object.entries(restaurantGroups).forEach(([restaurantName, items]) => {
+        cartHTML += `
+            <div class="restaurant-info">
+                <h3>${restaurantName || 'Restaurant'}</h3>
+            </div>
+        `;
+
+        items.forEach(item => {
+            subtotal += item.price * item.quantity;
+            cartHTML += `
+                <div class="cart-item" data-id="${item.id}">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="item-details">
+                        <h4>${item.name}</h4>
+                        <p class="item-price">₹${item.price}</p>
+                    </div>
+                    <div class="quantity-controls">
+                        <button onclick="updateQuantity('${item.id}', -1)">-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateQuantity('${item.id}', 1)">+</button>
+                    </div>
+                    <button class="remove-item" onclick="removeItem('${item.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+        });
+    });
+
+    cartContainer.innerHTML = cartHTML;
+
+    // Update summary
+    const deliveryFee = 40;
+    const total = subtotal + deliveryFee;
+    document.getElementById('subtotal-amount').textContent = `₹${subtotal.toFixed(2)}`;
+    document.getElementById('total-amount').textContent = `₹${total.toFixed(2)}`;
+    document.getElementById('checkout-btn').disabled = false;
+} 

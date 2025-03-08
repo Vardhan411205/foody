@@ -423,20 +423,12 @@
                         additionalContent = `
                             ${item.restaurant ? `<p class="restaurant">${item.restaurant}</p>` : ''}
                             <div class="price-action">
-                                <span class="price">₹${item.price || '0.00'}</span>
+                                <span class="price">${item.price || '0.00'}</span>
                                 <button class="remove-favorite" data-id="${item.id}" title="Remove from favorites">
                                     <i class="fas fa-heart"></i>
                                 </button>
                             </div>
-                            ${item.type === 'quickbite' ? `
-                                <button class="book-now add-to-cart" 
-                                        data-id="${item.id}"
-                                        data-name="${item.name}"
-                                        data-price="${item.price}"
-                                        style="margin-top: 10px;">
-                                    <i class="fas fa-shopping-cart"></i> Add to Cart
-                                </button>
-                            ` : ''}`;
+                            </div></div>`;
                     }
 
                     return baseCard + additionalContent + '</div></div>';
